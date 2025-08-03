@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Design System Colors */
+    --soft-pink: #F8BBD0;
+    --muted-lavender: #E1BEE7;
+    --gentle-mint: #B2DFDB;
+    --warm-beige: #FFF3E0;
+    --light-coral: #FFCDD2;
+    --soft-blue: #BBDEFB;
+    
+    /* Shadcn UI Colors - Light Theme (Pregnancy-themed) */
+    --background: 252 245 224; /* Very light warm beige */
+    --foreground: 51 51 51; /* Dark gray for text */
+    --card: 255 255 255; /* White */
+    --card-foreground: 51 51 51; /* Dark gray */
+    --popover: 255 255 255; /* White */
+    --popover-foreground: 51 51 51; /* Dark gray */
+    --primary: 338 82% 78%; /* Soft pink */
+    --primary-foreground: 0 0% 20%; /* Dark text on primary */
+    --secondary: 295 39% 82%; /* Muted lavender */
+    --secondary-foreground: 0 0% 20%; /* Dark text on secondary */
+    --muted: 36 100% 94%; /* Warm beige */
+    --muted-foreground: 0 0% 45%; /* Medium gray */
+    --accent: 180 39% 82%; /* Gentle mint */
+    --accent-foreground: 0 0% 20%; /* Dark text on accent */
+    --destructive: 0 84% 60%; /* Red for errors */
+    --destructive-foreground: 210 40% 98%; /* Light text on destructive */
+    --border: 36 45% 88%; /* Light warm border */
+    --input: 36 45% 88%; /* Light warm input border */
+    --ring: 338 82% 78%; /* Soft pink focus ring */
+    --radius: 0.75rem; /* Rounded corners for soft feel */
+  }
+
+  .dark {
+    /* Dark theme with warm pregnancy colors */
+    --background: 24 10% 10%; /* Very dark warm */
+    --foreground: 36 100% 94%; /* Light warm text */
+    --card: 24 10% 10%; /* Dark warm card */
+    --card-foreground: 36 100% 94%; /* Light warm text */
+    --popover: 24 10% 10%; /* Dark warm popover */
+    --popover-foreground: 36 100% 94%; /* Light warm text */
+    --primary: 338 82% 78%; /* Keep soft pink */
+    --primary-foreground: 0 0% 20%; /* Dark text on primary */
+    --secondary: 24 10% 15%; /* Dark warm secondary */
+    --secondary-foreground: 36 100% 94%; /* Light warm text */
+    --muted: 24 10% 15%; /* Dark warm muted */
+    --muted-foreground: 36 20% 65%; /* Medium warm gray */
+    --accent: 180 39% 82%; /* Keep gentle mint */
+    --accent-foreground: 0 0% 20%; /* Dark text on accent */
+    --destructive: 0 62% 30%; /* Darker red */
+    --destructive-foreground: 36 100% 94%; /* Light warm text */
+    --border: 24 10% 15%; /* Dark warm border */
+    --input: 24 10% 15%; /* Dark warm input */
+    --ring: 338 82% 78%; /* Soft pink focus ring */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  /* Typography Base Styles */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  
+  .logo {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    text-transform: lowercase;
+  }
+  
+  p, span, div {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+  }
+  
+  /* Pregnancy-themed base styles */
+  .pregnancy-card {
+    @apply bg-warm-beige/50 rounded-2xl p-6 shadow-sm border border-warm-beige;
+  }
+  
+  .pregnancy-button {
+    @apply bg-soft-pink hover:bg-soft-pink/80 text-gray-800 rounded-2xl px-6 py-3 font-medium transition-all duration-200 shadow-sm hover:shadow-md;
+  }
+  
+  .pregnancy-input {
+    @apply bg-white border-2 border-warm-beige rounded-xl px-4 py-3 focus:border-soft-pink focus:ring-2 focus:ring-soft-pink/20 transition-all duration-200;
+  }
+  
+  /* Supportive messaging styles */
+  .supportive-message {
+    @apply bg-gentle-mint/20 border-l-4 border-gentle-mint rounded-r-xl p-4 text-gray-700;
+  }
+  
+  .celebration-message {
+    @apply bg-light-coral/20 border-l-4 border-light-coral rounded-r-xl p-4 text-gray-700;
+  }
+  
+  /* Gentle animations */
+  .fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  .slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  /* Accessibility improvements */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
