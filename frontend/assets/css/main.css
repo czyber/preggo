@@ -2,18 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './animations.css';
+
 @layer base {
   :root {
     /* Design System Colors */
     --soft-pink: #F8BBD0;
     --muted-lavender: #E1BEE7;
     --gentle-mint: #B2DFDB;
-    --warm-beige: #FFF3E0;
+    --warm-neutral: #FFF3E0;
     --light-coral: #FFCDD2;
     --soft-blue: #BBDEFB;
     
     /* Shadcn UI Colors - Light Theme (Pregnancy-themed) */
-    --background: 252 245 224; /* Very light warm beige */
+    --background: 252 245 224; /* Very light warm neutral */
     --foreground: 51 51 51; /* Dark gray for text */
     --card: 255 255 255; /* White */
     --card-foreground: 51 51 51; /* Dark gray */
@@ -90,7 +92,7 @@
   
   /* Pregnancy-themed base styles */
   .pregnancy-card {
-    @apply bg-warm-beige/50 rounded-2xl p-6 shadow-sm border border-warm-beige;
+    @apply bg-warm-neutral/50 rounded-2xl p-6 shadow-sm border border-warm-neutral;
   }
   
   .pregnancy-button {
@@ -98,7 +100,7 @@
   }
   
   .pregnancy-input {
-    @apply bg-white border-2 border-warm-beige rounded-xl px-4 py-3 focus:border-soft-pink focus:ring-2 focus:ring-soft-pink/20 transition-all duration-200;
+    @apply bg-white border-2 border-warm-neutral rounded-xl px-4 py-3 focus:border-soft-pink focus:ring-2 focus:ring-soft-pink/20 transition-all duration-200;
   }
   
   /* Supportive messaging styles */
@@ -119,6 +121,39 @@
     animation: slideUp 0.3s ease-out;
   }
   
+  /* Browser autofill prevention */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus,
+  textarea:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-text-fill-color: rgb(51, 51, 51) !important;
+    background-color: white !important;
+    color: rgb(51, 51, 51) !important;
+  }
+
+  /* Ensure normal text color for all inputs and textareas */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
+  textarea {
+    color: rgb(51, 51, 51) !important;
+  }
+
+  /* Ensure placeholder text is properly styled */
+  input::placeholder,
+  textarea::placeholder {
+    color: rgb(156, 163, 175) !important;
+    opacity: 1;
+  }
+
   /* Accessibility improvements */
   .sr-only {
     position: absolute;

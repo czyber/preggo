@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-warm-beige via-white to-soft-pink/10">
+  <div class="min-h-screen bg-gradient-to-br from-warm-neutral via-white to-soft-pink/10">
     <!-- Loading State -->
     <div v-if="authLoading" class="flex items-center justify-center min-h-screen">
       <div class="text-center space-y-4">
@@ -94,7 +94,7 @@
           </div>
 
           <!-- Trust indicators -->
-          <div class="max-w-2xl mx-auto pt-8 border-t border-warm-beige/40">
+          <div class="max-w-2xl mx-auto pt-8 border-t border-warm-neutral/40">
             <p class="text-xs text-gray-500 font-secondary mb-4">Trusted by expecting families worldwide</p>
             <div class="flex items-center justify-center space-x-8 opacity-60">
               <div class="flex items-center space-x-1">
@@ -133,13 +133,13 @@
               </h1>
               <p class="text-gray-600 font-secondary mt-2">Here's your pregnancy journey overview</p>
             </div>
-            <BaseButton
+            <!-- <BaseButton
               variant="outline"
               size="default"
               @click="auth.signOut()"
             >
               Sign Out
-            </BaseButton>
+            </BaseButton> -->
           </div>
         </div>
 
@@ -164,11 +164,20 @@
 
         <!-- Pregnancy Dashboard - show if user has active pregnancies -->
         <div v-else class="space-y-6">
-          <!-- Create Update Card - Prominent placement at top -->
-          <CreateUpdateCard 
-            :current-pregnancy-week="currentPregnancyDetails?.current_week"
-            :current-mood="currentPregnancyDetails?.current_mood"
-          />
+          <!-- Top Action Cards Row -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Create Update Card -->
+            <CreateUpdateCard 
+              :current-pregnancy-week="currentPregnancyDetails?.current_week"
+              :current-mood="currentPregnancyDetails?.current_mood"
+            />
+            
+            <!-- Family Feed Card -->
+            <FamilyFeedCard 
+              :current-pregnancy="pregnancyStore.currentPregnancy"
+              @view-feed="handleViewFamilyFeed"
+            />
+          </div>
 
           <!-- Main Pregnancy Overview -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -193,6 +202,7 @@
               @add-photo="handleAddPhoto"
               @schedule-appointment="handleScheduleAppointment"
               @track-weight="handleTrackWeight"
+              @view-family-feed="handleViewFamilyFeed"
             />
             <MilestonesCard 
               :current-week="currentPregnancyDetails?.current_week"
@@ -219,6 +229,7 @@ import QuickActionsCard from "~/components/pregnancy/QuickActionsCard.vue";
 import MilestonesCard from "~/components/pregnancy/MilestonesCard.vue";
 import RecentActivityCard from "~/components/pregnancy/RecentActivityCard.vue";
 import CreateUpdateCard from "~/components/pregnancy/CreateUpdateCard.vue";
+import FamilyFeedCard from "~/components/pregnancy/FamilyFeedCard.vue";
 
 const router = useRouter()
 
@@ -267,6 +278,14 @@ const handleTrackWeight = () => {
 const handleViewAllActivity = () => {
   console.log('Navigate to all activity')
   // TODO: Navigate to activity feed page
+}
+
+const handleViewFamilyFeed = () => {
+  if (pregnancyStore.currentPregnancy?.id) {
+    router.push(`/feed/${pregnancyStore.currentPregnancy.id}`)
+  } else {
+    router.push('/family-feed')
+  }
 }
 
 // Load pregnancies when user is logged in

@@ -156,6 +156,28 @@ export const useFamilyStore = defineStore('family', () => {
     }
   }
 
+  async function fetchFamilyMembersByPregnancy(pregnancyId: string) {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const api = useApi()
+      
+      const { data, error: apiError } = await api.getPregnancyFamilyMembers(pregnancyId)
+      
+      if (apiError) {
+        throw new Error(`Failed to fetch family members: ${apiError}`)
+      }
+      
+      familyMembers.value = data || []
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error'
+      console.error('Error fetching family members:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function addFamilyMember(memberData: FamilyMemberCreate) {
     try {
       const api = useApi()
@@ -324,6 +346,7 @@ export const useFamilyStore = defineStore('family', () => {
     createFamilyGroup,
     updateFamilyGroup,
     fetchFamilyMembers,
+    fetchFamilyMembersByPregnancy,
     addFamilyMember,
     updateFamilyMember,
     removeFamilyMember,

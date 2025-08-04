@@ -43,11 +43,11 @@ const cardVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-card border-warm-beige hover:shadow-md',
+        default: 'bg-card border-warm-neutral hover:shadow-md',
         supportive: 'bg-gentle-mint/10 border-gentle-mint/30 hover:bg-gentle-mint/15 hover:shadow-md',
         celebration: 'bg-light-coral/10 border-light-coral/30 hover:bg-light-coral/15 hover:shadow-md',
         calming: 'bg-muted-lavender/10 border-muted-lavender/30 hover:bg-muted-lavender/15 hover:shadow-md',
-        warm: 'bg-warm-beige/30 border-warm-beige/50 hover:bg-warm-beige/40 hover:shadow-md',
+        warm: 'bg-warm-neutral/30 border-warm-neutral/50 hover:bg-warm-neutral/40 hover:shadow-md',
         milestone: 'bg-gradient-to-br from-soft-pink/10 to-gentle-mint/10 border-soft-pink/20 hover:shadow-lg',
         progress: 'bg-gradient-to-r from-gentle-mint/5 to-soft-blue/5 border-gentle-mint/20 hover:shadow-md',
       },
@@ -73,7 +73,7 @@ const headerVariants = cva(
         supportive: 'border-b border-gentle-mint/20 pb-4 mb-4',
         celebration: 'border-b border-light-coral/20 pb-4 mb-4',
         calming: 'border-b border-muted-lavender/20 pb-4 mb-4',
-        warm: 'border-b border-warm-beige/40 pb-4 mb-4',
+        warm: 'border-b border-warm-neutral/40 pb-4 mb-4',
         milestone: 'border-b border-soft-pink/20 pb-4 mb-4',
         progress: 'border-b border-gentle-mint/20 pb-4 mb-4',
       },
@@ -155,11 +155,11 @@ const footerVariants = cva(
   {
     variants: {
       variant: {
-        default: 'border-t border-warm-beige/40',
+        default: 'border-t border-warm-neutral/40',
         supportive: 'border-t border-gentle-mint/20',
         celebration: 'border-t border-light-coral/20',
         calming: 'border-t border-muted-lavender/20',
-        warm: 'border-t border-warm-beige/40',
+        warm: 'border-t border-warm-neutral/40',
         milestone: 'border-t border-soft-pink/20',
         progress: 'border-t border-gentle-mint/20',
       },

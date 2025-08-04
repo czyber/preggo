@@ -174,9 +174,15 @@ export const useApi = () => {
         params: { path: { post_id: postId } }
       }),
     
-    recordPostView: (postId: string) =>
+    recordPostView: (postId: string, data?: { time_spent?: number, source?: string }) =>
       loggedPOST('/posts/{post_id}/view', {
-        params: { path: { post_id: postId } }
+        params: { path: { post_id: postId } },
+        body: {
+          post_id: postId,
+          user_id: '', // Will be set by backend from auth
+          time_spent: data?.time_spent || null,
+          source: data?.source || 'timeline'
+        }
       }),
 
     // ==================== COMMENTS ====================
@@ -185,9 +191,9 @@ export const useApi = () => {
         params: { path: { post_id: postId } }
       }),
     
-    createComment: (postId: string, data: any) =>
+    createComment: (data: any) =>
       loggedPOST('/posts/{post_id}/comments', {
-        params: { path: { post_id: postId } },
+        params: { path: { post_id: data.post_id } },
         body: data
       }),
     
@@ -200,6 +206,82 @@ export const useApi = () => {
     deleteComment: (commentId: string) =>
       loggedDELETE('/posts/comments/{comment_id}', {
         params: { path: { comment_id: commentId } }
+      }),
+
+    // ==================== FEED ====================
+    getFamilyFeed: (pregnancyId: string, params?: any) =>
+      loggedGET('/feed/family/{pregnancy_id}', {
+        params: {
+          path: { pregnancy_id: pregnancyId },
+          query: params
+        }
+      }),
+
+    getPersonalTimeline: (pregnancyId: string) =>
+      loggedGET('/feed/personal/{pregnancy_id}', {
+        params: { path: { pregnancy_id: pregnancyId } }
+      }),
+
+    getFeedFilters: () => loggedGET('/feed/filters'),
+
+    getTrendingPosts: (pregnancyId: string) =>
+      loggedGET('/feed/trending/{pregnancy_id}', {
+        params: { path: { pregnancy_id: pregnancyId } }
+      }),
+
+    getPregnancyCelebrations: (pregnancyId: string, limit?: number) =>
+      loggedGET('/feed/celebrations/{pregnancy_id}', {
+        params: { 
+          path: { pregnancy_id: pregnancyId },
+          query: limit ? { limit } : {}
+        }
+      }),
+
+    // ==================== FAMILY ====================
+    getFamilyGroupMembers: (groupId: string) =>
+      loggedGET('/family/members/{group_id}', {
+        params: { path: { group_id: groupId } }
+      }),
+
+    getPregnancyFamilyMembers: (pregnancyId: string) =>
+      loggedGET('/family/{pregnancy_id}/members', {
+        params: { path: { pregnancy_id: pregnancyId } }
+      }),
+
+    addFamilyMember: (groupId: string, data: any) =>
+      loggedPOST('/family/{group_id}/members', {
+        params: { path: { group_id: groupId } },
+        body: data
+      }),
+
+    updateFamilyMember: (groupId: string, memberId: string, data: any) =>
+      loggedPUT('/family/{group_id}/members/{member_id}', {
+        params: { path: { group_id: groupId, member_id: memberId } },
+        body: data
+      }),
+
+    removeFamilyMember: (groupId: string, memberId: string) =>
+      loggedDELETE('/family/{group_id}/members/{member_id}', {
+        params: { path: { group_id: groupId, member_id: memberId } }
+      }),
+
+    inviteFamilyMember: (groupId: string, data: any) =>
+      loggedPOST('/family/{group_id}/invite', {
+        params: { path: { group_id: groupId } },
+        body: data
+      }),
+
+    getFamilyGroup: (groupId: string) =>
+      loggedGET('/family/{group_id}', {
+        params: { path: { group_id: groupId } }
+      }),
+
+    createFamilyGroup: (data: any) => loggedPOST('/family/', { body: data }),
+
+    updateFamilyGroup: (groupId: string, data: any) =>
+      loggedPUT('/family/{group_id}', {
+        params: { path: { group_id: groupId } },
+        body: data
       }),
   }
 }

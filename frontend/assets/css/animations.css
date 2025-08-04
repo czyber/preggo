@@ -1,0 +1,556 @@
+/**
+ * Pregnancy-Themed Animation CSS
+ * 
+ * Warm, supportive, and celebratory animations designed for a pregnancy tracking app.
+ * Follows accessibility guidelines and respects reduced motion preferences.
+ */
+
+/* === KEYFRAME DEFINITIONS === */
+
+/* Gentle fade in with upward movement */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Gentle fade in with scale */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Celebration sparkle animation */
+@keyframes sparkle-celebration {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1.2) rotate(315deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0) rotate(360deg);
+  }
+}
+
+/* Floating heart animation */
+@keyframes heart-float {
+  0% {
+    opacity: 0;
+    transform: translateY(0) translateX(0) scale(0.8);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(-10px) translateX(5px) scale(1);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(-60px) translateX(var(--drift, 0px)) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-80px) translateX(var(--drift, 0px)) scale(0.8);
+  }
+}
+
+/* Confetti burst animation */
+@keyframes confetti-burst {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100px) scale(0.5) rotate(720deg);
+  }
+}
+
+/* Gentle pulse for attention */
+@keyframes gentle-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.9;
+  }
+}
+
+/* Supportive glow animation */
+@keyframes supportive-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(178, 223, 219, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(178, 223, 219, 0.4);
+  }
+}
+
+/* Celebration bounce */
+@keyframes celebration-bounce {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.05) rotate(-2deg);
+  }
+  75% {
+    transform: scale(1.1) rotate(2deg);
+  }
+}
+
+/* Gentle shake for notifications */
+@keyframes gentle-shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+}
+
+/* Milestone celebration border glow */
+@keyframes milestone-border-glow {
+  0%, 100% {
+    border-color: rgba(248, 187, 208, 0.3);
+    box-shadow: 0 0 10px rgba(248, 187, 208, 0.1);
+  }
+  50% {
+    border-color: rgba(248, 187, 208, 0.6);
+    box-shadow: 0 0 20px rgba(248, 187, 208, 0.3);
+  }
+}
+
+/* Gentle wiggle for playful elements */
+@keyframes gentle-wiggle {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(1deg);
+  }
+  75% {
+    transform: rotate(-1deg);
+  }
+}
+
+/* Loading spinner with hearts */
+@keyframes heart-spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Reaction counter increment */
+@keyframes counter-increment {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+    color: #F8BBD0;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Gentle slide in from left */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Gentle slide in from right */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Celebration confetti falling */
+@keyframes confetti-fall {
+  0% {
+    opacity: 1;
+    transform: translateY(-100vh) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100vh) rotate(360deg);
+  }
+}
+
+/* Warm color pulse */
+@keyframes warm-color-pulse {
+  0%, 100% {
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  50% {
+    filter: hue-rotate(10deg) brightness(1.1);
+  }
+}
+
+/* === UTILITY CLASSES === */
+
+/* Base animation setup */
+.animate-in {
+  animation-fill-mode: both;
+}
+
+/* Fade and movement animations */
+.animate-fadeInUp {
+  animation: fadeInUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.animate-fadeInScale {
+  animation: fadeInScale 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.animate-slideInLeft {
+  animation: slideInLeft 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Supportive animations */
+.animate-supportive {
+  animation: supportive-glow 2s ease-in-out infinite;
+}
+
+.animate-gentle-pulse {
+  animation: gentle-pulse 2s ease-in-out infinite;
+}
+
+.animate-celebration-bounce {
+  animation: celebration-bounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-gentle-shake {
+  animation: gentle-shake 0.5s ease-in-out;
+}
+
+.animate-gentle-wiggle {
+  animation: gentle-wiggle 1s ease-in-out infinite;
+}
+
+.animate-milestone-glow {
+  animation: milestone-border-glow 3s ease-in-out infinite;
+}
+
+.animate-warm-pulse {
+  animation: warm-color-pulse 3s ease-in-out infinite;
+}
+
+/* === HOVER EFFECTS === */
+
+/* Gentle hover lift */
+.hover-gentle-lift {
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.hover-gentle-lift:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(248, 187, 208, 0.15);
+  filter: brightness(1.05);
+}
+
+/* Supportive hover glow */
+.hover-supportive-glow {
+  transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.hover-supportive-glow:hover {
+  box-shadow: 0 0 20px rgba(178, 223, 219, 0.4);
+  border-color: rgba(178, 223, 219, 0.6);
+}
+
+/* Celebration hover effect */
+.hover-celebration {
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.hover-celebration:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1) saturate(1.2);
+}
+
+/* Reaction button hover */
+.hover-reaction {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-reaction:hover {
+  transform: scale(1.1);
+  background-color: rgba(248, 187, 208, 0.2);
+  border-color: rgba(248, 187, 208, 0.5);
+}
+
+/* === LOADING ANIMATIONS === */
+
+/* Heart spinner loader */
+.loading-hearts {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  position: relative;
+}
+
+.loading-hearts::before {
+  content: '💕';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+  animation: heart-spinner 1s linear infinite;
+}
+
+/* Gentle loading dots */
+.loading-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.loading-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #F8BBD0;
+  animation: gentle-pulse 1.4s ease-in-out infinite both;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+.loading-dots span:nth-child(3) { animation-delay: 0s; }
+
+/* === MICRO-INTERACTIONS === */
+
+/* Button press effect */
+.button-press {
+  transition: transform 0.1s ease;
+}
+
+.button-press:active {
+  transform: scale(0.98);
+}
+
+/* Card interaction */
+.card-interactive {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-interactive:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Counter animation */
+.counter-animate {
+  animation: counter-increment 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* === CELEBRATION EFFECTS === */
+
+/* Special milestone celebration background */
+.celebration-background {
+  position: relative;
+  overflow: hidden;
+}
+
+.celebration-background::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, 
+    rgba(248, 187, 208, 0.1) 0%, 
+    rgba(178, 223, 219, 0.1) 50%, 
+    rgba(225, 190, 231, 0.1) 100%);
+  animation: warm-color-pulse 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Sparkle effect overlay */
+.sparkle-overlay {
+  position: relative;
+}
+
+.sparkle-overlay::after {
+  content: '✨';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 14px;
+  opacity: 0.7;
+  animation: gentle-wiggle 2s ease-in-out infinite;
+}
+
+/* === SCROLL ANIMATIONS === */
+
+/* Stagger animation delays for lists */
+.animate-stagger > *:nth-child(1) { animation-delay: 0.1s; }
+.animate-stagger > *:nth-child(2) { animation-delay: 0.2s; }
+.animate-stagger > *:nth-child(3) { animation-delay: 0.3s; }
+.animate-stagger > *:nth-child(4) { animation-delay: 0.4s; }
+.animate-stagger > *:nth-child(5) { animation-delay: 0.5s; }
+.animate-stagger > *:nth-child(6) { animation-delay: 0.6s; }
+
+/* === ACCESSIBILITY === */
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  /* Keep essential animations but make them instant */
+  .loading-dots span,
+  .loading-hearts::before {
+    animation: none;
+  }
+  
+  /* Remove floating and moving animations */
+  .animate-gentle-pulse,
+  .animate-supportive,
+  .animate-gentle-wiggle,
+  .animate-milestone-glow,
+  .animate-warm-pulse {
+    animation: none;
+  }
+  
+  /* Keep hover effects but remove transitions */
+  .hover-gentle-lift:hover,
+  .hover-supportive-glow:hover,
+  .hover-celebration:hover,
+  .hover-reaction:hover {
+    transition: none;
+  }
+}
+
+/* === EMOTION-SPECIFIC CLASSES === */
+
+/* Calming animations */
+.emotion-calm {
+  animation-duration: 800ms;
+  animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* Excited animations */
+.emotion-excited {
+  animation-duration: 250ms;
+  animation-timing-function: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+}
+
+/* Supportive animations */
+.emotion-supportive {
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Celebratory animations */
+.emotion-celebratory {
+  animation-duration: 600ms;
+  animation-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* === COMPONENT-SPECIFIC ANIMATIONS === */
+
+/* Feed post card animations */
+.feed-post-enter {
+  animation: fadeInUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.feed-post-celebration {
+  animation: celebration-bounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Reaction picker animations */
+.reaction-picker-enter {
+  animation: fadeInScale 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top center;
+}
+
+.reaction-option-hover {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reaction-option-hover:hover {
+  transform: scale(1.05);
+  background-color: rgba(248, 187, 208, 0.1);
+}
+
+/* Timeline animations */
+.timeline-item-enter {
+  animation: slideInLeft 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Engagement animations */
+.engagement-reaction-increment {
+  animation: counter-increment 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* === UTILITY HELPERS === */
+
+/* Hide elements that should only appear on animation */
+.animate-hidden {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Ensure smooth hardware acceleration */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* Remove animation after completion */
+.animation-none {
+  animation: none !important;
+}
+
+/* Pause animations */
+.animation-paused {
+  animation-play-state: paused !important;
+}

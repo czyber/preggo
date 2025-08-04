@@ -17,7 +17,7 @@ module.exports = {
         'gentle-mint': '#B2DFDB',
         
         // Secondary Colors
-        'warm-beige': '#FFF3E0',
+        'warm-neutral': '#F8FAFC',
         'light-coral': '#FFCDD2',
         'soft-blue': '#BBDEFB',
         
@@ -75,6 +75,11 @@ module.exports = {
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.3s ease-out',
+        'celebration-ripple': 'ripple 2s ease-out forwards',
+        'celebration-heart': 'heartEmerge 0.8s ease-out forwards',
+        'celebration-pulse': 'heartPulse 0.6s ease-in-out',
+        'celebration-sparkle': 'sparkleFloat 1.5s ease-out forwards',
+        'celebration-glow': 'glowFade 2.5s ease-in-out',
       },
       keyframes: {
         fadeIn: {
@@ -84,6 +89,31 @@ module.exports = {
         slideUp: {
           '0%': { transform: 'translateY(10px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        ripple: {
+          '0%': { transform: 'scale(0)', opacity: '0.8' },
+          '50%': { opacity: '0.4' },
+          '100%': { transform: 'scale(4)', opacity: '0' },
+        },
+        heartEmerge: {
+          '0%': { transform: 'scale(0)', opacity: '0' },
+          '70%': { transform: 'scale(1.1)' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        heartPulse: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.1)' },
+        },
+        sparkleFloat: {
+          '0%': { transform: 'translateY(0) scale(0)', opacity: '0' },
+          '20%': { opacity: '1', transform: 'scale(1)' },
+          '100%': { transform: 'translateY(-80px) scale(0.5)', opacity: '0' },
+        },
+        glowFade: {
+          '0%': { opacity: '0', transform: 'scale(0.8)' },
+          '30%': { opacity: '1', transform: 'scale(1)' },
+          '70%': { opacity: '0.8' },
+          '100%': { opacity: '0', transform: 'scale(1.2)' },
         },
       },
     },

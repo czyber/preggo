@@ -23,7 +23,7 @@ const buttonVariants = cva(
         celebration: 'bg-light-coral hover:bg-light-coral/80 text-gray-800 shadow-sm hover:shadow-md',
         calming: 'bg-muted-lavender hover:bg-muted-lavender/80 text-gray-800 shadow-sm hover:shadow-md',
         // Standard variants adapted for pregnancy theme
-        secondary: 'bg-warm-beige hover:bg-warm-beige/80 text-gray-800 border border-warm-beige/50 shadow-sm hover:shadow-md',
+        secondary: 'bg-warm-neutral hover:bg-warm-neutral/80 text-gray-800 border border-warm-neutral/50 shadow-sm hover:shadow-md',
         ghost: 'hover:bg-soft-pink/10 hover:text-gray-800 text-gray-600',
         link: 'text-soft-pink underline-offset-4 hover:underline',
         outline: 'border border-soft-pink bg-background hover:bg-soft-pink/10 hover:text-gray-800 text-soft-pink',

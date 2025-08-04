@@ -216,9 +216,11 @@ class CommentService(BaseService[Comment]):
         post_id: str,
         parent_id: Optional[str] = None
     ) -> List[Comment]:
-        """Get comments for a post."""
+        """Get comments for a post with author information."""
         try:
-            statement = select(Comment).where(
+            from app.models.user import User
+            
+            statement = select(Comment).join(User).where(
                 Comment.post_id == post_id
             )
             
@@ -239,7 +241,7 @@ class CommentService(BaseService[Comment]):
         session: Session, 
         comment_data: Dict[str, Any]
     ) -> Optional[Comment]:
-        """Create a new comment."""
+        """Create a new comment and return it with author information."""
         try:
             comment = await self.create(session, comment_data)
             
@@ -251,6 +253,13 @@ class CommentService(BaseService[Comment]):
                     post.comment_count += 1
                     session.add(post)
                     session.commit()
+                
+                # Fetch the comment with author information
+                from app.models.user import User
+                comment_with_author = session.exec(
+                    select(Comment).join(User).where(Comment.id == comment.id)
+                ).first()
+                return comment_with_author
             
             return comment
         except Exception as e:

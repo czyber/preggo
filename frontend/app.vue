@@ -4,5 +4,6 @@
       <NuxtPage />
     </NuxtLayout>
     <Toast />
+    <CelebrationAnimation />
   </div>
 </template>

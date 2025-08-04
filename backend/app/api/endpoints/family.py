@@ -278,6 +278,49 @@ async def get_group_members(
         )
 
 
+@router.get("/{pregnancy_id}/members", response_model=List[FamilyMemberResponse])
+async def get_pregnancy_family_members(
+    pregnancy_id: str,
+    current_user: Dict[str, Any] = Depends(get_current_active_user),
+    session: Session = Depends(get_session)
+):
+    """Get all family members across all groups for a pregnancy."""
+    try:
+        user_id = current_user["sub"]
+        
+        # Verify user has access to the pregnancy
+        if not await pregnancy_service.user_owns_pregnancy(session, user_id, pregnancy_id):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You don't have access to this pregnancy"
+            )
+        
+        # Get all family groups for this pregnancy
+        groups = await family_group_service.get_pregnancy_groups(session, pregnancy_id)
+        
+        # Get all members from all groups
+        all_members = []
+        for group in groups:
+            members = await family_member_service.get_group_members(session, group.id)
+            all_members.extend(members)
+        
+        # Remove duplicates (same user might be in multiple groups)
+        unique_members = {}
+        for member in all_members:
+            if member.user_id not in unique_members:
+                unique_members[member.user_id] = member
+        
+        return [FamilyMemberResponse.from_orm(member) for member in unique_members.values()]
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get pregnancy family members: {str(e)}"
+        )
+
+
 @router.put("/members/{member_id}", response_model=FamilyMemberResponse)
 async def update_family_member(
     member_id: str,

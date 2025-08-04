@@ -88,7 +88,7 @@
             id="agree-terms"
             v-model="agreeTerms"
             type="checkbox"
-            class="mt-1 h-4 w-4 text-gentle-mint focus:ring-gentle-mint/50 border-warm-beige rounded"
+            class="mt-1 h-4 w-4 text-gentle-mint focus:ring-gentle-mint/50 border-warm-neutral rounded"
             required
           />
           <label for="agree-terms" class="text-sm text-gray-700 font-secondary leading-relaxed">

@@ -54,7 +54,7 @@
               id="remember-me"
               v-model="rememberMe"
               type="checkbox"
-              class="h-4 w-4 text-soft-pink focus:ring-soft-pink/50 border-warm-beige rounded"
+              class="h-4 w-4 text-soft-pink focus:ring-soft-pink/50 border-warm-neutral rounded"
             />
             <label for="remember-me" class="text-sm text-gray-600 font-secondary">
               Remember me
@@ -81,7 +81,7 @@
       </form>
 
       <!-- Sign up link -->
-      <div class="text-center pt-4 border-t border-warm-beige/40">
+      <div class="text-center pt-4 border-t border-warm-neutral/40">
         <p class="text-sm text-gray-600 font-secondary">
           New to Preggo?
           <NuxtLink 
@@ -97,7 +97,7 @@
       <div class="space-y-3">
         <div class="relative">
           <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-warm-beige/40"></div>
+            <div class="w-full border-t border-warm-neutral/40"></div>
           </div>
           <div class="relative flex justify-center text-xs uppercase">
             <span class="bg-card px-2 text-gray-500 font-secondary">Or continue with</span>

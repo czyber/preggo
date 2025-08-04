@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.endpoints import items, logs, auth, pregnancies, family, posts, milestones, health
+from app.api.endpoints import items, logs, auth, pregnancies, family, posts, milestones, health, feed
 
 api_router = APIRouter()
 api_router.include_router(items.router)
@@ -11,3 +11,4 @@ api_router.include_router(family.router, tags=["family"])
 api_router.include_router(posts.router, tags=["posts"])
 api_router.include_router(milestones.router,  tags=["milestones"])
 api_router.include_router(health.router, tags=["health"])
+api_router.include_router(feed.router, tags=["feed"])

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-warm-beige via-white to-soft-pink/20 flex items-center justify-center">
+  <div class="min-h-screen bg-gradient-to-br from-warm-neutral via-white to-soft-pink/20 flex items-center justify-center">
     <!-- Background decoration -->
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
       <div class="absolute -top-40 -right-40 w-80 h-80 bg-soft-pink/10 rounded-full blur-3xl"></div>

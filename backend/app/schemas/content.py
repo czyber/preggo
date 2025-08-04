@@ -1,10 +1,26 @@
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from pydantic import BaseModel
 from datetime import datetime
 from app.models.content import (
     PostType, PostStatus, ReactionType, MediaType, PostContent, PostPrivacy,
     MediaMetadata, VisibilityLevel
 )
+
+
+class AuthorResponse(BaseModel):
+    """Schema for author information in comments"""
+    id: str
+    email: str
+    first_name: str
+    last_name: str
+    profile_image: Optional[str] = None
+    
+    @property
+    def display_name(self) -> str:
+        return f"{self.first_name} {self.last_name}".strip()
+    
+    class Config:
+        from_attributes = True
 
 
 class MediaItemBase(BaseModel):
@@ -132,6 +148,7 @@ class CommentResponse(CommentBase):
     reply_count: int
     created_at: datetime
     updated_at: datetime
+    author: Optional[AuthorResponse] = None  # Author information from User model
 
     class Config:
         from_attributes = True

@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-warm-beige/20">
+  <div class="min-h-screen bg-warm-neutral/20">
     <!-- Navigation Header -->
-    <nav class="bg-white/80 backdrop-blur-sm shadow-sm border-b border-warm-beige/30">
+    <nav class="bg-white/80 backdrop-blur-sm shadow-sm border-b border-warm-neutral/30">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-18">
           <div class="flex items-center">
@@ -49,9 +49,17 @@
               <Activity class="h-4 w-4" />
               <span>Health</span>
             </NuxtLink>
+            <NuxtLink
+              to="/family-feed"
+              class="nav-link"
+              :class="{ 'nav-link-active': isCurrentRoute('/family-feed') || isCurrentRoute('/feed') }"
+            >
+              <Users class="h-4 w-4" />
+              <span>Family</span>
+            </NuxtLink>
             
             <!-- User Menu -->
-            <div class="ml-4 pl-4 border-l border-warm-beige/40">
+            <div class="ml-4 pl-4 border-l border-warm-neutral/40">
               <BaseButton
                 variant="ghost"
                 size="sm"
@@ -74,7 +82,7 @@
     </main>
 
     <!-- Supportive Footer -->
-    <footer class="bg-white/60 backdrop-blur-sm border-t border-warm-beige/30 mt-16">
+    <footer class="bg-white/60 backdrop-blur-sm border-t border-warm-neutral/30 mt-16">
       <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div class="text-center">
           <p class="text-sm text-gray-600 font-secondary">
@@ -97,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import { Baby, Home, Heart, Sparkles, Activity, User } from 'lucide-vue-next'
+import { Baby, Home, Heart, Sparkles, Activity, User, Users } from 'lucide-vue-next'
 
 // Navigation helper
 const route = useRoute()

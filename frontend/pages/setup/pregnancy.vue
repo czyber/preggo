@@ -1,6 +1,6 @@
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-warm-beige via-white to-gentle-mint/10 py-8">
+  <div class="min-h-screen bg-gradient-to-br from-warm-neutral via-white to-gentle-mint/10 py-8">
     <div class="max-w-2xl mx-auto px-4">
       <!-- Header -->
       <div class="text-center mb-8">

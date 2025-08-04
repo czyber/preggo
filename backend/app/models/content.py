@@ -1,8 +1,11 @@
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, TYPE_CHECKING
 from sqlmodel import Field, SQLModel, JSON, Column, Relationship
 from datetime import datetime
 import uuid
 from enum import Enum
+
+if TYPE_CHECKING:
+    from app.models.user import User
 
 
 class PostType(str, Enum):
@@ -240,6 +243,9 @@ class Comment(SQLModel, table=True):
     # Timestamps
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
+    
+    # Relationships
+    author: Optional["User"] = Relationship(back_populates="comments")
 
 
 class PostView(SQLModel, table=True):

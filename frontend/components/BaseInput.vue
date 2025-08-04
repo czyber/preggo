@@ -42,7 +42,7 @@ const inputVariants = cva(
   {
     variants: {
       variant: {
-        default: 'border-warm-beige focus-visible:ring-soft-pink/50 focus-visible:border-soft-pink bg-white',
+        default: 'border-warm-neutral focus-visible:ring-soft-pink/50 focus-visible:border-soft-pink bg-white',
         supportive: 'border-gentle-mint focus-visible:ring-gentle-mint/50 focus-visible:border-gentle-mint bg-gentle-mint/5',
         celebration: 'border-light-coral focus-visible:ring-light-coral/50 focus-visible:border-light-coral bg-light-coral/5',
         outline: 'border-input bg-background hover:bg-accent hover:text-accent-foreground',
@@ -124,6 +124,7 @@ defineEmits<{
 input {
   font-family: 'Roboto', sans-serif;
   font-weight: 400;
+  color: rgb(51, 51, 51) !important;
 }
 
 label {

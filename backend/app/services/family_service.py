@@ -212,6 +212,30 @@ class FamilyMemberService(BaseService[FamilyMember]):
         except Exception as e:
             logger.error(f"Error removing family member {member_id}: {e}")
             return False
+    
+    async def get_pregnancy_members(
+        self, 
+        session: Session, 
+        pregnancy_id: str,
+        status: Optional[MemberStatus] = None
+    ) -> List[FamilyMember]:
+        """Get all family members for a pregnancy."""
+        try:
+            statement = select(FamilyMember).where(
+                FamilyMember.pregnancy_id == pregnancy_id
+            )
+            
+            if status:
+                statement = statement.where(FamilyMember.status == status)
+            else:
+                # Default to active members
+                statement = statement.where(FamilyMember.status == MemberStatus.ACTIVE)
+            
+            results = session.exec(statement).all()
+            return results
+        except Exception as e:
+            logger.error(f"Error getting members for pregnancy {pregnancy_id}: {e}")
+            return []
 
 
 class FamilyInvitationService(BaseService[FamilyInvitation]):

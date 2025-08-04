@@ -1,8 +1,11 @@
-from typing import Optional, Dict, Any
-from sqlmodel import Field, SQLModel, JSON, Column
+from typing import Optional, Dict, Any, List, TYPE_CHECKING
+from sqlmodel import Field, SQLModel, JSON, Column, Relationship
 from datetime import datetime
 import uuid
 from enum import Enum
+
+if TYPE_CHECKING:
+    from app.models.content import Comment
 
 
 class NotificationSettings(SQLModel):
@@ -76,6 +79,9 @@ class User(SQLModel, table=True):
     is_active: bool = Field(default=True)
     email_verified: bool = Field(default=False)
     last_login: Optional[datetime] = Field(default=None)
+    
+    # Relationships
+    comments: List["Comment"] = Relationship(back_populates="author")
     
     class Config:
         # Enable JSON encoding for Pydantic models
