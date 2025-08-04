@@ -97,7 +97,7 @@ definePageMeta({
 
 const router = useRouter()
 const route = useRoute()
-const authStore = useAuthStore()
+const auth = useAuth()
 
 const loading = ref(true)
 const success = ref(false)
@@ -118,15 +118,15 @@ onMounted(async () => {
     if (access_token) {
       // OAuth success - update auth store
       try {
-        await authStore.getCurrentUser()
-        if (authStore.isLoggedIn) {
+        await auth.initialize()
+        if (auth.isLoggedIn.value) {
           success.value = true
           
           // Wait a moment to show success state
           await new Promise(resolve => setTimeout(resolve, 1500))
           
           // Check if user needs to complete setup
-          const user = authStore.currentUser
+          const user = auth.currentUser.value
           if (!user?.is_profile_complete) {
             await router.push('/setup/profile')
           } else if (!user?.has_pregnancy_data) {
@@ -144,8 +144,8 @@ onMounted(async () => {
     } else {
       // Regular callback - check if user is authenticated
       try {
-        await authStore.getCurrentUser()
-        if (authStore.isLoggedIn) {
+        await auth.initialize()
+        if (auth.isLoggedIn.value) {
           success.value = true
           await new Promise(resolve => setTimeout(resolve, 1000))
           await router.push('/')

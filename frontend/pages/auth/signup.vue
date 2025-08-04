@@ -177,8 +177,8 @@ definePageMeta({
   middleware: 'guest'
 })
 
-// Using Pinia store and comprehensive form validation
-const authStore = useAuthStore()
+// Using unified auth composable and comprehensive form validation
+const auth = useAuth()
 const router = useRouter()
 
 // Form state
@@ -187,7 +187,7 @@ const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const agreeTerms = ref(false)
-const loading = computed(() => authStore.loading)
+const loading = computed(() => auth.loading.value)
 const error = ref('')
 const success = ref('')
 
@@ -285,10 +285,16 @@ const handleSubmit = async () => {
   }
 
   try {
-    await authStore.register({
+    // Split full name into first and last name
+    const nameParts = fullName.value.trim().split(' ')
+    const firstName = nameParts[0] || ''
+    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : ''
+
+    await auth.register({
       email: email.value.trim(),
       password: password.value,
-      full_name: fullName.value.trim()
+      first_name: firstName,
+      last_name: lastName
     })
 
     success.value = 'Welcome to Preggo! Please check your email to confirm your account before signing in.'
@@ -323,16 +329,13 @@ const handleSubmit = async () => {
 // Redirect if already authenticated
 onMounted(async () => {
   try {
+    // Initialize auth state
+    await auth.initialize()
+    
     // Check if user is already authenticated
-    if (authStore.isLoggedIn) {
+    if (auth.isLoggedIn.value) {
       await router.push('/')
       return
-    }
-    
-    // Try to get current user (in case of page refresh)
-    await authStore.getCurrentUser()
-    if (authStore.isLoggedIn) {
-      await router.push('/')
     }
   } catch (err) {
     // User is not authenticated, stay on signup page

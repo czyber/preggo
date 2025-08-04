@@ -6,10 +6,13 @@
  */
 
 export default defineNuxtRouteMiddleware(() => {
-  const user = useSupabaseUser()
+  // Skip authentication check on server-side rendering
+  if (process.server) return
+  
+  const auth = useAuth()
   
   // If user is authenticated, redirect away from guest pages
-  if (user.value) {
+  if (auth.isAuthenticated.value) {
     return navigateTo('/')
   }
 })

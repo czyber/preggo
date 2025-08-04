@@ -6,10 +6,13 @@
  */
 
 export default defineNuxtRouteMiddleware((to) => {
-  const user = useSupabaseUser()
+  // Skip authentication check on server-side rendering
+  if (process.server) return
+  
+  const auth = useAuth()
   
   // If user is not authenticated, redirect to login
-  if (!user.value) {
+  if (!auth.isAuthenticated.value) {
     // Store the intended destination for redirect after login
     const redirectTo = to.fullPath !== '/auth/login' ? to.fullPath : undefined
     

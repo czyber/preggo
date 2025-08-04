@@ -7,9 +7,9 @@
         <p class="text-gray-600 font-secondary">Loading your pregnancy journey...</p>
       </div>
     </div>
-    
+
     <!-- Not authenticated view -->
-    <div v-else-if="!authStore?.isLoggedIn" class="px-4 py-12">
+    <div v-else-if="!isLoggedIn" class="px-4 py-12">
       <div class="max-w-6xl mx-auto">
         <!-- Hero Section -->
         <div class="text-center mb-16">
@@ -21,11 +21,11 @@
             Your pregnancy journey, beautifully tracked
           </h2>
           <p class="text-xl text-gray-600 font-secondary max-w-2xl mx-auto leading-relaxed">
-            Join thousands of expecting parents who trust Preggo to track symptoms, celebrate milestones, 
+            Join thousands of expecting parents who trust Preggo to track symptoms, celebrate milestones,
             and document their precious pregnancy moments with care and support.
           </p>
         </div>
-        
+
         <!-- Features Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           <BaseCard variant="supportive" class="text-center">
@@ -41,7 +41,7 @@
               </p>
             </div>
           </BaseCard>
-          
+
           <BaseCard variant="celebration" class="text-center">
             <div class="space-y-4">
               <div class="w-16 h-16 bg-light-coral/20 rounded-full flex items-center justify-center mx-auto">
@@ -55,7 +55,7 @@
               </p>
             </div>
           </BaseCard>
-          
+
           <BaseCard variant="calming" class="text-center">
             <div class="space-y-4">
               <div class="w-16 h-16 bg-muted-lavender/20 rounded-full flex items-center justify-center mx-auto">
@@ -70,7 +70,7 @@
             </div>
           </BaseCard>
         </div>
-        
+
         <!-- CTA Section -->
         <div class="text-center space-y-6">
           <div class="space-y-4">
@@ -84,15 +84,15 @@
             </BaseButton>
             <p class="text-sm text-gray-600 font-secondary">
               Already have an account?
-              <NuxtLink 
-                to="/auth/login" 
+              <NuxtLink
+                to="/auth/login"
                 class="font-medium text-soft-pink hover:text-soft-pink/80 transition-colors ml-1"
               >
                 Sign in here
               </NuxtLink>
             </p>
           </div>
-          
+
           <!-- Trust indicators -->
           <div class="max-w-2xl mx-auto pt-8 border-t border-warm-beige/40">
             <p class="text-xs text-gray-500 font-secondary mb-4">Trusted by expecting families worldwide</p>
@@ -136,7 +136,7 @@
             <BaseButton
               variant="outline"
               size="default"
-              @click="authStore?.logout()"
+              @click="auth.signOut()"
             >
               Sign Out
             </BaseButton>
@@ -144,8 +144,8 @@
         </div>
 
         <!-- Setup reminder -->
-        <BaseAlert 
-          variant="supportive" 
+        <BaseAlert
+          variant="supportive"
           title="Complete your profile setup"
           class="mb-8"
         >
@@ -166,25 +166,21 @@
 </template>
 
 <script setup lang="ts">
-// Proper store initialization with error handling
-const router = useRouter()
-const { $pinia } = useNuxtApp()
+import { usePregnancyStore } from "~/stores/pregnancy";
 
-// Initialize stores safely
-const authStore = useAuthStore()
+const router = useRouter()
+
+// Use unified auth composable
+const auth = useAuth()
 const pregnancyStore = usePregnancyStore()
 
-// Loading state
-const authLoading = ref(true)
-
 // Reactive data
-const currentUser = computed(() => authStore?.currentUser || null)
+const currentUser = computed(() => auth.userProfile.value)
+const isLoggedIn = computed(() => auth.isLoggedIn.value)
+const authLoading = computed(() => auth.loading.value)
 
-// Initialize on mount
-onMounted(() => {
-  // Simple delay to allow stores to initialize
-  setTimeout(() => {
-    authLoading.value = false
-  }, 100)
+// Initialize auth on mount
+onMounted(async () => {
+  await auth.initialize()
 })
 </script>

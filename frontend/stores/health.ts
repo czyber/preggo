@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
 import type { components } from '~/types/api'
 
 // Type aliases for cleaner code
@@ -11,346 +12,380 @@ type SymptomTracking = components['schemas']['SymptomTrackingCreate']
 type WeightEntry = components['schemas']['WeightEntryCreate']
 type MoodEntry = components['schemas']['MoodEntryCreate']
 
-export const useHealthStore = defineStore('health', {
-  state: () => ({
-    pregnancyHealth: null as PregnancyHealth | null,
-    healthAlerts: [] as HealthAlert[],
-    symptoms: [] as SymptomTracking[],
-    weightEntries: [] as WeightEntry[],
-    moodEntries: [] as MoodEntry[],
-    loading: false,
-    error: null as string | null,
-  }),
+export const useHealthStore = defineStore('health', () => {
+  // State as refs
+  const pregnancyHealth = ref<PregnancyHealth | null>(null)
+  const healthAlerts = ref<HealthAlert[]>([])
+  const symptoms = ref<SymptomTracking[]>([])
+  const weightEntries = ref<WeightEntry[]>([])
+  const moodEntries = ref<MoodEntry[]>([])
+  const loading = ref(false)
+  const error = ref<string | null>(null)
 
-  getters: {
-    getHealthAlertById: (state) => (id: string) => {
-      return state.healthAlerts.find(alert => alert.id === id)
-    },
+  // Computed properties as computed()
+  const getHealthAlertById = computed(() => (id: string) => {
+    return healthAlerts.value.find(alert => alert.id === id)
+  })
+  
+  const activeHealthAlerts = computed(() => {
+    return healthAlerts.value.filter(alert => alert.is_active)
+  })
+  
+  const criticalHealthAlerts = computed(() => {
+    return healthAlerts.value.filter(alert => 
+      alert.severity === 'critical' && alert.is_active
+    )
+  })
+  
+  const recentSymptoms = computed(() => (days: number = 7) => {
+    const cutoffDate = new Date()
+    cutoffDate.setDate(cutoffDate.getDate() - days)
     
-    activeHealthAlerts: (state) => {
-      return state.healthAlerts.filter(alert => alert.is_active)
-    },
+    return symptoms.value.filter(symptom => 
+      new Date(symptom.date) >= cutoffDate
+    ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  })
+  
+  const recentWeightEntries = computed(() => (limit: number = 10) => {
+    return [...weightEntries.value]
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, limit)
+  })
+  
+  const recentMoodEntries = computed(() => (days: number = 7) => {
+    const cutoffDate = new Date()
+    cutoffDate.setDate(cutoffDate.getDate() - days)
     
-    criticalHealthAlerts: (state) => {
-      return state.healthAlerts.filter(alert => 
-        alert.severity === 'critical' && alert.is_active
-      )
-    },
-    
-    recentSymptoms: (state) => (days: number = 7) => {
+    return moodEntries.value.filter(mood => 
+      new Date(mood.date) >= cutoffDate
+    ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  })
+  
+  const averageMoodRating = computed(() => (days: number = 7) => {
+    const recentMoods = moodEntries.value.filter(mood => {
       const cutoffDate = new Date()
       cutoffDate.setDate(cutoffDate.getDate() - days)
-      
-      return state.symptoms.filter(symptom => 
-        new Date(symptom.date) >= cutoffDate
-      ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    },
+      return new Date(mood.date) >= cutoffDate
+    })
     
-    recentWeightEntries: (state) => (limit: number = 10) => {
-      return [...state.weightEntries]
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-        .slice(0, limit)
-    },
+    if (recentMoods.length === 0) return null
     
-    recentMoodEntries: (state) => (days: number = 7) => {
-      const cutoffDate = new Date()
-      cutoffDate.setDate(cutoffDate.getDate() - days)
-      
-      return state.moodEntries.filter(mood => 
-        new Date(mood.date) >= cutoffDate
-      ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    },
+    const sum = recentMoods.reduce((acc, mood) => acc + mood.mood_score, 0)
+    return sum / recentMoods.length
+  })
+  
+  const weightTrend = computed(() => {
+    if (weightEntries.value.length < 2) return null
     
-    averageMoodRating: (state) => (days: number = 7) => {
-      const recentMoods = state.moodEntries.filter(mood => {
-        const cutoffDate = new Date()
-        cutoffDate.setDate(cutoffDate.getDate() - days)
-        return new Date(mood.date) >= cutoffDate
-      })
-      
-      if (recentMoods.length === 0) return null
-      
-      const sum = recentMoods.reduce((acc, mood) => acc + mood.mood_score, 0)
-      return sum / recentMoods.length
-    },
+    const sorted = [...weightEntries.value]
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     
-    weightTrend: (state) => {
-      if (state.weightEntries.length < 2) return null
+    const latest = sorted[sorted.length - 1]
+    const previous = sorted[sorted.length - 2]
+    
+    return latest.weight - previous.weight
+  })
+
+  // Actions as functions
+  async function fetchPregnancyHealth(pregnancyId: string) {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const api = useApi()
+      const { data, error: apiError } = await api.getPregnancyHealth(pregnancyId)
       
-      const sorted = [...state.weightEntries]
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      if (apiError) {
+        throw new Error(`Failed to fetch pregnancy health: ${apiError}`)
+      }
       
-      const latest = sorted[sorted.length - 1]
-      const previous = sorted[sorted.length - 2]
-      
-      return latest.weight - previous.weight
-    },
-  },
-
-  actions: {
-    async fetchPregnancyHealth(pregnancyId: string) {
-      this.loading = true
-      this.error = null
-      
-      try {
-        const api = useApi()
-        const { data, error } = await api.getPregnancyHealth(pregnancyId)
-        
-        if (error) {
-          throw new Error(`Failed to fetch pregnancy health: ${error}`)
-        }
-        
-        this.pregnancyHealth = data || null
-      } catch (err) {
-        this.error = err instanceof Error ? err.message : 'Unknown error'
-        console.error('Error fetching pregnancy health:', err)
-      } finally {
-        this.loading = false
-      }
-    },
-
-    async createPregnancyHealth(healthData: PregnancyHealth) {
-      try {
-        const api = useApi()
-        const { data, error } = await api.createPregnancyHealth(healthData)
-        
-        if (error) {
-          throw new Error(`Failed to create pregnancy health: ${error}`)
-        }
-        
-        if (data) {
-          this.pregnancyHealth = data
-        }
-        
-        return data
-      } catch (err) {
-        this.error = err instanceof Error ? err.message : 'Unknown error'
-        console.error('Error creating pregnancy health:', err)
-        throw err
-      }
-    },
-
-    async updatePregnancyHealth(healthId: string, healthData: PregnancyHealthUpdate) {
-      try {
-        const api = useApi()
-        const { data, error } = await api.updatePregnancyHealth(healthId, healthData)
-        
-        if (error) {
-          throw new Error(`Failed to update pregnancy health: ${error}`)
-        }
-        
-        if (data) {
-          this.pregnancyHealth = data
-        }
-        
-        return data
-      } catch (err) {
-        this.error = err instanceof Error ? err.message : 'Unknown error'
-        console.error('Error updating pregnancy health:', err)
-        throw err
-      }
-    },
-
-    async fetchHealthAlerts(pregnancyId: string) {
-      this.loading = true
-      this.error = null
-      
-      try {
-        const api = useApi()
-        const { data, error } = await api.getPregnancyHealthAlerts(pregnancyId)
-        
-        if (error) {
-          throw new Error(`Failed to fetch health alerts: ${error}`)
-        }
-        
-        this.healthAlerts = data || []
-      } catch (err) {
-        this.error = err instanceof Error ? err.message : 'Unknown error'
-        console.error('Error fetching health alerts:', err)
-      } finally {
-        this.loading = false
-      }
-    },
-
-    async createHealthAlert(alertData: HealthAlertCreate) {
-      try {
-        const api = useApi()
-        const { data, error } = await api.createHealthAlert(alertData)
-        
-        if (error) {
-          throw new Error(`Failed to create health alert: ${error}`)
-        }
-        
-        if (data) {
-          this.healthAlerts.push(data)
-        }
-        
-        return data
-      } catch (err) {
-        this.error = err instanceof Error ? err.message : 'Unknown error'
-        console.error('Error creating health alert:', err)
-        throw err
-      }
-    },
-
-    async updateHealthAlert(alertId: string, alertData: HealthAlertUpdate) {
-      try {
-        const api = useApi()
-        const { data, error } = await api.updateHealthAlert(alertId, alertData)
-        
-        if (error) {
-          throw new Error(`Failed to update health alert: ${error}`)
-        }
-        
-        if (data) {
-          const index = this.healthAlerts.findIndex(alert => alert.id === alertId)
-          if (index !== -1) {
-            this.healthAlerts[index] = data
-          }
-        }
-        
-        return data
-      } catch (err) {
-        this.error = err instanceof Error ? err.message : 'Unknown error'
-        console.error('Error updating health alert:', err)
-        throw err
-      }
-    },
-
-    async fetchSymptoms(pregnancyId: string) {
-      this.loading = true
-      this.error = null
-      
-      try {
-        const api = useApi()
-        const { data, error } = await api.getPregnancySymptoms(pregnancyId)
-        
-        if (error) {
-          throw new Error(`Failed to fetch symptoms: ${error}`)
-        }
-        
-        this.symptoms = data || []
-      } catch (err) {
-        this.error = err instanceof Error ? err.message : 'Unknown error'
-        console.error('Error fetching symptoms:', err)
-      } finally {
-        this.loading = false
-      }
-    },
-
-    async trackSymptom(symptomData: SymptomTracking) {
-      try {
-        const api = useApi()
-        const { data, error } = await api.trackSymptom(symptomData)
-        
-        if (error) {
-          throw new Error(`Failed to track symptom: ${error}`)
-        }
-        
-        if (data) {
-          this.symptoms.push(data)
-        }
-        
-        return data
-      } catch (err) {
-        this.error = err instanceof Error ? err.message : 'Unknown error'
-        console.error('Error tracking symptom:', err)
-        throw err
-      }
-    },
-
-    async fetchWeightEntries(pregnancyId: string) {
-      this.loading = true
-      this.error = null
-      
-      try {
-        const api = useApi()
-        const { data, error } = await api.getPregnancyWeights(pregnancyId)
-        
-        if (error) {
-          throw new Error(`Failed to fetch weight entries: ${error}`)
-        }
-        
-        this.weightEntries = data || []
-      } catch (err) {
-        this.error = err instanceof Error ? err.message : 'Unknown error'
-        console.error('Error fetching weight entries:', err)
-      } finally {
-        this.loading = false
-      }
-    },
-
-    async createWeightEntry(weightData: WeightEntry) {
-      try {
-        const api = useApi()
-        const { data, error } = await api.createWeightEntry(weightData)
-        
-        if (error) {
-          throw new Error(`Failed to create weight entry: ${error}`)
-        }
-        
-        if (data) {
-          this.weightEntries.push(data)
-        }
-        
-        return data
-      } catch (err) {
-        this.error = err instanceof Error ? err.message : 'Unknown error'
-        console.error('Error creating weight entry:', err)
-        throw err
-      }
-    },
-
-    async fetchMoodEntries(pregnancyId: string) {
-      this.loading = true
-      this.error = null
-      
-      try {
-        const api = useApi()
-        const { data, error } = await api.getPregnancyMoods(pregnancyId)
-        
-        if (error) {
-          throw new Error(`Failed to fetch mood entries: ${error}`)
-        }
-        
-        this.moodEntries = data || []
-      } catch (err) {
-        this.error = err instanceof Error ? err.message : 'Unknown error'
-        console.error('Error fetching mood entries:', err)
-      } finally {
-        this.loading = false
-      }
-    },
-
-    async createMoodEntry(moodData: MoodEntry) {
-      try {
-        const api = useApi()
-        const { data, error } = await api.createMoodEntry(moodData)
-        
-        if (error) {
-          throw new Error(`Failed to create mood entry: ${error}`)
-        }
-        
-        if (data) {
-          this.moodEntries.push(data)
-        }
-        
-        return data
-      } catch (err) {
-        this.error = err instanceof Error ? err.message : 'Unknown error'
-        console.error('Error creating mood entry:', err)
-        throw err
-      }
-    },
-
-    reset() {
-      this.pregnancyHealth = null
-      this.healthAlerts = []
-      this.symptoms = []
-      this.weightEntries = []
-      this.moodEntries = []
-      this.loading = false
-      this.error = null
+      pregnancyHealth.value = data || null
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error'
+      console.error('Error fetching pregnancy health:', err)
+    } finally {
+      loading.value = false
     }
+  }
+
+  async function createPregnancyHealth(healthData: PregnancyHealth) {
+    try {
+      const api = useApi()
+      const { data, error: apiError } = await api.createPregnancyHealth(healthData)
+      
+      if (apiError) {
+        throw new Error(`Failed to create pregnancy health: ${apiError}`)
+      }
+      
+      if (data) {
+        pregnancyHealth.value = data
+      }
+      
+      return data
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error'
+      console.error('Error creating pregnancy health:', err)
+      throw err
+    }
+  }
+
+  async function updatePregnancyHealth(healthId: string, healthData: PregnancyHealthUpdate) {
+    try {
+      const api = useApi()
+      const { data, error: apiError } = await api.updatePregnancyHealth(healthId, healthData)
+      
+      if (apiError) {
+        throw new Error(`Failed to update pregnancy health: ${apiError}`)
+      }
+      
+      if (data) {
+        pregnancyHealth.value = data
+      }
+      
+      return data
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error'
+      console.error('Error updating pregnancy health:', err)
+      throw err
+    }
+  }
+
+  async function fetchHealthAlerts(pregnancyId: string) {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const api = useApi()
+      const { data, error: apiError } = await api.getPregnancyHealthAlerts(pregnancyId)
+      
+      if (apiError) {
+        throw new Error(`Failed to fetch health alerts: ${apiError}`)
+      }
+      
+      healthAlerts.value = data || []
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error'
+      console.error('Error fetching health alerts:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function createHealthAlert(alertData: HealthAlertCreate) {
+    try {
+      const api = useApi()
+      const { data, error: apiError } = await api.createHealthAlert(alertData)
+      
+      if (apiError) {
+        throw new Error(`Failed to create health alert: ${apiError}`)
+      }
+      
+      if (data) {
+        healthAlerts.value.push(data)
+      }
+      
+      return data
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error'
+      console.error('Error creating health alert:', err)
+      throw err
+    }
+  }
+
+  async function updateHealthAlert(alertId: string, alertData: HealthAlertUpdate) {
+    try {
+      const api = useApi()
+      const { data, error: apiError } = await api.updateHealthAlert(alertId, alertData)
+      
+      if (apiError) {
+        throw new Error(`Failed to update health alert: ${apiError}`)
+      }
+      
+      if (data) {
+        const index = healthAlerts.value.findIndex(alert => alert.id === alertId)
+        if (index !== -1) {
+          healthAlerts.value[index] = data
+        }
+      }
+      
+      return data
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error'
+      console.error('Error updating health alert:', err)
+      throw err
+    }
+  }
+
+  async function fetchSymptoms(pregnancyId: string) {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const api = useApi()
+      const { data, error: apiError } = await api.getPregnancySymptoms(pregnancyId)
+      
+      if (apiError) {
+        throw new Error(`Failed to fetch symptoms: ${apiError}`)
+      }
+      
+      symptoms.value = data || []
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error'
+      console.error('Error fetching symptoms:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function trackSymptom(symptomData: SymptomTracking) {
+    try {
+      const api = useApi()
+      const { data, error: apiError } = await api.trackSymptom(symptomData)
+      
+      if (apiError) {
+        throw new Error(`Failed to track symptom: ${apiError}`)
+      }
+      
+      if (data) {
+        symptoms.value.push(data)
+      }
+      
+      return data
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error'
+      console.error('Error tracking symptom:', err)
+      throw err
+    }
+  }
+
+  async function fetchWeightEntries(pregnancyId: string) {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const api = useApi()
+      const { data, error: apiError } = await api.getPregnancyWeights(pregnancyId)
+      
+      if (apiError) {
+        throw new Error(`Failed to fetch weight entries: ${apiError}`)
+      }
+      
+      weightEntries.value = data || []
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error'
+      console.error('Error fetching weight entries:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function createWeightEntry(weightData: WeightEntry) {
+    try {
+      const api = useApi()
+      const { data, error: apiError } = await api.createWeightEntry(weightData)
+      
+      if (apiError) {
+        throw new Error(`Failed to create weight entry: ${apiError}`)
+      }
+      
+      if (data) {
+        weightEntries.value.push(data)
+      }
+      
+      return data
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error'
+      console.error('Error creating weight entry:', err)
+      throw err
+    }
+  }
+
+  async function fetchMoodEntries(pregnancyId: string) {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const api = useApi()
+      const { data, error: apiError } = await api.getPregnancyMoods(pregnancyId)
+      
+      if (apiError) {
+        throw new Error(`Failed to fetch mood entries: ${apiError}`)
+      }
+      
+      moodEntries.value = data || []
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error'
+      console.error('Error fetching mood entries:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function createMoodEntry(moodData: MoodEntry) {
+    try {
+      const api = useApi()
+      const { data, error: apiError } = await api.createMoodEntry(moodData)
+      
+      if (apiError) {
+        throw new Error(`Failed to create mood entry: ${apiError}`)
+      }
+      
+      if (data) {
+        moodEntries.value.push(data)
+      }
+      
+      return data
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error'
+      console.error('Error creating mood entry:', err)
+      throw err
+    }
+  }
+
+  function reset() {
+    pregnancyHealth.value = null
+    healthAlerts.value = []
+    symptoms.value = []
+    weightEntries.value = []
+    moodEntries.value = []
+    loading.value = false
+    error.value = null
+  }
+
+  // Return all state, computed properties, and functions
+  return {
+    // State
+    pregnancyHealth,
+    healthAlerts,
+    symptoms,
+    weightEntries,
+    moodEntries,
+    loading,
+    error,
+    
+    // Computed
+    getHealthAlertById,
+    activeHealthAlerts,
+    criticalHealthAlerts,
+    recentSymptoms,
+    recentWeightEntries,
+    recentMoodEntries,
+    averageMoodRating,
+    weightTrend,
+    
+    // Actions
+    fetchPregnancyHealth,
+    createPregnancyHealth,
+    updatePregnancyHealth,
+    fetchHealthAlerts,
+    createHealthAlert,
+    updateHealthAlert,
+    fetchSymptoms,
+    trackSymptom,
+    fetchWeightEntries,
+    createWeightEntry,
+    fetchMoodEntries,
+    createMoodEntry,
+    reset
   }
 })

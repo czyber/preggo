@@ -2,44 +2,25 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: [
-    '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
-    '@nuxtjs/supabase',
+    '@nuxtjs/tailwindcss',
     '@nuxtjs/google-fonts',
     '@vueuse/nuxt'
   ],
+  pinia: {
+    autoImports: ['defineStore', 'storeToRefs']
+  },
   css: ['~/assets/css/main.css'],
   runtimeConfig: {
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8000/api/v1',
       appName: process.env.NUXT_PUBLIC_APP_NAME || 'Preggo',
-      appVersion: process.env.NUXT_PUBLIC_APP_VERSION || '0.1.0'
+      appVersion: process.env.NUXT_PUBLIC_APP_VERSION || '0.1.0',
+      supabaseUrl: process.env.SUPABASE_URL,
+      supabaseAnonKey: process.env.SUPABASE_ANON_KEY
     }
   },
-  supabase: {
-    // We use Supabase for auth only, but integrate with our FastAPI backend for data
-    redirectOptions: {
-      login: '/auth/login',
-      callback: '/auth/callback',
-      exclude: ['/', '/auth/signup'],
-      include: undefined,
-      cookieRedirect: false
-    },
-    cookieOptions: {
-      maxAge: 60 * 60 * 8, // 8 hours
-      sameSite: 'lax',
-      secure: true
-    },
-    clientOptions: {
-      auth: {
-        flowType: 'pkce',
-        detectSessionInUrl: true,
-        persistSession: true,
-        autoRefreshToken: true
-      }
-    }
-  },
-  ssr: true,
+  ssr: false,
   typescript: {
     strict: true
   },
@@ -47,7 +28,8 @@ export default defineNuxtConfig({
   googleFonts: {
     families: {
       Poppins: [300, 400, 500, 600, 700],
-      Roboto: [300, 400, 500, 700]
+      Roboto: [300, 400, 500, 700],
+      Lato: [400]
     },
     display: 'swap',
     preload: true

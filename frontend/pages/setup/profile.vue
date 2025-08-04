@@ -333,7 +333,7 @@ definePageMeta({
 })
 
 const router = useRouter()
-const authStore = useAuthStore()
+const auth = useAuth()
 
 // Form state
 const firstName = ref('')
@@ -359,7 +359,7 @@ const phoneError = ref('')
 const birthDateError = ref('')
 
 // Pre-fill from existing user data
-const currentUser = computed(() => authStore.currentUser)
+const currentUser = computed(() => auth.currentUser.value)
 
 onMounted(() => {
   const user = currentUser.value
@@ -472,7 +472,7 @@ const handleSubmit = async () => {
       privacy_accepted_at: new Date().toISOString()
     }
     
-    await authStore.updateUser(profileData)
+    await auth.updateUser(profileData)
     
     success.value = 'Profile completed successfully!'
     
@@ -496,7 +496,7 @@ const handleSubmit = async () => {
 const handleSkip = async () => {
   try {
     // Mark profile as complete with minimal data
-    await authStore.updateUser({
+    await auth.updateUser({
       full_name: `${firstName.value.trim() || 'User'} ${lastName.value.trim() || ''}`.trim(),
       is_profile_complete: true
     })

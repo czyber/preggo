@@ -57,7 +57,7 @@ module.exports = {
         },
       },
       fontFamily: {
-        'logo': ['Poppins', 'sans-serif'],
+        'logo': ['Lato', 'sans-serif'],
         'primary': ['Poppins', 'sans-serif'],
         'secondary': ['Roboto', 'sans-serif'],
         'sans': ['Poppins', 'sans-serif'],

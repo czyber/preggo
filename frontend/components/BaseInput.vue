@@ -5,10 +5,11 @@
       :type="type"
       :placeholder="placeholder"
       :disabled="disabled"
-      :class="cn(inputVariants({ variant, size }), $attrs.class)"
+      :autocomplete="autocomplete"
+      :required="required"
+      :class="cn(inputVariants({ variant, size }))"
       :value="modelValue"
-      @input="onInput"
-      v-bind="$attrs"
+      @input="$emit('update:modelValue', $event.target.value)"
     />
     <label
       v-if="label"
@@ -99,30 +100,23 @@ const hintVariants = cva(
   },
 )
 
-/* @vue-ignore */
-interface InputProps extends VariantProps<typeof inputVariants> {
+interface InputProps extends /* @vue-ignore */ VariantProps<typeof inputVariants> {
   id?: string
   type?: string
   placeholder?: string
   disabled?: boolean
+  autocomplete?: string
+  required?: boolean
   modelValue?: string | number
   label?: string
   hint?: string
   error?: string
 }
 
-const props = withDefaults(defineProps<InputProps>(), {
-  type: 'text',
-})
-
-const emit = defineEmits<{
+defineProps<InputProps>()
+defineEmits<{
   'update:modelValue': [value: string | number]
 }>()
-
-const onInput = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  emit('update:modelValue', target.value)
-}
 </script>
 
 <style scoped>

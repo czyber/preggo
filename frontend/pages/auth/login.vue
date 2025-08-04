@@ -143,15 +143,14 @@ definePageMeta({
   middleware: 'guest'
 })
 
-// Using Pinia store and form validation
-const authStore = useAuthStore()
+const auth = useAuth()
 const router = useRouter()
 
 // Form state
 const email = ref('')
 const password = ref('')
 const rememberMe = ref(false)
-const loading = computed(() => authStore.loading)
+const loading = computed(() => auth.loading.value)
 const error = ref('')
 
 // Form validation
@@ -206,7 +205,7 @@ const handleSubmit = async () => {
   }
 
   try {
-    await authStore.login({
+    await auth.login({
       email: email.value.trim(),
       password: password.value
     })
@@ -235,16 +234,13 @@ const handleSubmit = async () => {
 // Redirect if already authenticated
 onMounted(async () => {
   try {
+    // Initialize auth state
+    await auth.initialize()
+    
     // Check if user is already authenticated
-    if (authStore.isLoggedIn) {
+    if (auth.isLoggedIn.value) {
       await router.push('/')
       return
-    }
-    
-    // Try to get current user (in case of page refresh)
-    await authStore.getCurrentUser()
-    if (authStore.isLoggedIn) {
-      await router.push('/')
     }
   } catch (err) {
     // User is not authenticated, stay on login page
