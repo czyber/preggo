@@ -415,11 +415,8 @@ const handleSubmit = async () => {
     // Create pregnancy record using the store
     await pregnancyStore.createPregnancy(pregnancyData)
     
-    // Mark user as having pregnancy data
-    const auth = useAuth()
-    await auth.updateUser({ has_pregnancy_data: true })
-    
     // Redirect to profile setup or dashboard
+    const auth = useAuth()
     const user = auth.currentUser.value
     if (!user?.is_profile_complete) {
       await router.push('/setup/profile')

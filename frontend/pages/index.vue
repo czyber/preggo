@@ -143,8 +143,9 @@
           </div>
         </div>
 
-        <!-- Setup reminder -->
+        <!-- Setup reminder - only show if user doesn't have any active pregnancies -->
         <BaseAlert
+          v-if="!hasActivePregnancy"
           variant="supportive"
           title="Complete your profile setup"
           class="mb-8"
@@ -160,6 +161,50 @@
             </BaseButton>
           </div>
         </BaseAlert>
+
+        <!-- Pregnancy Dashboard - show if user has active pregnancies -->
+        <div v-else class="space-y-6">
+          <!-- Create Update Card - Prominent placement at top -->
+          <CreateUpdateCard 
+            :current-pregnancy-week="currentPregnancyDetails?.current_week"
+            :current-mood="currentPregnancyDetails?.current_mood"
+          />
+
+          <!-- Main Pregnancy Overview -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <PregnancyOverviewCard
+              :current-week="currentPregnancyDetails?.current_week"
+              :current-day="currentPregnancyDetails?.current_day"
+              :trimester="currentPregnancyDetails?.trimester"
+              :due-date="currentPregnancyDetails?.due_date"
+            />
+            <BabyDevelopmentCard 
+              :current-week="currentPregnancyDetails?.current_week"
+            />
+          </div>
+
+          <!-- Secondary Dashboard Row -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <WeeklyInfoCard 
+              :current-week="currentPregnancyDetails?.current_week"
+            />
+            <QuickActionsCard 
+              @log-symptoms="handleLogSymptoms"
+              @add-photo="handleAddPhoto"
+              @schedule-appointment="handleScheduleAppointment"
+              @track-weight="handleTrackWeight"
+            />
+            <MilestonesCard 
+              :current-week="currentPregnancyDetails?.current_week"
+            />
+          </div>
+
+          <!-- Recent Activity -->
+          <RecentActivityCard 
+            :activities="recentActivities"
+            @view-all="handleViewAllActivity"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -167,6 +212,13 @@
 
 <script setup lang="ts">
 import { usePregnancyStore } from "~/stores/pregnancy";
+import PregnancyOverviewCard from "~/components/pregnancy/PregnancyOverviewCard.vue";
+import BabyDevelopmentCard from "~/components/pregnancy/BabyDevelopmentCard.vue";
+import WeeklyInfoCard from "~/components/pregnancy/WeeklyInfoCard.vue";
+import QuickActionsCard from "~/components/pregnancy/QuickActionsCard.vue";
+import MilestonesCard from "~/components/pregnancy/MilestonesCard.vue";
+import RecentActivityCard from "~/components/pregnancy/RecentActivityCard.vue";
+import CreateUpdateCard from "~/components/pregnancy/CreateUpdateCard.vue";
 
 const router = useRouter()
 
@@ -179,8 +231,48 @@ const currentUser = computed(() => auth.userProfile.value)
 const isLoggedIn = computed(() => auth.isLoggedIn.value)
 const authLoading = computed(() => auth.loading.value)
 
-// Initialize auth on mount
-onMounted(async () => {
-  await auth.initialize()
+// Pregnancy data
+const hasActivePregnancy = computed(() => {
+  return pregnancyStore.activePregnancies.length > 0
 })
+
+const currentPregnancyDetails = computed(() => {
+  return pregnancyStore.currentPregnancy?.pregnancy_details || null
+})
+
+// Mock recent activities (could be from a store in the future)
+const recentActivities = ref([])
+
+// Event handlers for quick actions
+const handleLogSymptoms = () => {
+  console.log('Navigate to log symptoms')
+  // TODO: Navigate to symptoms logging page
+}
+
+const handleAddPhoto = () => {
+  console.log('Navigate to add photo')
+  // TODO: Navigate to photo upload page
+}
+
+const handleScheduleAppointment = () => {
+  console.log('Navigate to schedule appointment')
+  // TODO: Navigate to appointment scheduling page
+}
+
+const handleTrackWeight = () => {
+  console.log('Navigate to track weight')
+  // TODO: Navigate to weight tracking page
+}
+
+const handleViewAllActivity = () => {
+  console.log('Navigate to all activity')
+  // TODO: Navigate to activity feed page
+}
+
+// Load pregnancies when user is logged in
+watch(isLoggedIn, async (loggedIn) => {
+  if (loggedIn && !pregnancyStore.pregnancies.length) {
+    await pregnancyStore.fetchPregnancies()
+  }
+}, { immediate: true })
 </script>

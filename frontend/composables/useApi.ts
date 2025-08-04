@@ -127,6 +127,80 @@ export const useApi = () => {
     
     deleteItem: (itemId: number) =>
       loggedDELETE('/items/{item_id}', { params: { path: { item_id: itemId } } }),
+
+    // ==================== POSTS ====================
+    getPosts: () => loggedGET('/posts/'),
+    
+    getPregnancyPosts: (pregnancyId: string) =>
+      loggedGET('/posts/pregnancy/{pregnancy_id}', {
+        params: { path: { pregnancy_id: pregnancyId } }
+      }),
+    
+    getPost: (postId: string) =>
+      loggedGET('/posts/{post_id}', {
+        params: { path: { post_id: postId } }
+      }),
+    
+    createPost: (data: any) => loggedPOST('/posts/', { body: data }),
+    
+    updatePost: (postId: string, data: any) =>
+      loggedPUT('/posts/{post_id}', {
+        params: { path: { post_id: postId } },
+        body: data
+      }),
+    
+    deletePost: (postId: string) =>
+      loggedDELETE('/posts/{post_id}', {
+        params: { path: { post_id: postId } }
+      }),
+
+    // ==================== MEDIA ====================
+    createMediaItem: (data: any) => loggedPOST('/posts/media', { body: data }),
+    
+    getPostMedia: (postId: string) =>
+      loggedGET('/posts/{post_id}/media', {
+        params: { path: { post_id: postId } }
+      }),
+
+    // ==================== POST INTERACTIONS ====================
+    addPostReaction: (postId: string, reactionType: string) =>
+      loggedPOST('/posts/{post_id}/reactions', {
+        params: { path: { post_id: postId } },
+        body: { type: reactionType }
+      }),
+    
+    removePostReaction: (postId: string) =>
+      loggedDELETE('/posts/{post_id}/reactions', {
+        params: { path: { post_id: postId } }
+      }),
+    
+    recordPostView: (postId: string) =>
+      loggedPOST('/posts/{post_id}/view', {
+        params: { path: { post_id: postId } }
+      }),
+
+    // ==================== COMMENTS ====================
+    getPostComments: (postId: string) =>
+      loggedGET('/posts/{post_id}/comments', {
+        params: { path: { post_id: postId } }
+      }),
+    
+    createComment: (postId: string, data: any) =>
+      loggedPOST('/posts/{post_id}/comments', {
+        params: { path: { post_id: postId } },
+        body: data
+      }),
+    
+    updateComment: (commentId: string, data: any) =>
+      loggedPUT('/posts/comments/{comment_id}', {
+        params: { path: { comment_id: commentId } },
+        body: data
+      }),
+    
+    deleteComment: (commentId: string) =>
+      loggedDELETE('/posts/comments/{comment_id}', {
+        params: { path: { comment_id: commentId } }
+      }),
   }
 }
 

@@ -16,6 +16,8 @@ from fastapi import APIRouter, Depends, HTTPException, status, Response
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel, EmailStr
 from sqlmodel import Session
+import logging
+from datetime import datetime, timedelta
 
 from app.core.supabase import (
     supabase_service, 
@@ -29,6 +31,11 @@ from app.schemas.user import UserCreate, UserUpdate, UserResponse, UserPublic
 from app.models.user import UserPreferences
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
+logger = logging.getLogger(__name__)
+
+# Simple in-memory cache for user profiles to reduce database load
+_user_cache: Dict[str, tuple[UserResponse, datetime]] = {}
+CACHE_TTL_MINUTES = 5
 
 
 class LoginRequest(BaseModel):
@@ -197,26 +204,79 @@ async def logout(current_user: Dict[str, Any] = Depends(get_current_user_require
         return {"message": "Logged out"}
 
 
+def _get_cached_user(user_id: str) -> Optional[UserResponse]:
+    """Get user from cache if valid"""
+    if user_id in _user_cache:
+        cached_user, cached_time = _user_cache[user_id]
+        if datetime.now() - cached_time < timedelta(minutes=CACHE_TTL_MINUTES):
+            return cached_user
+        else:
+            # Remove expired cache entry
+            del _user_cache[user_id]
+    return None
+
+def _cache_user(user_id: str, user_response: UserResponse):
+    """Cache user response"""
+    _user_cache[user_id] = (user_response, datetime.now())
+
 @router.get("/me", response_model=UserResponse)
 async def get_current_user_profile(
     current_user: Dict[str, Any] = Depends(get_current_active_user),
     session: Session = Depends(get_session)
 ):
     """
-    Get current user's profile information using SQLModel session.
+    Get current user's profile information using SQLModel session with caching.
     """
     try:
-        # Get fresh user data from database
         user_id = current_user["sub"]
+        
+        # Check cache first
+        cached_user = _get_cached_user(user_id)
+        if cached_user:
+            logger.debug(f"Returning cached user profile for {user_id}")
+            return cached_user
+        
+        # Get fresh user data from database
         profile = await user_service.get_by_id(session, user_id)
         
         if not profile:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User profile not found"
-            )
+            # Check if user exists by email (might be different ID)
+            email = current_user.get("email")
+            if email:
+                profile = await user_service.get_by_email(session, email)
+                
+            if not profile:
+                # Auto-create user from JWT data if doesn't exist
+                user_data = {
+                    "id": user_id,
+                    "email": email,
+                    "first_name": current_user.get("user_metadata", {}).get("first_name", ""),
+                    "last_name": current_user.get("user_metadata", {}).get("last_name", ""),
+                    "is_active": True,
+                    "email_verified": current_user.get("email_confirmed", False)
+                }
+                profile = await user_service.create_user(session, user_data)
+                
+                if not profile:
+                    raise HTTPException(
+                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        detail="Failed to create user profile"
+                    )
+            else:
+                # User exists with different ID - this is a data consistency issue
+                # For now, return the existing profile but log the issue
+                logger.warning(f"User ID mismatch: JWT has {user_id} but DB has {profile.id} for email {email}")
+                
+                # You might want to handle this differently in production:
+                # - Update the existing user's ID to match JWT
+                # - Or redirect to a account linking flow
+                # For now, we'll use the existing profile
         
-        return UserResponse.from_orm(profile)
+        user_response = UserResponse.from_orm(profile)
+        # Cache the result for future requests
+        _cache_user(user_id, user_response)
+        logger.debug(f"Cached user profile for {user_id}")
+        return user_response
         
     except Exception as e:
         raise HTTPException(
@@ -246,6 +306,11 @@ async def update_current_user_profile(
         if not update_data:
             # No updates, return current profile
             profile = await user_service.get_by_id(session, user_id)
+            if not profile:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="User profile not found"
+                )
             return UserResponse.from_orm(profile)
         
         # Update user profile using service

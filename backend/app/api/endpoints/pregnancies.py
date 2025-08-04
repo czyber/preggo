@@ -15,6 +15,7 @@ from datetime import date, datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from pydantic import BaseModel
 from sqlmodel import Session
+import logging
 
 from app.core.supabase import get_current_active_user
 from app.services import pregnancy_service, weekly_update_service
@@ -35,6 +36,7 @@ from app.models.pregnancy import (
 )
 
 router = APIRouter(prefix="/pregnancies", tags=["pregnancies"])
+logger = logging.getLogger(__name__)
 
 
 class PregnancyWeekCalculation(BaseModel):
@@ -72,6 +74,36 @@ async def create_pregnancy(
     try:
         user_id = current_user["sub"]  # Use 'sub' from JWT token as user_id
         
+        # Ensure user exists in local database (sync from Supabase if needed)
+        from app.services.user_service import UserService
+        user_service = UserService()
+        
+        # Check if user exists, create if not
+        user_exists = await user_service.get_by_id(session, user_id)
+        if not user_exists:
+            # Check if user exists by email (might be different ID)
+            email = current_user.get("email")
+            if email:
+                user_exists = await user_service.get_by_email(session, email)
+                
+            if not user_exists:
+                # Create user record from JWT data
+                user_data = {
+                    "id": user_id,
+                    "email": email,
+                    "first_name": current_user.get("user_metadata", {}).get("first_name", ""),
+                    "last_name": current_user.get("user_metadata", {}).get("last_name", ""),
+                    "is_active": True,
+                    "email_verified": current_user.get("email_confirmed", False)
+                }
+                await user_service.create_user(session, user_data)
+                logger.info(f"Created user record for {user_id}")
+            else:
+                # User exists with different ID - log the issue
+                logger.warning(f"User ID mismatch: JWT has {user_id} but DB has {user_exists.id} for email {email}")
+                # Use the actual user ID for pregnancy creation
+                user_id = user_exists.id
+        
         # Check if user already has active pregnancies (business rule)
         existing_pregnancies = await pregnancy_service.get_active_pregnancies(session, user_id)
         
@@ -105,22 +137,22 @@ async def create_pregnancy(
         else:
             trimester = 3
         
-        # Prepare pregnancy data
+        # Prepare pregnancy data with proper JSON serialization
         pregnancy_record = {
             "user_id": user_id,
             "partner_ids": pregnancy_data.partner_ids or [],
             "pregnancy_details": {
-                "due_date": due_date,
-                "conception_date": conception_date,
+                "due_date": due_date.isoformat(),
+                "conception_date": conception_date.isoformat(),
                 "current_week": current_week,
                 "current_day": current_day,
                 "trimester": trimester,
                 "is_multiple": pregnancy_data.pregnancy_details.is_multiple,
                 "expected_babies": [baby.dict() for baby in pregnancy_data.pregnancy_details.expected_babies],
-                "risk_level": pregnancy_data.pregnancy_details.risk_level
+                "risk_level": pregnancy_data.pregnancy_details.risk_level.value
             },
             "preferences": pregnancy_data.preferences.dict() if pregnancy_data.preferences else {},
-            "status": PregnancyStatus.ACTIVE
+            "status": PregnancyStatus.ACTIVE.value
         }
         
         # Create pregnancy record using service
