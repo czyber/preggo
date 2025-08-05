@@ -60,14 +60,7 @@
             
             <!-- User Menu -->
             <div class="ml-4 pl-4 border-l border-warm-neutral/40">
-              <BaseButton
-                variant="ghost"
-                size="sm"
-                class="!h-10 !px-3"
-                @click="handleUserMenu"
-              >
-                <User class="h-4 w-4" />
-              </BaseButton>
+              <UserProfileDropdown />
             </div>
           </div>
         </div>
@@ -105,7 +98,8 @@
 </template>
 
 <script setup lang="ts">
-import { Baby, Home, Heart, Sparkles, Activity, User, Users } from 'lucide-vue-next'
+import { Baby, Home, Heart, Sparkles, Activity, Users } from 'lucide-vue-next'
+import UserProfileDropdown from '~/components/ui/UserProfileDropdown.vue'
 
 // Navigation helper
 const route = useRoute()
@@ -113,11 +107,6 @@ const isCurrentRoute = (path: string) => {
   return route.path === path || (path !== '/' && route.path.startsWith(path))
 }
 
-// User menu handler
-const handleUserMenu = () => {
-  // Implement user menu logic (profile, settings, logout)
-  console.log('User menu clicked')
-}
 </script>
 
 <style scoped>
