@@ -104,8 +104,6 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
-# Poetry
-poetry.lock
 
 # Alembic
 alembic/versions/*.py
