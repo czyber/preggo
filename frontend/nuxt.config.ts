@@ -5,7 +5,8 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@nuxtjs/tailwindcss',
     '@nuxtjs/google-fonts',
-    '@vueuse/nuxt'
+    '@vueuse/nuxt',
+    'shadcn-nuxt'
   ],
   pinia: {
     autoImports: ['defineStore', 'storeToRefs']
@@ -33,5 +34,9 @@ export default defineNuxtConfig({
     },
     display: 'swap',
     preload: true
+  },
+  shadcn: {
+    prefix: '',
+    componentDir: './components/ui'
   }
 })

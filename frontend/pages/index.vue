@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-warm-neutral via-white to-soft-pink/10">
+  <div class="min-h-screen bg-gradient-to-br from-warm-neutral via-white to-soft-pink/10 relative overflow-hidden">
     <!-- Loading State -->
     <div v-if="authLoading" class="flex items-center justify-center min-h-screen">
       <div class="text-center space-y-4">
@@ -9,78 +9,170 @@
     </div>
 
     <!-- Not authenticated view -->
-    <div v-else-if="!isLoggedIn" class="px-4 py-12">
+    <div v-else-if="!isLoggedIn" class="relative px-4 py-12">
+      <!-- Floating background shapes for visual appeal -->
+      <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="floating-shape absolute top-20 left-10 w-32 h-32 bg-soft-pink/10 rounded-full animate-pulse"></div>
+        <div class="floating-shape absolute top-40 right-20 w-24 h-24 bg-gentle-mint/10 rounded-full animate-pulse" style="animation-delay: 1s;"></div>
+        <div class="floating-shape absolute bottom-40 left-1/4 w-16 h-16 bg-light-coral/10 rounded-full animate-pulse" style="animation-delay: 2s;"></div>
+        <div class="floating-shape absolute bottom-20 right-1/3 w-40 h-40 bg-muted-lavender/10 rounded-full animate-pulse" style="animation-delay: 0.5s;"></div>
+      </div>
       <div class="max-w-6xl mx-auto">
         <!-- Hero Section -->
-        <div class="text-center mb-16">
-          <h1 class="text-5xl font-logo text-gray-800 mb-4">
-            preggo
-          </h1>
-          <div class="w-20 h-1 bg-soft-pink mx-auto rounded-full mb-8"></div>
-          <h2 class="text-3xl font-primary font-semibold text-gray-800 mb-6">
-            Your pregnancy journey, beautifully tracked
-          </h2>
-          <p class="text-xl text-gray-600 font-secondary max-w-2xl mx-auto leading-relaxed">
-            Join thousands of expecting parents who trust Preggo to track symptoms, celebrate milestones,
-            and document their precious pregnancy moments with care and support.
-          </p>
+        <div class="text-center mb-20 pt-8">
+          <!-- Logo -->
+          <div class="mb-8 animate-fade-in">
+            <h1 class="text-4xl md:text-6xl font-logo text-gray-800 mb-4 tracking-wide">
+              preggo
+            </h1>
+            <div class="w-20 h-1 bg-gradient-to-r from-soft-pink to-gentle-mint mx-auto rounded-full"></div>
+          </div>
+          
+          <!-- Hero Content -->
+          <div class="max-w-4xl mx-auto space-y-8">
+            <!-- Main Headline -->
+            <h2 class="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-primary font-bold text-gray-800 leading-tight animate-slide-up">
+              Your pregnancy journey,
+              <span class="bg-gradient-to-r from-soft-pink via-muted-lavender to-gentle-mint bg-clip-text text-transparent">
+                beautifully shared
+              </span>
+            </h2>
+            
+            <!-- Subheadline -->
+            <p class="text-lg md:text-xl lg:text-2xl text-gray-600 font-secondary max-w-3xl mx-auto leading-relaxed animate-slide-up" style="animation-delay: 0.2s;">
+              Connect your family to every precious moment of your pregnancy with private sharing, milestone tracking, and memory creation
+            </p>
+            
+            <!-- Hero Visual Placeholder -->
+            <div class="flex justify-center my-8 md:my-12 animate-fade-in" style="animation-delay: 0.4s;">
+              <div class="relative hero-visual w-80 h-80 md:w-96 md:h-96">
+                <!-- Pregnancy silhouette with glow -->
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <div class="pregnancy-silhouette w-32 h-48 bg-gradient-to-b from-soft-pink/30 to-gentle-mint/30 rounded-full relative">
+                    <div class="absolute inset-2 bg-gradient-to-b from-soft-pink/20 to-gentle-mint/20 rounded-full">
+                      <div class="absolute top-8 left-1/2 transform -translate-x-1/2 w-16 h-20 bg-gradient-to-b from-muted-lavender/40 to-soft-pink/40 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Family connection circles -->
+                <div class="absolute top-4 left-4 w-12 h-12 bg-gentle-mint/20 rounded-full flex items-center justify-center animate-pulse" style="animation-delay: 1s;">
+                  <div class="w-6 h-6 bg-gentle-mint/40 rounded-full"></div>
+                </div>
+                <div class="absolute top-8 right-8 w-14 h-14 bg-light-coral/20 rounded-full flex items-center justify-center animate-pulse" style="animation-delay: 1.5s;">
+                  <div class="w-7 h-7 bg-light-coral/40 rounded-full"></div>
+                </div>
+                <div class="absolute bottom-12 left-8 w-10 h-10 bg-muted-lavender/20 rounded-full flex items-center justify-center animate-pulse" style="animation-delay: 2s;">
+                  <div class="w-5 h-5 bg-muted-lavender/40 rounded-full"></div>
+                </div>
+                <div class="absolute bottom-8 right-12 w-16 h-16 bg-soft-pink/20 rounded-full flex items-center justify-center animate-pulse" style="animation-delay: 0.5s;">
+                  <div class="w-8 h-8 bg-soft-pink/40 rounded-full"></div>
+                </div>
+                
+                <!-- Connection lines -->
+                <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 400">
+                  <defs>
+                    <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#F8BBD0;stop-opacity:0.3" />
+                      <stop offset="50%" style="stop-color:#E1BEE7;stop-opacity:0.2" />
+                      <stop offset="100%" style="stop-color:#B2DFDB;stop-opacity:0.3" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M50 50 Q200 200 350 100" stroke="url(#connectionGradient)" stroke-width="2" fill="none" opacity="0.6"/>
+                  <path d="M100 350 Q200 200 50 120" stroke="url(#connectionGradient)" stroke-width="2" fill="none" opacity="0.6"/>
+                  <path d="M350 350 Q200 200 350 100" stroke="url(#connectionGradient)" stroke-width="2" fill="none" opacity="0.6"/>
+                </svg>
+              </div>
+            </div>
+            
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style="animation-delay: 0.6s;">
+              <BaseButton
+                size="lg"
+                variant="default"
+                class="hero-button text-lg px-10 py-4 font-semibold shadow-lg"
+                @click="router.push('/auth/signup')"
+              >
+                Start Your Journey
+              </BaseButton>
+              <BaseButton
+                size="lg"
+                variant="outline"
+                class="hero-button text-lg px-10 py-4 font-medium hover:bg-soft-pink/5"
+                @click="scrollToFeatures"
+              >
+                See How It Works
+              </BaseButton>
+            </div>
+            
+            <!-- Trust indicator -->
+            <p class="text-sm text-gray-500 font-secondary animate-fade-in" style="animation-delay: 0.8s;">
+              Join thousands of families sharing their pregnancy journey
+            </p>
+          </div>
         </div>
 
         <!-- Features Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          <BaseCard variant="supportive" class="text-center">
+        <div class="features-section grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-12 scroll-mt-20">
+          <BaseCard variant="supportive" class="text-center feature-card">
             <div class="space-y-4">
               <div class="w-16 h-16 bg-gentle-mint/20 rounded-full flex items-center justify-center mx-auto">
                 <svg class="h-8 w-8 text-gentle-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                 </svg>
               </div>
-              <h3 class="text-xl font-primary font-semibold text-gray-800">Track with Love</h3>
+              <h3 class="text-xl font-primary font-semibold text-gray-800">Share What Matters</h3>
               <p class="text-gray-600 font-secondary">
-                Log symptoms, appointments, and measurements with a caring, supportive interface designed for expecting parents.
+                Control exactly who sees each update, from ultrasounds to weekly belly photos, with complete privacy control.
               </p>
             </div>
           </BaseCard>
 
-          <BaseCard variant="celebration" class="text-center">
+          <BaseCard variant="celebration" class="text-center feature-card">
             <div class="space-y-4">
               <div class="w-16 h-16 bg-light-coral/20 rounded-full flex items-center justify-center mx-auto">
                 <svg class="h-8 w-8 text-light-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
                 </svg>
               </div>
-              <h3 class="text-xl font-primary font-semibold text-gray-800">Celebrate Milestones</h3>
+              <h3 class="text-xl font-primary font-semibold text-gray-800">Celebrate Every Moment</h3>
               <p class="text-gray-600 font-secondary">
-                Mark special moments and achievements throughout your pregnancy with beautiful milestone celebrations.
+                Track and share first kicks, heartbeats, and every magical milestone with your loved ones.
               </p>
             </div>
           </BaseCard>
 
-          <BaseCard variant="calming" class="text-center">
+          <BaseCard variant="calming" class="text-center feature-card">
             <div class="space-y-4">
               <div class="w-16 h-16 bg-muted-lavender/20 rounded-full flex items-center justify-center mx-auto">
                 <svg class="h-8 w-8 text-muted-lavender" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                 </svg>
               </div>
-              <h3 class="text-xl font-primary font-semibold text-gray-800">Safe & Secure</h3>
+              <h3 class="text-xl font-primary font-semibold text-gray-800">Keep Everyone Connected</h3>
               <p class="text-gray-600 font-secondary">
-                Your personal pregnancy data is protected with enterprise-grade security and complete privacy controls.
+                Let grandparents, siblings, and friends follow along at your comfort level with safe, private sharing.
               </p>
             </div>
           </BaseCard>
         </div>
 
         <!-- CTA Section -->
-        <div class="text-center space-y-6">
-          <div class="space-y-4">
+        <div class="text-center space-y-8 bg-gradient-to-r from-soft-pink/10 via-muted-lavender/10 to-gentle-mint/10 rounded-3xl p-6 md:p-12 mx-4">
+          <div class="space-y-6">
+            <h3 class="text-2xl md:text-3xl font-primary font-semibold text-gray-800">
+              Ready to start your beautiful pregnancy journey?
+            </h3>
+            <p class="text-lg text-gray-600 font-secondary max-w-2xl mx-auto">
+              Join thousands of families already sharing their special moments
+            </p>
             <BaseButton
               size="lg"
               variant="default"
-              class="text-lg px-8 py-4"
+              class="text-lg px-12 py-4 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
               @click="router.push('/auth/signup')"
             >
-              Start Your Pregnancy Journey
+              Create Your Free Account
             </BaseButton>
             <p class="text-sm text-gray-600 font-secondary">
               Already have an account?
@@ -254,6 +346,17 @@ const currentPregnancyDetails = computed(() => {
 // Mock recent activities (could be from a store in the future)
 const recentActivities = ref([])
 
+// Smooth scroll to features section
+const scrollToFeatures = () => {
+  const featuresSection = document.querySelector('.features-section')
+  if (featuresSection) {
+    featuresSection.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    })
+  }
+}
+
 // Event handlers for quick actions
 const handleLogSymptoms = () => {
   console.log('Navigate to log symptoms')
@@ -295,3 +398,96 @@ watch(isLoggedIn, async (loggedIn) => {
   }
 }, { immediate: true })
 </script>
+
+<style scoped>
+/* Enhanced animations for the landing page */
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.8s ease-out forwards;
+}
+
+/* Floating shapes animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+  66% {
+    transform: translateY(5px) rotate(-1deg);
+  }
+}
+
+/* Enhanced pulse animation for hero visual */
+@keyframes pregnancy-glow {
+  0%, 100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+.pregnancy-silhouette {
+  animation: pregnancy-glow 3s ease-in-out infinite;
+}
+
+/* Button hover effects */
+.hero-button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(248, 187, 208, 0.3);
+}
+
+/* Feature cards hover effects */
+.feature-card:hover {
+  transform: translateY(-4px);
+  transition: transform 0.3s ease-out;
+}
+
+/* Gradient text effect */
+.gradient-text {
+  background: linear-gradient(135deg, #F8BBD0, #E1BEE7, #B2DFDB);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .hero-visual {
+    width: 280px;
+    height: 280px;
+  }
+  
+  .floating-shape {
+    display: none;
+  }
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced card animations */
+.card-enter-active,
+.card-leave-active {
+  transition: all 0.3s ease;
+}
+
+.card-enter-from,
+.card-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+</style>
