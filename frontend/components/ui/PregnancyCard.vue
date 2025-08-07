@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { cn } from '@/lib/utils'
+import { cn } from "./utils"
 import Card from './Card.vue'
 import CardHeader from './CardHeader.vue'
 import CardTitle from './CardTitle.vue'

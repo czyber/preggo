@@ -3,6 +3,7 @@ from sqlmodel import Field, SQLModel, JSON, Column, Relationship
 from datetime import datetime
 import uuid
 from enum import Enum
+import json
 
 if TYPE_CHECKING:
     from app.models.content import Comment

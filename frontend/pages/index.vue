@@ -45,7 +45,7 @@
             
             <!-- Hero Visual Placeholder -->
             <div class="flex justify-center my-8 md:my-12 animate-fade-in" style="animation-delay: 0.4s;">
-              <div class="relative hero-visual w-80 h-80 md:w-96 md:h-96">
+              <div class="relative hero-visual w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96">
                 <!-- Pregnancy silhouette with glow -->
                 <div class="absolute inset-0 flex items-center justify-center">
                   <div class="pregnancy-silhouette w-32 h-48 bg-gradient-to-b from-soft-pink/30 to-gentle-mint/30 rounded-full relative">
@@ -86,19 +86,19 @@
             </div>
             
             <!-- CTA Buttons -->
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style="animation-delay: 0.6s;">
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 animate-slide-up" style="animation-delay: 0.6s;">
               <BaseButton
-                size="lg"
+                size="default"
                 variant="default"
-                class="hero-button text-lg px-10 py-4 font-semibold shadow-lg"
+                class="w-full sm:w-auto"
                 @click="router.push('/auth/signup')"
               >
                 Start Your Journey
               </BaseButton>
               <BaseButton
-                size="lg"
+                size="default"
                 variant="outline"
-                class="hero-button text-lg px-10 py-4 font-medium hover:bg-soft-pink/5"
+                class="w-full sm:w-auto"
                 @click="scrollToFeatures"
               >
                 See How It Works
@@ -106,7 +106,7 @@
             </div>
             
             <!-- Trust indicator -->
-            <p class="text-sm text-gray-500 font-secondary animate-fade-in" style="animation-delay: 0.8s;">
+            <p class="text-sm text-gray-600 font-secondary animate-fade-in" style="animation-delay: 0.8s;">
               Join thousands of families sharing their pregnancy journey
             </p>
           </div>
@@ -158,7 +158,7 @@
         </div>
 
         <!-- CTA Section -->
-        <div class="text-center space-y-8 bg-gradient-to-r from-soft-pink/10 via-muted-lavender/10 to-gentle-mint/10 rounded-3xl p-6 md:p-12 mx-4">
+        <div class="text-center space-y-8 bg-gradient-to-r from-soft-pink/10 via-muted-lavender/10 to-gentle-mint/10 rounded-3xl p-6 md:p-12">
           <div class="space-y-6">
             <h3 class="text-2xl md:text-3xl font-primary font-semibold text-gray-800">
               Ready to start your beautiful pregnancy journey?
@@ -167,9 +167,9 @@
               Join thousands of families already sharing their special moments
             </p>
             <BaseButton
-              size="lg"
+              size="default"
               variant="default"
-              class="text-lg px-12 py-4 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+              class="px-6"
               @click="router.push('/auth/signup')"
             >
               Create Your Free Account
@@ -186,26 +186,26 @@
           </div>
 
           <!-- Trust indicators -->
-          <div class="max-w-2xl mx-auto pt-8 border-t border-warm-neutral/40">
+          <div class="max-w-2xl mx-auto pt-8 border-t border-gray-200">
             <p class="text-xs text-gray-500 font-secondary mb-4">Trusted by expecting families worldwide</p>
-            <div class="flex items-center justify-center space-x-8 opacity-60">
+            <div class="flex items-center justify-center space-x-8">
               <div class="flex items-center space-x-1">
-                <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-green-600/70" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                 </svg>
-                <span class="text-xs font-secondary">HIPAA Compliant</span>
+                <span class="text-xs font-secondary text-gray-600">HIPAA Compliant</span>
               </div>
               <div class="flex items-center space-x-1">
-                <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-blue-600/70" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                 </svg>
-                <span class="text-xs font-secondary">SSL Encrypted</span>
+                <span class="text-xs font-secondary text-gray-600">SSL Encrypted</span>
               </div>
               <div class="flex items-center space-x-1">
-                <svg class="w-4 h-4 text-purple-500" fill="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-purple-600/70" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                 </svg>
-                <span class="text-xs font-secondary">4.9★ Rating</span>
+                <span class="text-xs font-secondary text-gray-600">4.9★ Rating</span>
               </div>
             </div>
           </div>
@@ -313,15 +313,15 @@
 </template>
 
 <script setup lang="ts">
-import { usePregnancyStore } from "~/stores/pregnancy";
-import PregnancyOverviewCard from "~/components/pregnancy/PregnancyOverviewCard.vue";
-import BabyDevelopmentCard from "~/components/pregnancy/BabyDevelopmentCard.vue";
-import WeeklyInfoCard from "~/components/pregnancy/WeeklyInfoCard.vue";
-import QuickActionsCard from "~/components/pregnancy/QuickActionsCard.vue";
-import MilestonesCard from "~/components/pregnancy/MilestonesCard.vue";
-import RecentActivityCard from "~/components/pregnancy/RecentActivityCard.vue";
-import CreateUpdateCard from "~/components/pregnancy/CreateUpdateCard.vue";
-import FamilyFeedCard from "~/components/pregnancy/FamilyFeedCard.vue";
+import { usePregnancyStore } from "@/stores/pregnancy";
+import PregnancyOverviewCard from "@/components/pregnancy/PregnancyOverviewCard.vue";
+import BabyDevelopmentCard from "@/components/pregnancy/BabyDevelopmentCard.vue";
+import WeeklyInfoCard from "@/components/pregnancy/WeeklyInfoCard.vue";
+import QuickActionsCard from "@/components/pregnancy/QuickActionsCard.vue";
+import MilestonesCard from "@/components/pregnancy/MilestonesCard.vue";
+import RecentActivityCard from "@/components/pregnancy/RecentActivityCard.vue";
+import CreateUpdateCard from "@/components/pregnancy/CreateUpdateCard.vue";
+import FamilyFeedCard from "@/components/pregnancy/FamilyFeedCard.vue";
 
 const router = useRouter()
 
@@ -438,16 +438,6 @@ watch(isLoggedIn, async (loggedIn) => {
   animation: pregnancy-glow 3s ease-in-out infinite;
 }
 
-/* Button hover effects */
-.hero-button {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.hero-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(248, 187, 208, 0.3);
-}
-
 /* Feature cards hover effects */
 .feature-card:hover {
   transform: translateY(-4px);
@@ -465,12 +455,17 @@ watch(isLoggedIn, async (loggedIn) => {
 /* Mobile optimizations */
 @media (max-width: 640px) {
   .hero-visual {
-    width: 280px;
-    height: 280px;
+    width: 16rem; /* 256px */
+    height: 16rem;
   }
   
   .floating-shape {
     display: none;
+  }
+  
+  /* Prevent horizontal overflow on mobile */
+  .pregnancy-silhouette {
+    max-width: 100%;
   }
 }
 

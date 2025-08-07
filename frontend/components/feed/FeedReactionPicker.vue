@@ -126,7 +126,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
-import { cn } from '~/utils/cn'
+import { cn } from '~/components/ui/utils'
 import { useReactionAnimation, useGentleTransitions, useCelebrationAnimation } from '~/composables/useAnimations'
 
 interface Props {

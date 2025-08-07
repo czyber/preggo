@@ -36,7 +36,7 @@
           <!-- "You" Badge for current user -->
           <span
             v-if="isCurrentUser"
-            class="px-2 py-1 bg-soft-pink/20 text-soft-pink-dark text-xs font-bold rounded-full border border-soft-pink/30"
+            class="px-2 py-1 bg-soft-pink/20 text-pink-700 text-xs font-bold rounded-full border border-soft-pink/30"
           >
             You
           </span>
@@ -44,7 +44,7 @@
           <!-- Relationship Badge -->
           <span
             v-else-if="authorRelationship"
-            class="px-2 py-1 bg-gentle-mint/20 text-gentle-mint-dark text-xs font-medium rounded-full"
+            class="px-2 py-1 bg-gentle-mint/20 text-gray-700 text-xs font-medium rounded-full"
           >
             {{ authorRelationship }}
           </span>
@@ -147,7 +147,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
-import { cn } from '~/utils/cn'
+import { cn } from '~/components/ui/utils'
 import type { components } from '~/types/api'
 
 type EnrichedPost = components['schemas']['EnrichedPost']
@@ -319,7 +319,7 @@ function getPostTypeBadgeColor() {
   
   const typeColors = {
     milestone: 'bg-soft-pink/20 text-soft-pink',
-    update: 'bg-gentle-mint/20 text-gentle-mint-dark',
+    update: 'bg-gentle-mint/20 text-gray-700',
     photo: 'bg-muted-lavender/20 text-muted-lavender-dark',
     journal: 'bg-blue-50 text-blue-700',
     question: 'bg-light-coral/20 text-light-coral-dark',

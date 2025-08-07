@@ -76,22 +76,22 @@
             
             <div class="space-y-2 text-sm text-gray-700">
               <div v-if="celebration.milestone_details.baby_size" class="flex items-center gap-2">
-                <span class="font-medium text-gentle-mint-dark">Baby Size:</span>
+                <span class="font-medium text-gray-700">Baby Size:</span>
                 <span>{{ celebration.milestone_details.baby_size }}</span>
               </div>
               
               <div v-if="celebration.milestone_details.development" class="flex items-start gap-2">
-                <span class="font-medium text-gentle-mint-dark">Development:</span>
+                <span class="font-medium text-gray-700">Development:</span>
                 <span>{{ celebration.milestone_details.development }}</span>
               </div>
               
               <div v-if="celebration.milestone_details.key_changes && celebration.milestone_details.key_changes.length > 0" class="flex items-start gap-2">
-                <span class="font-medium text-gentle-mint-dark">Key Changes:</span>
+                <span class="font-medium text-gray-700">Key Changes:</span>
                 <div class="flex flex-wrap gap-1">
                   <span
                     v-for="change in celebration.milestone_details.key_changes"
                     :key="change"
-                    class="px-2 py-1 bg-gentle-mint/20 text-gentle-mint-dark text-xs rounded-full"
+                    class="px-2 py-1 bg-gentle-mint/20 text-gray-700 text-xs rounded-full"
                   >
                     {{ change }}
                   </span>
@@ -130,7 +130,7 @@
             :key="message.id"
             class="flex items-start gap-2 p-2 bg-white/50 rounded-lg"
           >
-            <div class="w-6 h-6 bg-gentle-mint/30 rounded-full flex items-center justify-center text-xs font-semibold text-gentle-mint-dark">
+            <div class="w-6 h-6 bg-gentle-mint/30 rounded-full flex items-center justify-center text-xs font-semibold text-gray-700">
               {{ message.author_name?.charAt(0).toUpperCase() }}
             </div>
             <div class="flex-1 min-w-0">
@@ -212,7 +212,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { cn } from '~/utils/cn'
+import { cn } from '~/components/ui/utils'
 import type { components } from '~/types/api'
 import { useCelebrationAnimation, useGentleTransitions, useScrollAnimation } from '~/composables/useAnimations'
 

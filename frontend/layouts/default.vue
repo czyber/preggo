@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-warm-neutral/20">
+  <div class="min-h-screen bg-gray-50 overflow-x-hidden">
     <!-- Navigation Header -->
     <nav class="bg-white/80 backdrop-blur-sm shadow-sm border-b border-warm-neutral/30">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -68,7 +68,7 @@
     </nav>
 
     <!-- Main Content Area -->
-    <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <main class="w-full max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
       <div class="fade-in">
         <slot />
       </div>
@@ -99,7 +99,7 @@
 
 <script setup lang="ts">
 import { Baby, Home, Heart, Sparkles, Activity, Users } from 'lucide-vue-next'
-import UserProfileDropdown from '~/components/ui/UserProfileDropdown.vue'
+import UserProfileDropdown from '@/components/ui/UserProfileDropdown.vue'
 
 // Navigation helper
 const route = useRoute()

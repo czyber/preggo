@@ -148,8 +148,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useFeedStore } from '~/stores/feed'
-import { cn } from '~/utils/cn'
+import { useFeedStore } from "~/stores/feed"
+import { cn } from '~/components/ui/utils'
 import { useScrollAnimation, useFeedAnimations, useGentleTransitions } from '~/composables/useAnimations'
 
 interface Props {

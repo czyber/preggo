@@ -1,5 +1,12 @@
 <template>
-  <div class="relative">
+  <div class="space-y-1">
+    <label
+      v-if="label"
+      :for="id"
+      :class="cn(labelVariants({ variant, size }))"
+    >
+      {{ label }}
+    </label>
     <input
       :id="id"
       :type="type"
@@ -11,13 +18,6 @@
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
     />
-    <label
-      v-if="label"
-      :for="id"
-      :class="cn(labelVariants({ variant, size }))"
-    >
-      {{ label }}
-    </label>
     <div
       v-if="hint"
       :class="cn(hintVariants({ variant }))"
@@ -35,22 +35,22 @@
 
 <script setup lang="ts">
 import { cva, type VariantProps } from 'class-variance-authority'
-import { cn } from '~/utils/cn'
+import { cn } from '~/components/ui/utils'
 
 const inputVariants = cva(
-  'flex w-full rounded-xl border bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200',
+  'flex w-full rounded-lg border bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200',
   {
     variants: {
       variant: {
-        default: 'border-warm-neutral focus-visible:ring-soft-pink/50 focus-visible:border-soft-pink bg-white',
-        supportive: 'border-gentle-mint focus-visible:ring-gentle-mint/50 focus-visible:border-gentle-mint bg-gentle-mint/5',
-        celebration: 'border-light-coral focus-visible:ring-light-coral/50 focus-visible:border-light-coral bg-light-coral/5',
-        outline: 'border-input bg-background hover:bg-accent hover:text-accent-foreground',
+        default: 'border-gray-200 focus-visible:ring-gray-300 focus-visible:border-gray-400 bg-white hover:border-gray-300',
+        supportive: 'border-gray-200 focus-visible:ring-gentle-mint/30 focus-visible:border-gentle-mint/50 bg-white hover:border-gray-300',
+        celebration: 'border-gray-200 focus-visible:ring-light-coral/30 focus-visible:border-light-coral/50 bg-white hover:border-gray-300',
+        outline: 'border-gray-200 bg-white hover:border-gray-300',
       },
       size: {
-        default: 'h-12 px-4 py-3',
-        sm: 'h-10 px-3 py-2 text-sm',
-        lg: 'h-14 px-5 py-4 text-base',
+        default: 'h-10 px-3 py-2',
+        sm: 'h-9 px-3 py-1.5 text-xs',
+        lg: 'h-11 px-4 py-2.5 text-base',
       },
     },
     defaultVariants: {
@@ -61,7 +61,7 @@ const inputVariants = cva(
 )
 
 const labelVariants = cva(
-  'absolute left-4 transition-all duration-200 pointer-events-none font-primary',
+  'block text-sm font-medium text-gray-700 mb-1',
   {
     variants: {
       variant: {
@@ -71,9 +71,9 @@ const labelVariants = cva(
         outline: 'text-muted-foreground',
       },
       size: {
-        default: '-top-2.5 text-sm bg-background px-2',
-        sm: '-top-2 text-xs bg-background px-2',
-        lg: '-top-3 text-base bg-background px-2',
+        default: 'text-sm',
+        sm: 'text-xs',
+        lg: 'text-base',
       },
     },
     defaultVariants: {
@@ -120,33 +120,30 @@ defineEmits<{
 </script>
 
 <style scoped>
-/* Enhanced styling for pregnancy theme */
+/* Professional styling similar to Linear */
 input {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-weight: 400;
   color: rgb(51, 51, 51) !important;
+  letter-spacing: -0.01em;
 }
 
 label {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
-/* Soft glow effect on focus */
+/* Soft focus effect */
 input:focus-visible {
-  box-shadow: 0 0 0 3px rgba(248, 187, 208, 0.15);
+  box-shadow: 0 0 0 2px rgba(156, 163, 175, 0.1);
 }
 
-/* Floating label animation when input has value */
-input:focus + label,
-input:not(:placeholder-shown) + label {
-  transform: translateY(-50%) scale(0.9);
-}
-
-/* Custom placeholder styling */
+/* Custom placeholder styling - not italic */
 input::placeholder {
   color: rgb(156, 163, 175);
-  font-style: italic;
+  font-style: normal;
+  opacity: 0.8;
 }
 
 /* Supportive styling for different states */

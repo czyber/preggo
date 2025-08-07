@@ -171,12 +171,14 @@ app = FastAPI(
 )
 
 # Set up CORS
+logger.info(f"Setting up CORS with origins: {settings.BACKEND_CORS_ORIGINS}")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.BACKEND_CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Include API routes
@@ -214,7 +216,8 @@ async def health_check():
             "status": "healthy",
             "environment": settings.ENVIRONMENT,
             "database": "connected",
-            "supabase": "connected"
+            "supabase": "connected",
+            "cors_origins": settings.BACKEND_CORS_ORIGINS
         }
     except Exception as e:
         return {
@@ -222,3 +225,11 @@ async def health_check():
             "error": str(e),
             "environment": settings.ENVIRONMENT
         }
+
+@app.options("/{full_path:path}")
+async def options_handler(full_path: str):
+    """
+    Explicit OPTIONS handler for CORS preflight requests.
+    This ensures preflight requests get proper CORS headers.
+    """
+    return {"message": "OK"}

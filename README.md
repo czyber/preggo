@@ -153,7 +153,7 @@ Use the generated types in your frontend code:
 
 ```typescript
 // frontend/composables/useApi.ts
-import type { components } from '~/types/api'
+import type { components } from '@/types/api'
 
 type Item = components['schemas']['ItemRead']
 
@@ -230,7 +230,7 @@ const { data, error } = await api.getItems()
    ```typescript
    // frontend/stores/users.ts
    import { defineStore } from 'pinia'
-   import type { components } from '~/types/api'
+   import type { components } from '@/types/api'
    
    type User = components['schemas']['UserRead']
    

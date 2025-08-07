@@ -1,8 +1,9 @@
+@import './animations.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import './animations.css';
 
 @layer base {
   :root {
@@ -10,13 +11,13 @@
     --soft-pink: #F8BBD0;
     --muted-lavender: #E1BEE7;
     --gentle-mint: #B2DFDB;
-    --warm-neutral: #FFF3E0;
+    --warm-neutral: #FAFAFA;
     --light-coral: #FFCDD2;
     --soft-blue: #BBDEFB;
     
     /* Shadcn UI Colors - Light Theme (Pregnancy-themed) */
-    --background: 252 245 224; /* Very light warm neutral */
-    --foreground: 51 51 51; /* Dark gray for text */
+    --background: 0 0% 98%; /* Very light neutral gray */
+    --foreground: 220 13% 37%; /* Proper gray-600 for text */
     --card: 255 255 255; /* White */
     --card-foreground: 51 51 51; /* Dark gray */
     --popover: 255 255 255; /* White */
@@ -67,9 +68,15 @@
   }
   
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background;
     font-feature-settings: "rlig" 1, "calt" 1;
     font-family: 'Poppins', sans-serif;
+    color: rgb(75, 85, 99); /* Default gray-600 color for all text */
+  }
+  
+  /* Reset any browser default text colors */
+  html {
+    color: rgb(75, 85, 99);
   }
   
   /* Typography Base Styles */
@@ -85,9 +92,15 @@
     text-transform: lowercase;
   }
   
-  p, span, div {
+  p, span, div, a, li, td, th, label {
     font-family: 'Roboto', sans-serif;
     line-height: 1.6;
+    color: inherit; /* Inherit the gray color from body */
+  }
+  
+  /* Ensure all text elements have proper color */
+  * {
+    color: inherit;
   }
   
   /* Pregnancy-themed base styles */
@@ -165,5 +178,21 @@
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+  }
+  
+  /* Mobile overflow prevention */
+  @media (max-width: 640px) {
+    * {
+      max-width: 100vw !important;
+    }
+    
+    body {
+      overflow-x: hidden !important;
+      position: relative;
+    }
+    
+    .min-h-screen {
+      overflow-x: hidden;
+    }
   }
 }

@@ -73,7 +73,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { cn } from '~/utils/cn'
+import { cn } from '~/components/ui/utils'
 import type { components } from '~/types/api'
 import FamilyComment from './FamilyComment.vue'
 import UserAvatar from '~/components/ui/UserAvatar.vue'

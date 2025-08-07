@@ -30,16 +30,15 @@
       />
       
       <!-- Signup Form -->
-      <form class="space-y-5" @submit.prevent="handleSubmit">
-        <div class="space-y-4">
+      <form class="space-y-4" @submit.prevent="handleSubmit">
+        <div class="space-y-3">
           <BaseInput
             id="full-name"
             v-model="fullName"
             type="text"
             label="Full name"
-            placeholder="Enter your full name"
+            placeholder="John Doe"
             autocomplete="name"
-            variant="supportive"
             :error="fullNameError"
             required
           />
@@ -49,9 +48,8 @@
             v-model="email"
             type="email"
             label="Email address"
-            placeholder="Enter your email"
+            placeholder="john@example.com"
             autocomplete="email"
-            variant="supportive"
             :error="emailError"
             required
           />
@@ -61,11 +59,10 @@
             v-model="password"
             type="password"
             label="Password"
-            placeholder="Create a password (min. 6 characters)"
+            placeholder="••••••••"
             autocomplete="new-password"
-            variant="supportive"
             :error="passwordError"
-            hint="Choose a secure password with at least 6 characters"
+            hint="Minimum 6 characters"
             required
           />
           
@@ -74,30 +71,29 @@
             v-model="confirmPassword"
             type="password"
             label="Confirm password"
-            placeholder="Confirm your password"
+            placeholder="••••••••"
             autocomplete="new-password"
-            variant="supportive"
             :error="confirmPasswordError"
             required
           />
         </div>
 
         <!-- Terms Agreement -->
-        <div class="flex items-start space-x-3">
+        <div class="flex items-start space-x-2 py-2">
           <input
             id="agree-terms"
             v-model="agreeTerms"
             type="checkbox"
-            class="mt-1 h-4 w-4 text-gentle-mint focus:ring-gentle-mint/50 border-warm-neutral rounded"
+            class="mt-0.5 h-4 w-4 text-gray-600 focus:ring-gray-400 border-gray-300 rounded"
             required
           />
-          <label for="agree-terms" class="text-sm text-gray-700 font-secondary leading-relaxed">
+          <label for="agree-terms" class="text-sm text-gray-600 leading-relaxed">
             I agree to Preggo's 
-            <NuxtLink to="/terms" class="text-gentle-mint hover:text-gentle-mint/80 underline">
+            <NuxtLink to="/terms" class="text-gray-700 hover:text-gray-900 underline underline-offset-2">
               Terms of Service
             </NuxtLink>
             and 
-            <NuxtLink to="/privacy" class="text-gentle-mint hover:text-gentle-mint/80 underline">
+            <NuxtLink to="/privacy" class="text-gray-700 hover:text-gray-900 underline underline-offset-2">
               Privacy Policy
             </NuxtLink>
           </label>
@@ -105,12 +101,12 @@
 
         <BaseButton
           type="submit"
-          variant="supportive"
-          size="lg"
+          variant="default"
+          size="default"
           class="w-full"
           :disabled="loading || !isFormValid"
         >
-          {{ loading ? 'Creating your account...' : 'Create your Preggo account' }}
+          {{ loading ? 'Creating account...' : 'Create account' }}
         </BaseButton>
       </form>
 

@@ -7,7 +7,7 @@ instead of direct Supabase client calls.
 
 from typing import Optional, List, Dict, Any
 from sqlmodel import Session, select
-from app.models.user import User
+from app.models.user import User, UserPreferences
 from app.services.base import BaseService
 import logging
 
@@ -39,8 +39,19 @@ class UserService(BaseService[User]):
                 logger.warning(f"User with email {user_data.get('email')} already exists")
                 return existing_user
             
+            # Handle preferences serialization
+            preferences_data = user_data.copy()
+            if "preferences" in preferences_data:
+                prefs = preferences_data["preferences"]
+                if isinstance(prefs, UserPreferences):
+                    preferences_data["preferences"] = prefs.dict()
+                elif prefs is None or prefs == {}:
+                    preferences_data["preferences"] = UserPreferences().dict()
+            else:
+                preferences_data["preferences"] = UserPreferences().dict()
+            
             # Create new user
-            db_user = await self.create(session, user_data)
+            db_user = await self.create(session, preferences_data)
             return db_user
         except Exception as e:
             logger.error(f"Error creating user: {e}")
@@ -54,11 +65,18 @@ class UserService(BaseService[User]):
                 logger.warning(f"User with ID {user_id} not found")
                 return None
             
+            # Handle preferences serialization
+            update_data = user_data.copy()
+            if "preferences" in update_data:
+                prefs = update_data["preferences"]
+                if isinstance(prefs, UserPreferences):
+                    update_data["preferences"] = prefs.dict()
+            
             # Update timestamp
             from datetime import datetime
-            user_data["updated_at"] = datetime.utcnow()
+            update_data["updated_at"] = datetime.utcnow()
             
-            updated_user = await self.update(session, db_user, user_data)
+            updated_user = await self.update(session, db_user, update_data)
             return updated_user
         except Exception as e:
             logger.error(f"Error updating user {user_id}: {e}")

@@ -14,7 +14,7 @@ import {
   applyEmotionalAnimation,
   getEmotionalTiming,
   type ANIMATION_PRESETS 
-} from '~/utils/animations'
+} from '@/utils/animations'
 
 // === SCROLL ANIMATIONS COMPOSABLE ===
 

@@ -69,7 +69,7 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted, watch } from 'vue'
-import { cn } from '~/utils/cn'
+import { cn } from '~/components/ui/utils'
 import type { components } from '~/types/api'
 import { useReactionAnimation, useGentleTransitions, useFeedAnimations } from '~/composables/useAnimations'
 

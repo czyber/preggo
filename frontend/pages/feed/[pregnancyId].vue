@@ -306,12 +306,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useFeedStore } from '~/stores/feed'
-import { usePregnancyStore } from '~/stores/pregnancy'
-import { useFamilyStore } from '~/stores/family'
-import { useAuth } from '~/composables/useAuth'
-import { useToast } from '~/composables/useToast'
-import UserAvatar from '~/components/ui/UserAvatar.vue'
+import { useFeedStore } from "@/stores/feed"
+import { usePregnancyStore } from "@/stores/pregnancy"
+import { useFamilyStore } from "@/stores/family"
+import { useAuth } from '@/composables/useAuth'
+import { useToast } from '@/composables/useToast'
+import UserAvatar from '@/components/ui/UserAvatar.vue'
 
 // Composables
 const route = useRoute()

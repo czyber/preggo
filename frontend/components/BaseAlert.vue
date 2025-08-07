@@ -37,7 +37,7 @@
 
 <script setup lang="ts">
 import { cva, type VariantProps } from 'class-variance-authority'
-import { cn } from '~/utils/cn'
+import { cn } from '~/components/ui/utils'
 import { useSlots, computed } from 'vue'
 import { Heart, Baby, Sparkles, Info, AlertTriangle, CheckCircle, X } from 'lucide-vue-next'
 

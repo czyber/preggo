@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { components } from '~/types/api'
+import type { components } from '@/types/api'
 
 // Type aliases for cleaner code - matching backend schemas
 type EnrichedPost = components['schemas']['EnrichedPost']

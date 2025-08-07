@@ -10,8 +10,8 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { cn } from '~/utils/cn'
-import { getUserAvatarColor, getUserInitials, getUserDisplayName, getAvatarClasses } from '~/utils/avatar'
+import { cn } from '~/components/ui/utils'
+import { getUserAvatarColor, getUserInitials, getUserDisplayName, getAvatarClasses } from '@/utils/avatar'
 
 interface User {
   id?: string

@@ -102,10 +102,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { ChevronDown, User as UserIcon, Settings, LogOut } from 'lucide-vue-next'
-import { cn } from '~/lib/utils'
-import DropdownMenu from "~/components/ui/DropdownMenu.vue";
-import DropdownMenuItem from "~/components/ui/DropdownMenuItem.vue";
-import UserAvatar from "~/components/ui/UserAvatar.vue";
+import { cn } from "./utils"
+import DropdownMenu from "@/components/ui/DropdownMenu.vue";
+import DropdownMenuItem from "@/components/ui/DropdownMenuItem.vue";
+import UserAvatar from "@/components/ui/UserAvatar.vue";
 
 const { userProfile, signOut, loading, isAuthenticated } = useAuth()
 const router = useRouter()

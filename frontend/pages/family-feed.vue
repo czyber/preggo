@@ -121,7 +121,7 @@
 
 <script setup lang="ts">
 import { Users, Baby } from 'lucide-vue-next'
-import { usePregnancyStore } from '~/stores/pregnancy'
+import { usePregnancyStore } from "@/stores/pregnancy"
 
 definePageMeta({
   middleware: 'auth'

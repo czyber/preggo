@@ -74,10 +74,10 @@
 </template>
 
 <script setup lang="ts">
-import { cn } from '~/utils/cn'
+import { cn } from '~/components/ui/utils'
 import type { components } from '~/types/api'
 import UserAvatar from '~/components/ui/UserAvatar.vue'
-import { getUserDisplayName } from '~/utils/avatar'
+import { getUserDisplayName } from '@/utils/avatar'
 
 type Comment = components['schemas']['CommentResponse']
 type PregnancyContext = components['schemas']['PregnancyContext']

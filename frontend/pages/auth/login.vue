@@ -21,16 +21,15 @@
       />
       
       <!-- Login Form -->
-      <form class="space-y-5" @submit.prevent="handleSubmit">
-        <div class="space-y-4">
+      <form class="space-y-4" @submit.prevent="handleSubmit">
+        <div class="space-y-3">
           <BaseInput
             id="email"
             v-model="email"
             type="email"
             label="Email address"
-            placeholder="Enter your email"
+            placeholder="john@example.com"
             autocomplete="email"
-            variant="default"
             :error="emailError"
             required
           />
@@ -40,30 +39,29 @@
             v-model="password"
             type="password"
             label="Password"
-            placeholder="Enter your password"
+            placeholder="••••••••"
             autocomplete="current-password"
-            variant="default"
             :error="passwordError"
             required
           />
         </div>
 
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between py-1">
           <div class="flex items-center space-x-2">
             <input
               id="remember-me"
               v-model="rememberMe"
               type="checkbox"
-              class="h-4 w-4 text-soft-pink focus:ring-soft-pink/50 border-warm-neutral rounded"
+              class="h-4 w-4 text-gray-600 focus:ring-gray-400 border-gray-300 rounded"
             />
-            <label for="remember-me" class="text-sm text-gray-600 font-secondary">
+            <label for="remember-me" class="text-sm text-gray-600">
               Remember me
             </label>
           </div>
 
           <NuxtLink 
             to="/auth/forgot-password" 
-            class="text-sm font-medium text-soft-pink hover:text-soft-pink/80 transition-colors"
+            class="text-sm text-gray-600 hover:text-gray-900 transition-colors"
           >
             Forgot password?
           </NuxtLink>
@@ -72,21 +70,21 @@
         <BaseButton
           type="submit"
           variant="default"
-          size="lg"
+          size="default"
           class="w-full"
           :disabled="loading || !isFormValid"
         >
-          {{ loading ? 'Signing in...' : 'Sign in to your account' }}
+          {{ loading ? 'Signing in...' : 'Sign in' }}
         </BaseButton>
       </form>
 
       <!-- Sign up link -->
-      <div class="text-center pt-4 border-t border-warm-neutral/40">
-        <p class="text-sm text-gray-600 font-secondary">
+      <div class="text-center pt-4 border-t border-gray-200">
+        <p class="text-sm text-gray-600">
           New to Preggo?
           <NuxtLink 
             to="/auth/signup" 
-            class="font-medium text-soft-pink hover:text-soft-pink/80 transition-colors ml-1"
+            class="font-medium text-gray-700 hover:text-gray-900 transition-colors ml-1"
           >
             Create your account
           </NuxtLink>
@@ -97,7 +95,7 @@
       <div class="space-y-3">
         <div class="relative">
           <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-warm-neutral/40"></div>
+            <div class="w-full border-t border-gray-200"></div>
           </div>
           <div class="relative flex justify-center text-xs uppercase">
             <span class="bg-card px-2 text-gray-500 font-secondary">Or continue with</span>

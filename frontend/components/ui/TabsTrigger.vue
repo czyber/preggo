@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import { inject, computed, type Ref } from 'vue'
-import { cn } from '@/lib/utils'
+import { cn } from "./utils"
 
 interface Props {
   value: string

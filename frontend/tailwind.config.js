@@ -17,7 +17,7 @@ module.exports = {
         'gentle-mint': '#B2DFDB',
         
         // Secondary Colors
-        'warm-neutral': '#F8FAFC',
+        'warm-neutral': '#FAFAFA',
         'light-coral': '#FFCDD2',
         'soft-blue': '#BBDEFB',
         
@@ -80,6 +80,7 @@ module.exports = {
         'celebration-pulse': 'heartPulse 0.6s ease-in-out',
         'celebration-sparkle': 'sparkleFloat 1.5s ease-out forwards',
         'celebration-glow': 'glowFade 2.5s ease-in-out',
+        'gentle-pulse': 'gentlePulse 2s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -114,6 +115,10 @@ module.exports = {
           '30%': { opacity: '1', transform: 'scale(1)' },
           '70%': { opacity: '0.8' },
           '100%': { opacity: '0', transform: 'scale(1.2)' },
+        },
+        gentlePulse: {
+          '0%, 100%': { transform: 'scale(1)', opacity: '1' },
+          '50%': { transform: 'scale(1.02)', opacity: '0.9' },
         },
       },
     },

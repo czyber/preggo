@@ -1,5 +1,5 @@
 import type { User, Session } from '@supabase/supabase-js'
-import type { components } from '~/types/api'
+import type { components } from '@/types/api'
 
 // Type aliases for cleaner code
 type UserProfile = components['schemas']['UserResponse'] | null

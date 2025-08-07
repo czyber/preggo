@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
-import { cn } from '~/lib/utils'
+import { cn } from "./utils"
 
 interface Props {
   class?: string

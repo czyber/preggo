@@ -262,8 +262,8 @@
 </template>
 
 <script setup lang="ts">
-import { usePregnancyStore } from '~/stores/pregnancy'
-import { usePostsStore } from '~/stores/posts'
+import { usePregnancyStore } from "@/stores/pregnancy"
+import { usePostsStore } from "@/stores/posts"
 import type { PostType, MoodType, VisibilityLevel } from '~/types/api'
 
 // Props

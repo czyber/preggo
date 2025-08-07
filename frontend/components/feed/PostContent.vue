@@ -151,7 +151,7 @@
       <span
         v-for="tag in post.tags"
         :key="tag"
-        class="inline-flex items-center px-2 py-1 bg-gentle-mint/20 text-gentle-mint-dark text-xs font-medium rounded-full"
+        class="inline-flex items-center px-2 py-1 bg-gentle-mint/20 text-gray-700 text-xs font-medium rounded-full"
       >
         #{{ tag }}
       </span>
@@ -181,7 +181,7 @@
         
         <!-- Symptoms -->
         <div v-if="post.pregnancy_context.pregnancy_symptoms && post.pregnancy_context.pregnancy_symptoms.length > 0" class="flex items-start gap-2">
-          <span class="text-gentle-mint-dark font-medium">Symptoms:</span>
+          <span class="text-gray-700 font-medium">Symptoms:</span>
           <div class="flex flex-wrap gap-1">
             <span
               v-for="symptom in post.pregnancy_context.pregnancy_symptoms"
@@ -266,7 +266,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { cn } from '~/utils/cn'
+import { cn } from '~/components/ui/utils'
 import type { components } from '~/types/api'
 
 type EnrichedPost = components['schemas']['EnrichedPost']

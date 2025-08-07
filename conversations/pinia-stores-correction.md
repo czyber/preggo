@@ -73,7 +73,7 @@ All stores follow the exact same pattern as the original `items.ts` store:
 1. **Import Structure**: 
    ```typescript
    import { defineStore } from 'pinia'
-   import type { components } from '~/types/api'
+   import type { components } from '@/types/api'
    ```
 
 2. **Type Aliases**: Clean type aliases from the generated API types

@@ -29,30 +29,39 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     ENVIRONMENT: str = "development"
     
-    # CORS origins - expanded for Supabase integration
-    BACKEND_CORS_ORIGINS: List[str] = [
-        "http://localhost:3000",
-        "http://localhost:3001", 
-        "https://localhost:3000",
-        "https://localhost:3001"
-    ]
+    # CORS origins - allowing all origins for development
+    # In production, set BACKEND_CORS_ORIGINS env var to your frontend URL
+    # Accepts: ["*"], "*", or comma-separated list like "url1,url2"
+    BACKEND_CORS_ORIGINS: List[str] = ["*"]
     
     @validator("BACKEND_CORS_ORIGINS", pre=True)
     def assemble_cors_origins(cls, v):
-        if isinstance(v, str) and not v.startswith("["):
+        # Handle environment variable string
+        if isinstance(v, str):
+            # Handle JSON array format like ["*"] or ["url1","url2"]
+            if v.startswith("[") and v.endswith("]"):
+                import json
+                try:
+                    return json.loads(v)
+                except json.JSONDecodeError:
+                    pass
+            # Handle single wildcard
+            if v == "*":
+                return ["*"]
+            # Handle comma-separated list
             return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
+        elif isinstance(v, list):
             return v
         raise ValueError(v)
     
-    # Database Configuration - Using Supabase PostgreSQL
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://postgres:password@localhost:5432/preggo")
+    # Database Configuration - Railway PostgreSQL
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "")
     
     @validator("DATABASE_URL")
     def validate_database_url(cls, v, values):
         """Validate database URL format and security"""
         if not v or v.strip() == "":
-            raise ValueError("DATABASE_URL cannot be empty")
+            raise ValueError("DATABASE_URL environment variable is required. Please add a PostgreSQL database in Railway.")
         
         # Basic URL format validation
         if not v.startswith(("postgresql://", "postgres://")):

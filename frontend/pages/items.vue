@@ -139,7 +139,7 @@
 </template>
 
 <script setup>
-import { useItemsStore } from '~/stores/items'
+import { useItemsStore } from "@/stores/items"
 
 const itemsStore = useItemsStore()
 

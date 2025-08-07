@@ -82,7 +82,7 @@ Pinia is used for state management. Example store structure:
 ```typescript
 // stores/items.ts
 import { defineStore } from 'pinia'
-import type { components } from '~/types/api'
+import type { components } from '@/types/api'
 
 type Item = components['schemas']['ItemRead']
 

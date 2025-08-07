@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { components } from '~/types/api'
+import type { components } from '@/types/api'
 
 // Type aliases for cleaner code
 type Post = components['schemas']['PostResponse']

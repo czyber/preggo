@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'optimize_feed_perf'
-down_revision = 'previous_revision'  # Replace with actual previous revision
+down_revision = '44fe28c51a8d'  # Replace with actual previous revision
 branch_labels = None
 depends_on = None
 
@@ -23,8 +23,7 @@ def upgrade():
     op.create_index(
         'idx_posts_pregnancy_status_created',
         'posts',
-        ['pregnancy_id', 'status', 'created_at'],
-        postgresql_where=sa.text('deleted_at IS NULL')
+        ['pregnancy_id', 'status', 'created_at']
     )
     
     # Index on posts for type filtering
@@ -39,7 +38,6 @@ def upgrade():
         'idx_reactions_post_user',
         'reactions',
         ['post_id', 'user_id'],
-        postgresql_where=sa.text('deleted_at IS NULL')
     )
     
     # Index on comments for post aggregation
@@ -47,9 +45,8 @@ def upgrade():
         'idx_comments_post_created',
         'comments',
         ['post_id', 'created_at'],
-        postgresql_where=sa.text('deleted_at IS NULL')
     )
-    
+
     # Index on family_members for access control
     op.create_index(
         'idx_family_members_pregnancy_user',
@@ -62,7 +59,6 @@ def upgrade():
         'idx_posts_trending',
         'posts',
         ['pregnancy_id', 'created_at', 'reaction_count', 'comment_count'],
-        postgresql_where=sa.text('status = \'published\' AND deleted_at IS NULL')
     )
 
 

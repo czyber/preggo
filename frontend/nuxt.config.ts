@@ -1,12 +1,25 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { resolve } from 'path'
+
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  devtools: { enabled: false }, // Disable devtools for production build
+  components: {
+    dirs: [
+      {
+        path: '~/components',
+        pathPrefix: false,
+        global: true
+      }
+    ]
+  },
+  build: {
+    transpile: ['estree-walker'] // Force transpilation of problematic packages
+  },
   modules: [
     '@pinia/nuxt',
     '@nuxtjs/tailwindcss',
     '@nuxtjs/google-fonts',
-    '@vueuse/nuxt',
-    'shadcn-nuxt'
+    '@vueuse/nuxt'
   ],
   pinia: {
     autoImports: ['defineStore', 'storeToRefs']
@@ -22,21 +35,23 @@ export default defineNuxtConfig({
     }
   },
   ssr: false,
+  nitro: {
+    experimental: {
+      wasm: true
+    }
+  },
   typescript: {
     strict: true
   },
   // Remove global auth middleware - we'll apply it per page as needed
   googleFonts: {
     families: {
+      Inter: [400, 500, 600, 700],
       Poppins: [300, 400, 500, 600, 700],
       Roboto: [300, 400, 500, 700],
       Lato: [400]
     },
     display: 'swap',
     preload: true
-  },
-  shadcn: {
-    prefix: '',
-    componentDir: './components/ui'
   }
 })

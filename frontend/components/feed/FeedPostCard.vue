@@ -103,10 +103,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
-import { cn } from '~/utils/cn'
+import { cn } from '~/components/ui/utils'
 import type { components } from '~/types/api'
 import { useGentleTransitions, useFeedAnimations, useCelebrationAnimation, useScrollAnimation } from '~/composables/useAnimations'
-import { usePostsStore } from '~/stores/posts'
+import { usePostsStore } from "~/stores/posts"
 import PostContent from "~/components/feed/PostContent.vue";
 import PostHeader from "~/components/feed/PostHeader.vue";
 import PostEngagement from "~/components/feed/PostEngagement.vue";

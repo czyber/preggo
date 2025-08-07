@@ -1,5 +1,5 @@
 import createClient from 'openapi-fetch'
-import type { paths } from '~/types/api'
+import type { paths } from '@/types/api'
 
 /**
  * Typed API client composable for Preggo app
@@ -290,4 +290,4 @@ export const useApi = () => {
 export type {
   paths,
   components
-} from '~/types/api'
+} from '@/types/api'

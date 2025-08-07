@@ -1,0 +1,11 @@
+node_modules
+.nuxt
+.output
+.env
+.env.local
+.env.production
+.git
+README.md
+*.log
+coverage
+.nyc_output

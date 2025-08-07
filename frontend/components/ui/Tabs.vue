@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import { provide, computed } from 'vue'
-import { cn } from '@/lib/utils'
+import { cn } from "./utils"
 
 interface Props {
   defaultValue?: string
