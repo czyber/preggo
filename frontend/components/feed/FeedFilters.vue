@@ -14,9 +14,7 @@
       :aria-expanded="isOpen"
       aria-label="Filter and sort options"
     >
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707v4.586l-4-4V9.414a1 1 0 00-.293-.707L3.293 6.707A1 1 0 013 6V4z" />
-      </svg>
+      <Filter class="w-4 h-4" />
       
       <span>Filters</span>
       
@@ -27,14 +25,7 @@
       />
       
       <!-- Chevron -->
-      <svg
-        :class="cn('w-4 h-4 transition-transform duration-200', isOpen && 'rotate-180')"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-      </svg>
+      <ChevronDown :class="cn('w-4 h-4 transition-transform duration-200', isOpen && 'rotate-180')" />
     </button>
 
     <!-- Filter Dropdown -->
@@ -54,9 +45,7 @@
             class="p-1 hover:bg-gray-100 rounded-full transition-colors"
             aria-label="Close filters"
           >
-            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X class="w-4 h-4 text-gray-500" />
           </button>
         </div>
 
@@ -118,9 +107,7 @@
                   v-if="sortBy === sort.value"
                   class="w-4 h-4 text-gentle-mint"
                 >
-                  <svg fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                  </svg>
+                  <Check class="w-4 h-4" />
                 </div>
               </button>
             </div>
@@ -174,6 +161,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { cn } from '~/components/ui/utils'
+import { Filter, ChevronDown, X, Check } from 'lucide-vue-next'
 
 interface FilterOption {
   value: string

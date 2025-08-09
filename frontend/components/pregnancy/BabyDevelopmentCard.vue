@@ -1,71 +1,58 @@
 <template>
   <div
-    class="baby-development-card group relative overflow-hidden rounded-2xl transition-all duration-200 ease-out cursor-pointer"
-    :class="[
-      'hover:shadow-lg',
-      trimesterGradient
-    ]"
+    class="baby-development-card group relative overflow-hidden bg-white rounded-default border shadow-sm transition-all duration-200 ease-out cursor-pointer hover:shadow-md"
     @click="handleCardClick"
   >
-    <!-- Background gradient overlay -->
-    <div class="absolute inset-0 opacity-90" :class="trimesterGradient"></div>
+    <!-- Subtle accent border -->
+    <div class="absolute top-0 left-0 right-0 h-1 rounded-t-default" :class="trimesterAccentBg"></div>
     
-
-    <div class="relative z-10 p-6 h-full">
+    <div class="relative p-lg h-full">
       <!-- Header -->
-      <div class="flex items-center justify-between mb-4">
-        <div class="flex items-center space-x-2">
-          <div class="w-2 h-8 rounded-full" :class="trimesterAccent"></div>
-          <h3 class="text-white font-semibold text-lg">
+      <div class="flex items-center justify-between mb-lg">
+        <div class="flex items-center space-x-sm">
+          <div class="w-1 h-8 rounded-pill" :class="trimesterAccentBg"></div>
+          <h3 class="text-warm-graphite font-semibold text-xl font-primary">
             Week {{ displayWeek }}
           </h3>
         </div>
-        <div class="flex items-center space-x-1 text-white/80 text-sm">
+        <div class="flex items-center space-x-1 text-neutral-gray text-sm font-medium">
           <span>{{ trimesterLabel }}</span>
-          <div class="w-1 h-1 bg-white/60 rounded-full"></div>
+          <div class="w-1 h-1 bg-neutral-gray rounded-full"></div>
           <span>Day {{ currentDay || 0 }}</span>
         </div>
       </div>
 
       <!-- Progress bar -->
-      <div class="mb-6">
-        <div class="flex justify-between text-white/80 text-xs mb-2">
-          <span>Progress</span>
+      <div class="mb-lg">
+        <div class="flex justify-between text-soft-charcoal text-xs mb-sm font-medium">
+          <span>Pregnancy Progress</span>
           <span>{{ Math.round(progressPercentage) }}%</span>
         </div>
-        <div class="w-full bg-white/20 rounded-full h-2 overflow-hidden">
+        <div class="w-full bg-gray-100 rounded-pill h-2 overflow-hidden">
           <div 
-            class="h-full transition-all duration-1000 ease-out rounded-full"
-            :class="trimesterAccent"
+            class="h-full transition-all duration-1000 ease-out rounded-pill"
+            :class="trimesterAccentBg"
             :style="{ width: progressPercentage + '%' }"
           ></div>
         </div>
       </div>
 
       <!-- Baby size visualization -->
-      <div class="text-center mb-6">
-        <div class="relative inline-block">
-          <div class="text-6xl mb-2">
+      <div class="text-center mb-lg">
+        <div class="relative inline-block mb-sm">
+          <div class="text-6xl mb-sm">
             {{ babyIcon }}
           </div>
-          <!-- Size comparison circle -->
-          <div 
-            class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 border-2 border-white/40 rounded-full opacity-60"
-            :style="{
-              width: sizeVisualization.width,
-              height: sizeVisualization.height
-            }"
-          ></div>
         </div>
-        <p class="text-white font-medium text-sm mb-1">{{ sizeComparison }}</p>
-        <p class="text-white/70 text-xs">{{ babyWeight }}</p>
+        <p class="text-warm-graphite font-medium text-base mb-xs">Size of {{ sizeComparison }}</p>
+        <p class="text-soft-charcoal text-sm">{{ babyWeight }}</p>
       </div>
 
       <!-- Development milestones -->
-      <div class="space-y-2">
-        <h4 class="text-white/90 text-sm font-medium mb-3 flex items-center">
-          <div class="w-4 h-4 mr-2 flex items-center justify-center">
-            <svg class="w-3 h-3 text-white/70" fill="currentColor" viewBox="0 0 20 20">
+      <div class="space-y-sm">
+        <h4 class="text-warm-graphite text-sm font-medium mb-sm flex items-center">
+          <div class="w-4 h-4 mr-sm flex items-center justify-center">
+            <svg class="w-3 h-3 text-sage-green" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
             </svg>
           </div>
@@ -74,17 +61,17 @@
         <div 
           v-for="(milestone, index) in displayedMilestones" 
           :key="milestone"
-          class="flex items-start text-sm text-white/90"
+          class="flex items-start text-sm text-soft-charcoal"
         >
-          <div class="w-1.5 h-1.5 bg-white/60 rounded-full mr-3 mt-2 flex-shrink-0"></div>
+          <div class="w-1.5 h-1.5 rounded-full mr-sm mt-2 flex-shrink-0" :class="trimesterAccentBg"></div>
           <span class="leading-5">{{ milestone }}</span>
         </div>
         
         <div 
           v-if="developmentMilestones.length > 2"
-          class="text-center pt-2"
+          class="text-center pt-sm"
         >
-          <span class="text-white/60 text-xs">
+          <span class="text-neutral-gray text-xs font-medium">
             +{{ developmentMilestones.length - 2 }} more developments
           </span>
         </div>
@@ -201,18 +188,11 @@ const trimesterLabel = computed(() => {
   return `${t === 1 ? '1st' : t === 2 ? '2nd' : '3rd'} Trimester`
 })
 
-const trimesterGradient = computed(() => {
+const trimesterAccentBg = computed(() => {
   const t = trimester.value
-  if (t === 1) return 'bg-gradient-to-br from-rose-400 via-pink-500 to-rose-600'
-  if (t === 2) return 'bg-gradient-to-br from-purple-400 via-violet-500 to-purple-600'
-  return 'bg-gradient-to-br from-blue-400 via-indigo-500 to-blue-600'
-})
-
-const trimesterAccent = computed(() => {
-  const t = trimester.value
-  if (t === 1) return 'bg-rose-300'
-  if (t === 2) return 'bg-purple-300'
-  return 'bg-blue-300'
+  if (t === 1) return 'bg-rose-400'
+  if (t === 2) return 'bg-purple-400'
+  return 'bg-green-400'
 })
 
 const progressPercentage = computed(() => {
@@ -244,11 +224,12 @@ const handleCardClick = () => {
 <style scoped>
 .baby-development-card {
   min-height: 320px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-color: #e5e7eb;
 }
 
+.baby-development-card:hover {
+  transform: translateY(-1px);
+}
 
 /* Mobile touch interactions */
 @media (max-width: 768px) {
@@ -262,5 +243,10 @@ const handleCardClick = () => {
   .baby-development-card {
     transition: none;
   }
+  
+  .baby-development-card:hover {
+    transform: none;
+  }
 }
 </style>
+

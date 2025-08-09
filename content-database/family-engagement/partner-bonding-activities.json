@@ -1,0 +1,114 @@
+{
+  "content_type": "family_engagement",
+  "category": "partner_bonding",
+  "title": "Strengthening Your Bond During Pregnancy",
+  "subtitle": "Activities to bring you closer together as you prepare for parenthood",
+  "applicable_weeks": "all",
+  "activities": [
+    {
+      "week_range": "4-12",
+      "title": "Early Pregnancy Connection",
+      "activities": [
+        {
+          "name": "Dream Planning Sessions",
+          "description": "Spend time talking about your hopes and dreams for your family. What kind of parents do you want to be? What traditions do you want to create?",
+          "time_needed": "30-60 minutes",
+          "setting": "Quiet evening at home"
+        },
+        {
+          "name": "Pregnancy Documentation",
+          "description": "Take turns photographing each other during these early weeks. Even if there's no visible bump, document this special time when only you know about the baby.",
+          "time_needed": "15 minutes",
+          "setting": "Anywhere meaningful to you"
+        },
+        {
+          "name": "Research Together",
+          "description": "Choose one pregnancy topic each week to learn about together - from baby development to birth options. Make it a date night activity.",
+          "time_needed": "45 minutes",
+          "setting": "Cozy space with laptops or books"
+        }
+      ]
+    },
+    {
+      "week_range": "13-27",
+      "title": "Second Trimester Adventures",
+      "activities": [
+        {
+          "name": "Babymoon Planning",
+          "description": "Plan a special trip or staycation to celebrate your relationship before baby arrives. Focus on activities you both enjoy.",
+          "time_needed": "Several hours of planning, days for the trip",
+          "setting": "Anywhere that feels romantic and relaxing"
+        },
+        {
+          "name": "Nursery Dreaming",
+          "description": "Browse nursery ideas together, discuss your style preferences, and start planning the space. Make it fun, not stressful.",
+          "time_needed": "1-2 hours",
+          "setting": "Baby stores, online, or in the future nursery space"
+        },
+        {
+          "name": "Reading to Baby",
+          "description": "Take turns reading children's books or stories aloud to your belly. Baby can hear voices now, so this is actual bonding time.",
+          "time_needed": "15-20 minutes",
+          "setting": "Bed or comfortable seating area"
+        }
+      ]
+    },
+    {
+      "week_range": "28-40",
+      "title": "Final Trimester Preparation",
+      "activities": [
+        {
+          "name": "Birth Plan Discussions",
+          "description": "Talk through your birth preferences together. Make sure your partner knows your wishes and feels prepared to advocate for you.",
+          "time_needed": "1-2 hours",
+          "setting": "Private, comfortable space"
+        },
+        {
+          "name": "Baby Prep Tasks",
+          "description": "Tackle baby preparation tasks as a team - installing car seats, setting up the crib, washing baby clothes. Make it fun with music and snacks.",
+          "time_needed": "A few hours over several weekends",
+          "setting": "Home, baby's room"
+        },
+        {
+          "name": "Final Date Nights",
+          "description": "Plan special one-on-one time together before baby arrives. Do activities you love that might be harder with a newborn.",
+          "time_needed": "2-4 hours per date",
+          "setting": "Restaurants, movies, museums, nature walks"
+        }
+      ]
+    }
+  ],
+  "conversation_starters": [
+    "What are you most excited about in becoming a parent?",
+    "What are your biggest hopes for our family?",
+    "How do you think we'll handle the challenges together?",
+    "What traditions from your childhood do you want to continue?",
+    "What new traditions do we want to create?",
+    "How can we make sure to take care of our relationship after baby comes?"
+  ],
+  "relationship_maintenance_tips": [
+    "Schedule regular check-ins about how you're both feeling",
+    "Keep physical affection alive with hugs, kisses, and gentle touch",
+    "Express gratitude for each other regularly",
+    "Plan for postpartum relationship care before baby arrives",
+    "Remember that you're still a couple, not just future parents"
+  ],
+  "challenging_moments_guidance": {
+    "when_one_partner_is_less_excited": "It's normal for excitement levels to differ. Give space for different processing styles while maintaining open communication.",
+    "disagreements_about_preparation": "Focus on underlying values and concerns rather than specific decisions. Most logistics can be worked out with compromise.",
+    "stress_and_mood_changes": "Acknowledge that pregnancy hormones and stress affect relationships. Be extra patient and kind with each other."
+  },
+  "personalization_tags": [
+    "partner_bonding",
+    "relationship_strengthening",
+    "communication",
+    "pregnancy_activities",
+    "preparation_together"
+  ],
+  "cultural_adaptations": {
+    "relationship_styles": "Different cultures have varying expectations for partner involvement - adapt activities to fit your relationship dynamic",
+    "preparation_traditions": "Some cultures have specific ways partners prepare together - incorporate meaningful traditions"
+  },
+  "delivery_timing": "evening",
+  "tone": "warm, encouraging, relationship-focused"
+}

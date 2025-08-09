@@ -4,12 +4,17 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
+    "build:analyze": "ANALYZE=true nuxt build",
+    "build:production": "NODE_ENV=production nuxt build",
     "dev": "nuxt dev",
     "start": "node .output/server/index.mjs",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "generate-types": "openapi-typescript openapi.json -o ./types/api.ts"
+    "generate-types": "openapi-typescript openapi.json -o ./types/api.ts",
+    "performance:audit": "lighthouse http://localhost:3000 --output=json --output=html --chrome-flags='--headless'",
+    "performance:budget": "bundlesize",
+    "performance:monitor": "node scripts/performance-monitor.js"
   },
   "dependencies": {
     "@nuxtjs/google-fonts": "^3.2.0",
@@ -18,8 +23,11 @@
     "@supabase/supabase-js": "^2.53.0",
     "@types/uuid": "^10.0.0",
     "@vueuse/nuxt": "^13.6.0",
+    "@vueuse/gesture": "^2.0.0",
+    "@vueuse/motion": "^2.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "idb": "^7.1.1",
     "lucide-vue-next": "^0.536.0",
     "nuxt": "^3.11.2",
     "openapi-fetch": "^0.14.0",
@@ -28,14 +36,38 @@
     "tailwind-merge": "^3.3.1",
     "uuid": "^11.1.0",
     "vue": "latest",
-    "vue-router": "latest"
+    "vue-router": "latest",
+    "workbox-precaching": "^6.6.0",
+    "workbox-routing": "^6.6.0",
+    "workbox-strategies": "^6.6.0"
   },
   "engines": {
     "node": "24.5.0"
   },
   "devDependencies": {
-    "oxc-parser": "^0.80.0"
+    "@testing-library/vue": "^7.0.0",
+    "bundlesize": "^0.18.1",
+    "cypress": "^12.17.4",
+    "lighthouse": "^10.4.0",
+    "lighthouse-ci": "^0.12.0",
+    "oxc-parser": "^0.80.0",
+    "rollup-plugin-analyzer": "^4.0.0",
+    "rollup-plugin-visualizer": "^5.9.2",
+    "vite-bundle-analyzer": "^0.7.0",
+    "webpack-bundle-analyzer": "^4.9.1"
   },
+  "bundlesize": [
+    {
+      "path": ".output/public/_nuxt/*.js",
+      "maxSize": "250KB",
+      "compression": "gzip"
+    },
+    {
+      "path": ".output/public/_nuxt/*.css",
+      "maxSize": "50KB",
+      "compression": "gzip"
+    }
+  ],
   "optionalDependencies": {
     "@rollup/rollup-linux-arm64-gnu": "^4.0.0",
     "@rollup/rollup-linux-x64-gnu": "^4.46.2"

@@ -260,10 +260,47 @@ class Settings(BaseSettings):
     RATE_LIMIT_PER_MINUTE: int = 60
     RATE_LIMIT_BURST: int = 100
     
+    # Performance Configuration
+    ENABLE_RESPONSE_COMPRESSION: bool = True
+    ENABLE_REQUEST_CACHING: bool = True
+    CACHE_TTL_SECONDS: int = 300  # 5 minutes default
+    LONG_CACHE_TTL_SECONDS: int = 3600  # 1 hour for static content
+    DATABASE_POOL_SIZE: int = 20
+    DATABASE_MAX_OVERFLOW: int = 30
+    DATABASE_POOL_TIMEOUT: int = 30
+    DATABASE_POOL_RECYCLE: int = 3600
+    ENABLE_QUERY_OPTIMIZATION: bool = True
+    
+    # Content Delivery Performance
+    ENABLE_CDN: bool = True
+    CDN_BASE_URL: str = os.getenv("CDN_BASE_URL", "")
+    IMAGE_OPTIMIZATION_ENABLED: bool = True
+    IMAGE_QUALITY: int = 85
+    IMAGE_FORMATS: List[str] = ["webp", "avif", "jpeg", "png"]
+    
+    # API Performance
+    API_RESPONSE_TIMEOUT: int = 30
+    API_REQUEST_SIZE_LIMIT: int = 10 * 1024 * 1024  # 10MB
+    ENABLE_API_COMPRESSION: bool = True
+    ENABLE_ETAG_CACHING: bool = True
+    
+    # Background Tasks
+    CELERY_BROKER_URL: str = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
+    CELERY_RESULT_BACKEND: str = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
+    ENABLE_BACKGROUND_TASKS: bool = True
+    
+    # Caching Configuration
+    REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379")
+    ENABLE_REDIS_CACHING: bool = True
+    CACHE_PREFIX: str = "preggo:"
+    
     # Logging Configuration
     LOG_LEVEL: str = "INFO"
     LOG_TO_DATABASE: bool = True
     LOG_TO_FILE: bool = True
+    ENABLE_PERFORMANCE_LOGGING: bool = True
+    LOG_SLOW_QUERIES: bool = True
+    SLOW_QUERY_THRESHOLD: float = 1.0  # seconds
     
     # Pregnancy Tracking Configuration
     DEFAULT_PREGNANCY_DURATION_WEEKS: int = 40

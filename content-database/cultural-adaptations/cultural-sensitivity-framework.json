@@ -1,0 +1,139 @@
+{
+  "framework_type": "cultural_adaptation_guidelines",
+  "title": "Cultural Sensitivity Framework for Pregnancy Content",
+  "purpose": "Ensure all pregnancy content respects diverse cultural backgrounds, family structures, and traditions",
+  "core_principles": [
+    "Respect for diverse family structures and roles",
+    "Acknowledgment of different cultural pregnancy traditions",
+    "Inclusive language that doesn't assume specific religious or cultural backgrounds",
+    "Recognition that pregnancy experiences vary across cultures",
+    "Flexibility in applying universal principles to specific cultural contexts"
+  ],
+  "adaptation_categories": {
+    "family_structures": {
+      "single_parents": {
+        "content_adaptations": [
+          "Remove assumptions about partner involvement",
+          "Focus on broader support networks (family, friends, community)",
+          "Emphasize personal strength and self-advocacy",
+          "Include resources for single-parent preparation"
+        ],
+        "language_adjustments": [
+          "Use 'your support person' instead of 'your partner'",
+          "Focus on 'you' rather than 'you both'",
+          "Emphasize choice in support system composition"
+        ]
+      },
+      "same_sex_couples": {
+        "content_adaptations": [
+          "Use inclusive pronouns and relationship terms",
+          "Acknowledge different paths to pregnancy (IVF, donor conception)",
+          "Include both partners in bonding activities regardless of who's pregnant",
+          "Address unique legal and medical considerations"
+        ],
+        "language_adjustments": [
+          "Use 'partner' instead of assuming gender",
+          "Include both parents in pregnancy journey content",
+          "Acknowledge conception story diversity"
+        ]
+      },
+      "extended_family_involvement": {
+        "high_involvement_cultures": [
+          "Include grandparents and extended family in preparation activities",
+          "Acknowledge family decision-making styles",
+          "Respect traditional elder wisdom alongside medical advice",
+          "Include family celebration and ritual content"
+        ],
+        "individual_focused_cultures": [
+          "Emphasize personal choice and autonomy",
+          "Respect privacy preferences",
+          "Focus on nuclear family unit",
+          "Include boundary-setting guidance"
+        ]
+      }
+    },
+    "religious_considerations": {
+      "prayer_and_spirituality": {
+        "inclusive_approach": [
+          "Use 'prayer, meditation, or quiet reflection' options",
+          "Acknowledge spiritual practices without prescribing specific ones",
+          "Include gratitude and blessing concepts broadly",
+          "Respect both religious and secular perspectives"
+        ]
+      },
+      "dietary_restrictions": {
+        "content_adaptations": [
+          "Acknowledge religious and cultural dietary laws",
+          "Provide alternatives for restricted foods in nutrition guidance",
+          "Respect fasting and religious observance considerations",
+          "Include culturally appropriate food suggestions"
+        ]
+      },
+      "celebration_and_rituals": {
+        "flexible_frameworks": [
+          "Suggest milestone celebrations without prescribing specific types",
+          "Include options for private, family, or community celebrations",
+          "Acknowledge different traditions around pregnancy announcements",
+          "Respect varying comfort levels with public celebration"
+        ]
+      }
+    },
+    "socioeconomic_considerations": {
+      "resource_accessibility": {
+        "content_adaptations": [
+          "Provide low-cost and free alternatives for suggested activities",
+          "Acknowledge that not all resources are accessible to everyone",
+          "Focus on emotional and relationship aspects over material preparation",
+          "Include public resource and assistance program information"
+        ]
+      },
+      "healthcare_access": {
+        "language_adjustments": [
+          "Use 'when you're able to access healthcare' rather than assuming regular care",
+          "Provide self-advocacy tools for various healthcare settings",
+          "Acknowledge different levels of healthcare access",
+          "Include community health resource information"
+        ]
+      }
+    }
+  },
+  "language_guidelines": {
+    "inclusive_terms": {
+      "family": "Use 'family' broadly to include chosen family, not just biological",
+      "support_system": "Include friends, community, and extended family options",
+      "celebration": "Offer various scales and styles of celebration",
+      "traditions": "Acknowledge both continuing and creating new traditions",
+      "spirituality": "Include religious, spiritual, and secular approaches"
+    },
+    "avoid_assumptions": [
+      "Don't assume pregnancy was planned or desired initially",
+      "Don't assume specific relationship configurations",
+      "Don't assume economic circumstances",
+      "Don't assume cultural or religious backgrounds",
+      "Don't assume family support availability"
+    ]
+  },
+  "content_review_checklist": [
+    "Does this content respect diverse family structures?",
+    "Are the language and examples inclusive of different cultural backgrounds?",
+    "Do the suggestions accommodate different economic circumstances?",
+    "Are religious and spiritual elements optional rather than prescriptive?",
+    "Does the content avoid cultural stereotypes or assumptions?",
+    "Are there options for different levels of family involvement?",
+    "Is the advice adaptable to various living situations?"
+  ],
+  "implementation_guidelines": {
+    "content_creation": [
+      "Include cultural sensitivity review in content development process",
+      "Seek input from diverse community members",
+      "Test content with various demographic groups",
+      "Regular review and update based on user feedback"
+    ],
+    "personalization_options": [
+      "Allow users to indicate cultural preferences",
+      "Provide content filtering options",
+      "Offer multiple language versions where possible",
+      "Include cultural celebration calendars and acknowledgments"
+    ]
+  }
+}

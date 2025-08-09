@@ -21,9 +21,7 @@
           @click="handleReaction"
           class="flex items-center gap-1.5 text-gray-600 hover:text-gray-900 transition-colors"
         >
-          <svg class="w-5 h-5" :class="userReaction ? 'text-rose-500 fill-current' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
+          <Heart :class="cn('w-5 h-5', userReaction ? 'text-rose-500 fill-current' : '')" />
           <span class="text-sm font-medium">{{ userReaction ? 'Liked' : 'Like' }}</span>
         </button>
 
@@ -32,9 +30,7 @@
           @click="handleComment"
           class="flex items-center gap-1.5 text-gray-600 hover:text-gray-900 transition-colors"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a9.954 9.954 0 01-4.951-1.323L3 21l2.323-5.051C4.477 14.934 3 13.054 3 11c0-4.418 3.582-8 8-8s8 3.582 8 8z" />
-          </svg>
+          <MessageCircle class="w-5 h-5" />
           <span class="text-sm font-medium">Comment</span>
         </button>
 
@@ -43,9 +39,7 @@
           @click="handleShare"
           class="flex items-center gap-1.5 text-gray-600 hover:text-gray-900 transition-colors"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-          </svg>
+          <Share class="w-5 h-5" />
           <span class="text-sm font-medium">Share</span>
         </button>
       </div>
@@ -59,9 +53,7 @@
         )"
         :title="isBookmarked ? 'Remove from memory book' : 'Save to memory book'"
       >
-        <svg class="w-5 h-5" :fill="isBookmarked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-        </svg>
+        <Bookmark :class="cn('w-5 h-5', isBookmarked && 'fill-current')" />
       </button>
     </div>
   </div>
@@ -72,6 +64,7 @@ import { computed, ref, onMounted, watch } from 'vue'
 import { cn } from '~/components/ui/utils'
 import type { components } from '~/types/api'
 import { useReactionAnimation, useGentleTransitions, useFeedAnimations } from '~/composables/useAnimations'
+import { Heart, MessageCircle, Share, Bookmark } from 'lucide-vue-next'
 
 type EnrichedPost = components['schemas']['EnrichedPost']
 

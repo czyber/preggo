@@ -1,0 +1,47 @@
+[
+  {
+    "content_type": "WEEKLY_TIP",
+    "week_number": 12,
+    "trimester": 1,
+    "title": "Week 12: Celebrating Your First Trimester Victory",
+    "subtitle": "Tips for navigating this major milestone week",
+    "content_body": "# Week 12: First Trimester Completion Tips\n\n## Energy Revival\nMany people start feeling more energetic around week 12. If this is you, embrace it gradually - your body has been working incredibly hard. Use this energy boost for gentle activities you enjoy, but don't feel pressured to suddenly do everything.\n\n**Action Step:** Try a short walk outside or tackle one small task you've been putting off.\n\n## Permission to Dream\nWith the first trimester complete and risk significantly reduced, you might find yourself finally allowing excitement to fully bloom. This shift from cautious hope to genuine excitement is completely normal and beautiful.\n\n**Action Step:** Allow yourself to browse baby items online or start a Pinterest board without guilt.\n\n## Sharing Your News\nMany families choose to share their pregnancy news around week 12. There's no pressure to tell everyone at once - you can share gradually with different people when it feels right.\n\n**Action Step:** If you're ready to share, plan a special way to tell your most important people first.\n\n## Partner Connection\nYour partner might also be feeling more confident about the pregnancy now. This is a great time to start making plans together - from nursery ideas to discussing parenting hopes.\n\n**Action Step:** Have a 'dreaming session' with your partner about your hopes for your family.\n\n## Milestone Celebration\nCompleting the first trimester is a genuine accomplishment. Your body has created all of your baby's major organs and systems.\n\n**Action Step:** Do something special to mark this milestone - a nice dinner, a photo, or just a moment of gratitude.",
+    "content_summary": "Week 12 brings energy return, permission to get excited, announcement decisions, and celebration of completing the challenging first trimester.",
+    "reading_time_minutes": 5,
+    "priority": 90,
+    "tags": ["first_trimester_completion", "energy_return", "announcement_prep", "milestone_celebration", "partner_involvement"],
+    "personalization_rules": {
+      "family_structure_adaptations": {
+        "single_parent": "Focus on personal support network and self-celebration",
+        "partner_present": "Emphasize couple planning and shared excitement"
+      },
+      "emotional_state_adaptations": {
+        "anxious": "Emphasize reduced risk and permission to feel confident",
+        "excited": "Amplify celebration and sharing opportunities",
+        "tired": "Focus on energy return and gentle activity increases"
+      }
+    },
+    "target_audience": ["first_time_parent", "all_pregnancies"],
+    "medical_review_status": "APPROVED",
+    "delivery_methods": ["FEED_INTEGRATION", "EMAIL_DIGEST"],
+    "optimal_delivery_time": "09:00",
+    "is_active": true,
+    "version": 1
+  },
+  {
+    "content_type": "WEEKLY_TIP",
+    "week_number": 20,
+    "trimester": 2,
+    "title": "Week 20: Making the Most of Your Halfway Milestone",
+    "subtitle": "Tips for the anatomy scan week and celebration",
+    "content_body": "# Week 20: Halfway Point Navigation\n\n## Anatomy Scan Preparation\nThis week typically brings the detailed anatomy scan. Prepare questions in advance and consider bringing your partner or a support person for this exciting appointment.\n\n**Action Step:** Write down any questions you want to ask during the scan.\n\n## Communication Begins\nYour baby can now hear your voice! Start talking, singing, and playing music. This is actual bonding time as your baby learns to recognize familiar voices.\n\n**Action Step:** Choose a song or story to share with your baby regularly.\n\n## Halfway Celebration\nYou're officially halfway through your pregnancy journey! This deserves recognition. Consider how you want to celebrate this significant milestone.\n\n**Action Step:** Plan a special way to mark reaching the halfway point.\n\n## Movement Anticipation\nMany people start feeling baby's movements around this time. They might feel like butterflies, bubbles, or gentle flutters at first.\n\n**Action Step:** Pay attention to quiet moments when you might notice subtle movements.\n\n## Planning and Preparation\nThe second trimester is an ideal time for major preparations like nursery planning, registry creation, and baby gear research.\n\n**Action Step:** Choose one preparation task to focus on this week.\n\n## Partner Involvement\nThis is an exciting time for partners too, as the pregnancy becomes more 'real' with the anatomy scan and potential movement.\n\n**Action Step:** Include your partner in talking to baby and scan preparation.",
+    "content_summary": "Week 20 focuses on anatomy scan preparation, beginning communication with baby, halfway celebration, and major pregnancy preparations.",
+    "reading_time_minutes": 5,
+    "priority": 95,
+    "tags": ["anatomy_scan", "halfway_milestone", "baby_communication", "movement_anticipation", "preparation_time"],
+    "delivery_methods": ["FEED_INTEGRATION", "MILESTONE_TRIGGER"],
+    "optimal_delivery_time": "14:00",
+    "is_active": true,
+    "version": 1
+  }
+]

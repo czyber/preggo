@@ -1,11 +1,11 @@
 <template>
   <article 
     ref="postCardRef"
-    class="feed-post-card bg-white border border-gray-100 rounded-lg overflow-hidden hover:border-gray-200 transition-all duration-200"
+    class="feed-post-card bg-off-white border border-light-gray rounded-lg overflow-hidden hover:border-neutral-gray/40 transition-all duration-200 shadow-sm hover:shadow-md"
     :data-post-id="post.id"
   >
     <!-- Post Header -->
-    <header class="px-4 py-3 border-b border-gray-50">
+    <header class="px-4 py-3 border-b border-warm-gray">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
           <!-- Author Avatar -->
@@ -14,25 +14,25 @@
           <!-- Author Info -->
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2">
-              <span class="font-medium text-gray-900 text-sm truncate">
+              <span class="font-medium text-warm-graphite text-sm truncate font-inter">
                 {{ getAuthorName() }}
               </span>
               
               <!-- Milestone Badge -->
               <span 
                 v-if="post.pregnancy_context?.is_milestone_week" 
-                class="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-200"
+                class="inline-flex items-center gap-1 px-2 py-0.5 bg-dusty-lavender/20 text-warm-graphite text-xs font-medium rounded-full border border-dusty-lavender/30"
               >
                 ✨ Milestone
               </span>
             </div>
             
             <!-- Pregnancy Context -->
-            <div class="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
+            <div class="flex items-center gap-1 text-xs text-neutral-gray mt-0.5">
               <span v-if="post.pregnancy_context?.current_week">
                 Week {{ post.pregnancy_context.current_week }}
               </span>
-              <span v-if="post.pregnancy_context?.current_week && getRelativeTime()" class="text-gray-300">•</span>
+              <span v-if="post.pregnancy_context?.current_week && getRelativeTime()" class="text-light-gray">•</span>
               <span v-if="getRelativeTime()">{{ getRelativeTime() }}</span>
             </div>
           </div>
@@ -41,9 +41,9 @@
         <!-- Menu Button -->
         <button 
           @click="handleMenuAction('menu')"
-          class="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+          class="p-1.5 hover:bg-warm-gray rounded-full transition-colors"
         >
-          <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+          <svg class="w-4 h-4 text-neutral-gray" fill="currentColor" viewBox="0 0 20 20">
             <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
           </svg>
         </button>
@@ -61,11 +61,12 @@
     </div>
 
     <!-- Post Engagement -->
-    <footer class="border-t border-gray-50">
+    <footer class="border-t border-warm-gray">
       <PostEngagement
         :post="post"
         :user-reaction="post.reaction_summary?.user_reaction"
         @reaction="handleReaction"
+        @removeReaction="handleRemoveReaction"
         @comment="handleComment"
         @share="handleShare"
         @view-reactions="handleViewReactions"
@@ -73,7 +74,7 @@
       />
       
       <!-- Comments Section (Instagram-style) -->
-      <div v-if="showComments" class="comments-section border-t border-gray-50">
+      <div v-if="showComments" class="comments-section border-t border-warm-gray">
         <FamilyComments
           :comments="postComments"
           :post-id="post.id!"
@@ -86,18 +87,6 @@
       </div>
     </footer>
 
-    <!-- Celebration Animation Overlay -->
-    <Teleport to="body">
-      <div
-        v-if="showCelebrationAnimation"
-        class="fixed inset-0 pointer-events-none z-50 flex items-center justify-center"
-      >
-        <CelebrationAnimation
-          :type="celebrationAnimationType"
-          @complete="onCelebrationComplete"
-        />
-      </div>
-    </Teleport>
   </article>
 </template>
 
@@ -132,6 +121,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   reaction: [{ postId: string, reactionType: string }]
+  removeReaction: [postId: string]
   comment: [postId: string]
   share: [postId: string]
   view: [postId: string]
@@ -141,11 +131,8 @@ const emit = defineEmits<{
   viewComments: [postId: string]
 }>()
 
-// Animation composables
-const { createGentleHover, animateElementIn, pulseElement, glowElement } = useGentleTransitions()
-const { animatePostEntry, animatePostCelebration } = useFeedAnimations()
-const { celebrateSparkles, celebrateHearts } = useCelebrationAnimation()
-const { observeElement } = useScrollAnimation()
+// Simple transitions only
+const { createGentleHover, animateElementIn } = useGentleTransitions()
 
 // Auth composable for checking current user
 const auth = useAuth()
@@ -156,8 +143,6 @@ const postsStore = usePostsStore()
 // Local state
 const isExpanded = ref(false)
 const isHighlighted = ref(props.highlighted)
-const showCelebrationAnimation = ref(false)
-const celebrationAnimationType = ref('heart')
 const postCardRef = ref<HTMLElement>()
 const showComments = ref(false)
 const postComments = ref<Comment[]>([])
@@ -217,23 +202,14 @@ function toggleExpansion() {
 function handleReaction(data: { reactionType: string }) {
   emit('reaction', { postId: props.post.id!, reactionType: data.reactionType })
   
-  // Show celebration animation for special reactions
-  if (['love', 'excited', 'support', 'proud'].includes(data.reactionType)) {
-    showCelebrationAnimation.value = true
-    celebrationAnimationType.value = data.reactionType === 'love' ? 'heart' : 'sparkle'
-    
-    // Add post celebration animation
-    if (postCardRef.value && typeof postCardRef.value.querySelectorAll === 'function') {
-      animatePostCelebration(postCardRef.value)
-      
-      // Add specific celebration effects based on reaction type
-      if (data.reactionType === 'love') {
-        celebrateHearts(postCardRef.value, 4)
-      } else {
-        celebrateSparkles(postCardRef.value, 6)
-      }
-    }
+  // Simple visual feedback for reactions
+  if (postCardRef.value) {
+    animateElementIn(postCardRef.value)
   }
+}
+
+function handleRemoveReaction() {
+  emit('removeReaction', props.post.id!)
 }
 
 async function handleComment() {
@@ -294,11 +270,6 @@ async function handleLikeComment(commentId: string) {
 
 function handleShare() {
   emit('share', props.post.id!)
-  
-  // Add gentle sparkle animation for sharing
-  if (postCardRef.value && typeof postCardRef.value.querySelectorAll === 'function') {
-    celebrateSparkles(postCardRef.value, 3)
-  }
 }
 
 function handleView() {
@@ -321,9 +292,6 @@ function handleViewComments() {
   emit('viewComments', props.post.id!)
 }
 
-function onCelebrationComplete() {
-  showCelebrationAnimation.value = false
-}
 
 // Setup animations and interactions when component mounts
 onMounted(async () => {

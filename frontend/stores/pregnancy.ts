@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { components } from '@/types/api'
+import { useApi } from '@/composables/useApi'
 
 // Type aliases for cleaner code
 type Pregnancy = components['schemas']['PregnancyResponse']

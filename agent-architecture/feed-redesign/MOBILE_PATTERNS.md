@@ -11,7 +11,7 @@ This document defines pregnancy-aware mobile interaction patterns that prioritiz
 - **Reduced Dexterity:** Larger touch targets, more forgiving gestures
 - **Fatigue:** Minimize required precision and cognitive load
 - **Nausea:** Reduce motion that could trigger discomfort
-- **Changing Body:** One-handed operation becomes increasingly important
+- **Changing Body:** Design accommodates physical changes during pregnancy
 - **Emotional Sensitivity:** Gentle feedback, no harsh interactions
 
 ### Interaction Principles
@@ -19,7 +19,7 @@ This document defines pregnancy-aware mobile interaction patterns that prioritiz
 2. **Forgiving Always:** Interactions should be error-tolerant and recoverable
 3. **Contextual Adaptation:** Interface adapts to user's current state and needs
 4. **Gentle Feedback:** All responses feel supportive, never jarring
-5. **One-Handed Optimized:** Critical functions accessible with thumb only
+5. **Comfort Focused:** All interactions designed for user comfort
 
 ## Core Mobile Patterns
 
@@ -27,21 +27,20 @@ This document defines pregnancy-aware mobile interaction patterns that prioritiz
 
 **Standard Touch Target Sizing:**
 - **Minimum:** 48px × 48px (meets WCAG guidelines)
-- **Recommended:** 56px × 56px (comfortable for pregnancy changes)
-- **Primary Actions:** 64px × 64px (love, memory, respond buttons)
+- **Recommended:** 48px × 48px (comfortable for general use)
+- **Primary Actions:** 52px × 52px (love, memory, respond buttons)
 - **Text Links:** 44px minimum height with generous padding
 
-**Adaptive Sizing Logic:**
+**Consistent Sizing Logic:**
 ```typescript
 interface TouchTargetConfig {
   baseSize: number
-  pregnancyMultiplier: number
-  fatigueAdjustment: number
-  timeOfDayFactor: number
+  contextMultiplier: number
+  contentType: 'primary' | 'secondary' | 'tertiary'
 }
 
-// Evening and fatigue states increase target sizes
-const adaptiveSize = baseSize * pregnancyMultiplier * (1 + fatigueAdjustment)
+// Consistent sizing based on content importance
+const targetSize = baseSize * contextMultiplier
 ```
 
 **Visual Design:**
@@ -50,33 +49,31 @@ const adaptiveSize = baseSize * pregnancyMultiplier * (1 + fatigueAdjustment)
 - Generous spacing between interactive elements
 - Clear visual hierarchy with primary actions emphasized
 
-### 2. Thumb Zone Navigation
+### 2. Accessible Navigation
 
-**Thumb-Friendly Architecture:**
+**Mobile-Friendly Architecture:**
 ```
-┌─────────────────────────────────┐ ← Status bar (read-only)
-│     Content Area (View Only)    │
+┌─────────────────────────────────┐ ← Header (navigation)
+│     Content Area                │
 │                                 │ ← Content consumption zone
 │                                 │
 │                                 │
 ├─────────────────────────────────┤
-│ Primary Actions (Thumb Zone)    │ ← 100-220px from bottom
+│ Primary Actions                 │ ← Bottom action bar
 │ ○ Love    ○ Memory    ○ Share   │
 └─────────────────────────────────┘
 ```
 
 **Action Zone Distribution:**
-- **Primary Zone (0-100px from bottom):** Most frequent actions
-- **Secondary Zone (100-220px from bottom):** Common interactions  
-- **Tertiary Zone (220px+ from bottom):** Occasional actions
-- **Content Zone (Above 220px):** Information consumption
+- **Primary Zone (Bottom bar):** Most frequent actions
+- **Secondary Zone (Content cards):** Inline interactions  
+- **Content Zone (Main area):** Information consumption
 
-**Primary Actions in Thumb Zone:**
+**Primary Actions:**
 - Send Love (heart gesture)
 - Add to Memory Book
 - Family Response prompt
-- Quick photo sharing
-- Voice note recording
+- Photo sharing
 
 ### 3. Gesture Language for Pregnancy
 
@@ -112,7 +109,7 @@ const adaptiveSize = baseSize * pregnancyMultiplier * (1 + fatigueAdjustment)
   - Gentle confetti animation
 
 #### Long Press - "Thoughtful Action"
-- **Duration:** 800ms (vs standard 500ms) for deliberate intent
+- **Duration:** 600ms for deliberate intent
 - **Visual Progress:** Gentle ring fills around finger
 - **Haptic Pattern:** Increasing pulse to confirm activation
 - **Menu:** Soft shadow context menu with large targets
@@ -123,7 +120,7 @@ const adaptiveSize = baseSize * pregnancyMultiplier * (1 + fatigueAdjustment)
 - **Momentum Preservation:** Natural deceleration curve
 - **Rubber Band Effect:** Gentle bounce at scroll limits
 - **Auto-Scroll Position:** Returns to last meaningful position
-- **Fatigue Detection:** Reduces scroll sensitivity when user shows fatigue patterns
+- **Smooth Interaction:** Consistent scroll sensitivity
 
 **Scroll Position Memory:**
 ```typescript

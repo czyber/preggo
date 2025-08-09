@@ -7,35 +7,51 @@
 
 @layer base {
   :root {
-    /* Design System Colors */
-    --soft-pink: #F8BBD0;
-    --muted-lavender: #E1BEE7;
-    --gentle-mint: #B2DFDB;
-    --warm-neutral: #FAFAFA;
-    --light-coral: #FFCDD2;
-    --soft-blue: #BBDEFB;
+    /* Sophisticated Design System Colors */
+    --warm-graphite: #2C2937;
+    --soft-charcoal: #4A4754;
+    --neutral-gray: #6B6875;
+    --blush-rose: #E8B4B8;
+    --sage-green: #A8C09A;
+    --dusty-lavender: #C3B5D1;
+    --pure-white: #FFFFFF;
+    --off-white: #FAFAF9;
+    --warm-gray: #F5F4F2;
+    --light-gray: #E8E6E3;
+    --success: #7DA068;
+    --warning: #D4A574;
+    --error: #C67B7B;
+    --info: #8B9DC3;
     
-    /* Shadcn UI Colors - Light Theme (Pregnancy-themed) */
-    --background: 0 0% 98%; /* Very light neutral gray */
-    --foreground: 220 13% 37%; /* Proper gray-600 for text */
-    --card: 255 255 255; /* White */
-    --card-foreground: 51 51 51; /* Dark gray */
-    --popover: 255 255 255; /* White */
-    --popover-foreground: 51 51 51; /* Dark gray */
-    --primary: 338 82% 78%; /* Soft pink */
-    --primary-foreground: 0 0% 20%; /* Dark text on primary */
-    --secondary: 295 39% 82%; /* Muted lavender */
-    --secondary-foreground: 0 0% 20%; /* Dark text on secondary */
-    --muted: 36 100% 94%; /* Warm beige */
-    --muted-foreground: 0 0% 45%; /* Medium gray */
-    --accent: 180 39% 82%; /* Gentle mint */
-    --accent-foreground: 0 0% 20%; /* Dark text on accent */
-    --destructive: 0 84% 60%; /* Red for errors */
-    --destructive-foreground: 210 40% 98%; /* Light text on destructive */
-    --border: 36 45% 88%; /* Light warm border */
-    --input: 36 45% 88%; /* Light warm input border */
-    --ring: 338 82% 78%; /* Soft pink focus ring */
-    --radius: 0.75rem; /* Rounded corners for soft feel */
+    /* Legacy colors for gradual migration */
+    --soft-pink: #E8B4B8; /* mapped to blush-rose */
+    --muted-lavender: #C3B5D1; /* mapped to dusty-lavender */
+    --gentle-mint: #A8C09A; /* mapped to sage-green */
+    --warm-neutral: #FAFAF9; /* mapped to off-white */
+    --light-coral: #E8B4B8; /* mapped to blush-rose */
+    --soft-blue: #8B9DC3; /* mapped to info */
+    
+    /* Shadcn UI Colors - Sophisticated Light Theme */
+    --background: 52 50% 98%; /* Off-white #FAFAF9 */
+    --foreground: 255 15% 18%; /* Warm graphite #2C2937 */
+    --card: 52 50% 98%; /* Off-white #FAFAF9 */
+    --card-foreground: 255 15% 18%; /* Warm graphite #2C2937 */
+    --popover: 52 50% 98%; /* Off-white #FAFAF9 */
+    --popover-foreground: 255 15% 18%; /* Warm graphite #2C2937 */
+    --primary: 3 26% 82%; /* Blush rose #E8B4B8 */
+    --primary-foreground: 0 0% 100%; /* Pure white text on primary */
+    --secondary: 73 22% 77%; /* Sage green #A8C09A */
+    --secondary-foreground: 255 15% 18%; /* Warm graphite text */
+    --muted: 48 67% 95%; /* Warm gray #F5F4F2 */
+    --muted-foreground: 255 9% 42%; /* Neutral gray #6B6875 */
+    --accent: 279 23% 78%; /* Dusty lavender #C3B5D1 */
+    --accent-foreground: 255 15% 18%; /* Warm graphite text */
+    --destructive: 2 33% 76%; /* Error #C67B7B */
+    --destructive-foreground: 0 0% 100%; /* White text on error */
+    --border: 48 33% 90%; /* Light gray #E8E6E3 */
+    --input: 48 33% 90%; /* Light gray #E8E6E3 */
+    --ring: 3 26% 82%; /* Blush rose focus ring */
+    --radius: 0.5rem; /* 8px default radius */
   }
 
   .dark {
@@ -70,32 +86,34 @@
   body {
     @apply bg-background;
     font-feature-settings: "rlig" 1, "calt" 1;
-    font-family: 'Poppins', sans-serif;
-    color: rgb(75, 85, 99); /* Default gray-600 color for all text */
+    font-family: 'Inter', system-ui, sans-serif;
+    color: rgb(44, 41, 55); /* Warm graphite #2C2937 */
   }
   
   /* Reset any browser default text colors */
   html {
-    color: rgb(75, 85, 99);
+    color: rgb(44, 41, 55); /* Warm graphite */
   }
   
   /* Typography Base Styles */
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-weight: 600;
     line-height: 1.2;
+    color: rgb(44, 41, 55); /* Warm graphite */
   }
   
   .logo {
-    font-family: 'Lato', sans-serif;
+    font-family: 'Inter Display', 'Inter', system-ui, sans-serif;
     font-weight: 400;
     text-transform: lowercase;
+    color: rgb(44, 41, 55); /* Warm graphite */
   }
   
   p, span, div, a, li, td, th, label {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     line-height: 1.6;
-    color: inherit; /* Inherit the gray color from body */
+    color: inherit;
   }
   
   /* Ensure all text elements have proper color */
@@ -103,38 +121,52 @@
     color: inherit;
   }
   
-  /* Pregnancy-themed base styles */
+  /* Sophisticated pregnancy-themed base styles */
   .pregnancy-card {
-    @apply bg-warm-neutral/50 rounded-2xl p-6 shadow-sm border border-warm-neutral;
+    @apply bg-off-white rounded-default p-lg shadow-sm border border-light-gray;
   }
   
   .pregnancy-button {
-    @apply bg-soft-pink hover:bg-soft-pink/80 text-gray-800 rounded-2xl px-6 py-3 font-medium transition-all duration-200 shadow-sm hover:shadow-md;
+    @apply bg-blush-rose hover:bg-blush-rose/90 text-white rounded-default px-lg py-md font-medium transition-all duration-300 shadow-sm hover:shadow-md;
   }
   
   .pregnancy-input {
-    @apply bg-white border-2 border-warm-neutral rounded-xl px-4 py-3 focus:border-soft-pink focus:ring-2 focus:ring-soft-pink/20 transition-all duration-200;
+    @apply bg-off-white border border-light-gray rounded-default px-md py-md focus:border-blush-rose focus:ring-2 focus:ring-blush-rose/20 transition-all duration-200;
   }
   
-  /* Supportive messaging styles */
+  /* Sophisticated supportive messaging styles */
   .supportive-message {
-    @apply bg-gentle-mint/20 border-l-4 border-gentle-mint rounded-r-xl p-4 text-gray-700;
+    @apply bg-sage-green/10 border-l-4 border-sage-green rounded-r-default p-md text-soft-charcoal;
   }
   
   .celebration-message {
-    @apply bg-light-coral/20 border-l-4 border-light-coral rounded-r-xl p-4 text-gray-700;
+    @apply bg-blush-rose/10 border-l-4 border-blush-rose rounded-r-default p-md text-soft-charcoal;
   }
   
-  /* Gentle animations */
+  .milestone-message {
+    @apply bg-dusty-lavender/10 border-l-4 border-dusty-lavender rounded-r-default p-md text-soft-charcoal;
+  }
+  
+  /* Refined animations */
   .fade-in {
-    animation: fadeIn 0.5s ease-in-out;
+    animation: fadeIn 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
   }
   
   .slide-up {
-    animation: slideUp 0.3s ease-out;
+    animation: slideUp 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+  
+  /* Pregnancy-focused micro-interactions */
+  .gentle-hover {
+    @apply transition-all duration-200 hover:shadow-md hover:-translate-y-0.5;
+  }
+  
+  .milestone-glow {
+    @apply bg-gradient-to-r from-blush-rose/5 to-dusty-lavender/5 border border-blush-rose/20;
   }
   
   /* Browser autofill prevention */
+  /* Browser autofill with sophisticated colors */
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus,
@@ -143,13 +175,13 @@
   textarea:-webkit-autofill:hover,
   textarea:-webkit-autofill:focus,
   textarea:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px white inset !important;
-    -webkit-text-fill-color: rgb(51, 51, 51) !important;
-    background-color: white !important;
-    color: rgb(51, 51, 51) !important;
+    -webkit-box-shadow: 0 0 0 30px rgb(250, 249, 249) inset !important; /* off-white */
+    -webkit-text-fill-color: rgb(44, 41, 55) !important; /* warm-graphite */
+    background-color: rgb(250, 249, 249) !important; /* off-white */
+    color: rgb(44, 41, 55) !important; /* warm-graphite */
   }
 
-  /* Ensure normal text color for all inputs and textareas */
+  /* Sophisticated text colors for inputs */
   input[type="text"],
   input[type="email"],
   input[type="password"],
@@ -157,13 +189,13 @@
   input[type="tel"],
   input[type="url"],
   textarea {
-    color: rgb(51, 51, 51) !important;
+    color: rgb(44, 41, 55) !important; /* warm-graphite */
   }
 
-  /* Ensure placeholder text is properly styled */
+  /* Refined placeholder styling */
   input::placeholder,
   textarea::placeholder {
-    color: rgb(156, 163, 175) !important;
+    color: rgb(107, 104, 117) !important; /* neutral-gray */
     opacity: 1;
   }
 

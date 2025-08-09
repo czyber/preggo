@@ -171,7 +171,63 @@ class Post(SQLModel, table=True):
     status: PostStatus = PostStatus.PUBLISHED
     scheduled_for: Optional[datetime] = Field(default=None, description="When to publish scheduled post")
     
-    # Engagement counters (denormalized for performance)
+    # ENHANCED FEATURES FOR OVERHAUL
+    # Content integration with pregnancy content system
+    integrated_content_id: Optional[str] = Field(
+        default=None,
+        foreign_key="pregnancy_content.id",
+        description="Associated pregnancy content if post was inspired by content"
+    )
+    
+    # Family warmth score (replacing traditional engagement metrics)
+    family_warmth_score: float = Field(
+        default=0.0,
+        ge=0.0, le=1.0,
+        description="Calculated family warmth score"
+    )
+    
+    # Memory book integration
+    memory_book_eligible: bool = Field(
+        default=False,
+        description="Whether this post is eligible for memory book"
+    )
+    memory_book_priority: float = Field(
+        default=0.0,
+        ge=0.0, le=1.0,
+        description="Priority score for memory book inclusion"
+    )
+    
+    # Celebration and milestone integration
+    celebration_trigger_data: Optional[Dict[str, Any]] = Field(
+        default=None,
+        sa_column=Column(JSON),
+        description="Data for triggering celebrations or milestone recognition"
+    )
+    
+    # Emotional intelligence and context
+    emotional_context: Optional[Dict[str, Any]] = Field(
+        default=None,
+        sa_column=Column(JSON),
+        description="Detected emotional context for intelligent responses"
+    )
+    
+    # Enhanced performance optimizations for Instagram-like feed
+    reaction_summary: Optional[Dict[str, int]] = Field(
+        default_factory=dict,
+        sa_column=Column(JSON),
+        description="Cached reaction counts by type for performance"
+    )
+    last_family_interaction: Optional[datetime] = Field(
+        default=None,
+        description="Timestamp of last family member interaction"
+    )
+    trending_score: float = Field(
+        default=0.0,
+        ge=0.0, le=1.0,
+        description="Calculated trending score for feed prioritization"
+    )
+    
+    # Traditional engagement counters (kept for gradual transition)
     reaction_count: int = Field(default=0, description="Total reaction count")
     comment_count: int = Field(default=0, description="Total comment count")
     view_count: int = Field(default=0, description="Total view count")
@@ -187,7 +243,7 @@ class Post(SQLModel, table=True):
 
 
 class Reaction(SQLModel, table=True):
-    """Reactions to posts and comments"""
+    """Reactions to posts and comments with Instagram-like enhancements"""
     __tablename__ = "reactions"
     
     id: str = Field(
@@ -202,6 +258,15 @@ class Reaction(SQLModel, table=True):
     
     # Reaction details
     type: ReactionType = Field(description="Type of reaction")
+    
+    # ENHANCED FEATURES FOR INSTAGRAM-LIKE OVERHAUL
+    intensity: int = Field(default=1, ge=1, le=3, description="Reaction strength (1-3)")
+    custom_message: Optional[str] = Field(default=None, max_length=200, description="Personal note with reaction")
+    is_milestone_reaction: bool = Field(default=False, description="Special milestone recognition")
+    family_warmth_contribution: float = Field(default=0.0, ge=0.0, le=1.0, description="Contribution to family warmth score")
+    
+    # Client-side deduplication for optimistic updates
+    client_id: Optional[str] = Field(default=None, description="Client-side ID for deduplication")
     
     # Timestamps
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -300,3 +365,256 @@ class PostShare(SQLModel, table=True):
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
+
+
+class FeedActivity(SQLModel, table=True):
+    """Real-time activity tracking for Instagram-like feed features"""
+    __tablename__ = "feed_activities"
+    
+    id: str = Field(
+        primary_key=True,
+        default_factory=lambda: str(uuid.uuid4())
+    )
+    
+    # References
+    pregnancy_id: str = Field(foreign_key="pregnancies.id", description="Pregnancy this activity relates to")
+    user_id: str = Field(foreign_key="users.id", description="User who performed the activity")
+    
+    # Activity details
+    activity_type: str = Field(description="Type of activity (reaction, comment, view, share, post_create)")
+    target_id: str = Field(description="ID of target (post_id, comment_id, etc.)")
+    target_type: str = Field(description="Type of target (post, comment, etc.)")
+    
+    # Activity data stored as JSONB for flexibility
+    activity_data: Dict[str, Any] = Field(
+        default_factory=dict,
+        sa_column=Column(JSON),
+        description="Detailed activity data (reaction_type, comment_text, etc.)"
+    )
+    
+    # Real-time broadcasting control
+    broadcast_to_family: bool = Field(default=True, description="Whether to broadcast this activity to family members")
+    broadcast_priority: int = Field(default=1, ge=1, le=5, description="Broadcasting priority (1=low, 5=urgent)")
+    
+    # Performance tracking
+    client_timestamp: Optional[datetime] = Field(default=None, description="Client-side timestamp for latency calculation")
+    processed_at: Optional[datetime] = Field(default=None, description="When activity was processed by background jobs")
+    
+    # Timestamps
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    
+    class Config:
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
+
+
+# =============================================================================
+# ENHANCED CONTENT SYSTEM FOR PREGGO APP OVERHAUL
+# =============================================================================
+
+class ContentType(str, Enum):
+    """Types of pregnancy content"""
+    WEEKLY_TIP = "weekly_tip"
+    BABY_DEVELOPMENT = "baby_development"
+    HEALTH_WELLNESS = "health_wellness"
+    EMOTIONAL_SUPPORT = "emotional_support"
+    PREPARATION = "preparation"
+    PARTNER_FAMILY = "partner_family"
+    MILESTONE_CELEBRATION = "milestone_celebration"
+    SELF_CARE = "self_care"
+    LOOKING_AHEAD = "looking_ahead"
+    SYMPTOM_SUPPORT = "symptom_support"
+    DECISION_SUPPORT = "decision_support"
+
+
+class ContentDeliveryMethod(str, Enum):
+    """How content is delivered to users"""
+    FEED_INTEGRATION = "feed_integration"
+    PUSH_NOTIFICATION = "push_notification"
+    EMAIL_DIGEST = "email_digest"
+    ON_DEMAND = "on_demand"
+    MILESTONE_TRIGGER = "milestone_trigger"
+
+
+class MedicalReviewStatus(str, Enum):
+    """Medical review status for health content"""
+    PENDING = "pending"
+    APPROVED = "approved"
+    REQUIRES_REVISION = "requires_revision"
+    REJECTED = "rejected"
+    EXPIRED = "expired"  # Needs re-review due to guideline changes
+
+
+class PersonalizationContext(SQLModel):
+    """Context for personalizing content delivery"""
+    pregnancy_week: int = Field(ge=1, le=42)
+    trimester: int = Field(ge=1, le=3)
+    is_high_risk: bool = False
+    is_multiple_pregnancy: bool = False
+    first_time_parent: bool = True
+    preferred_detail_level: str = "standard"  # minimal, standard, detailed
+    cultural_preferences: Optional[Dict[str, Any]] = Field(default_factory=dict)
+    emotional_state: Optional[str] = None  # anxious, excited, tired, etc.
+    time_of_day: Optional[str] = None  # morning, afternoon, evening
+
+
+class ContentCategory(SQLModel, table=True):
+    """Categories for organizing pregnancy content"""
+    __tablename__ = "content_categories"
+    
+    id: str = Field(
+        primary_key=True,
+        default_factory=lambda: str(uuid.uuid4())
+    )
+    
+    name: str = Field(max_length=100, description="Category name")
+    slug: str = Field(max_length=100, unique=True, description="URL-friendly category identifier")
+    description: Optional[str] = Field(default=None, description="Category description")
+    icon_name: Optional[str] = Field(default=None, max_length=50, description="Icon identifier")
+    color_hex: Optional[str] = Field(default=None, max_length=7, description="Category color")
+    sort_order: int = Field(default=0, description="Display order")
+    is_active: bool = Field(default=True, description="Whether category is active")
+    
+    # Metadata
+    parent_category_id: Optional[str] = Field(
+        default=None, 
+        foreign_key="content_categories.id", 
+        description="Parent category for hierarchical organization"
+    )
+    
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class PregnancyContent(SQLModel, table=True):
+    """Comprehensive pregnancy content system"""
+    __tablename__ = "pregnancy_content"
+    
+    id: str = Field(
+        primary_key=True,
+        default_factory=lambda: str(uuid.uuid4())
+    )
+    
+    # Content classification
+    category_id: Optional[str] = Field(
+        default=None, 
+        foreign_key="content_categories.id", 
+        description="Content category"
+    )
+    content_type: ContentType = Field(description="Type of content")
+    
+    # Content targeting
+    week_number: Optional[int] = Field(
+        default=None, 
+        ge=1, le=42, 
+        description="Target pregnancy week (null for cross-week content)"
+    )
+    trimester: Optional[int] = Field(
+        default=None,
+        ge=1, le=3,
+        description="Target trimester (null for all trimesters)"
+    )
+    
+    # Content details
+    title: str = Field(max_length=200, description="Content title")
+    subtitle: Optional[str] = Field(default=None, max_length=300, description="Content subtitle")
+    content_body: str = Field(description="Main content body in Markdown")
+    content_summary: Optional[str] = Field(
+        default=None, 
+        max_length=500, 
+        description="Brief summary for cards and notifications"
+    )
+    
+    # Content metadata
+    reading_time_minutes: Optional[int] = Field(
+        default=None, 
+        description="Estimated reading time"
+    )
+    priority: int = Field(default=0, description="Content priority (higher numbers = higher priority)")
+    tags: List[str] = Field(
+        default_factory=list, 
+        sa_column=Column(JSON), 
+        description="Content tags for filtering and search"
+    )
+    
+    # Media and resources
+    featured_image: Optional[str] = Field(default=None, description="Featured image URL")
+    media_urls: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        sa_column=Column(JSON),
+        description="Associated media files (images, videos, audio)"
+    )
+    external_links: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        sa_column=Column(JSON),
+        description="External resource links"
+    )
+    
+    # Personalization rules
+    personalization_rules: Dict[str, Any] = Field(
+        default_factory=dict,
+        sa_column=Column(JSON),
+        description="Rules for content personalization and delivery"
+    )
+    target_audience: List[str] = Field(
+        default_factory=list,
+        sa_column=Column(JSON),
+        description="Target audience tags (first_time_parent, high_risk, etc.)"
+    )
+    
+    # Medical review and quality assurance
+    medical_review_status: MedicalReviewStatus = Field(
+        default=MedicalReviewStatus.PENDING,
+        description="Medical review status"
+    )
+    medical_reviewer_id: Optional[str] = Field(
+        default=None,
+        foreign_key="users.id",
+        description="Healthcare provider who reviewed content"
+    )
+    reviewed_at: Optional[datetime] = Field(
+        default=None,
+        description="When content was medically reviewed"
+    )
+    review_notes: Optional[str] = Field(
+        default=None,
+        description="Medical reviewer notes"
+    )
+    expires_at: Optional[datetime] = Field(
+        default=None,
+        description="When content needs re-review"
+    )
+    
+    # Content delivery
+    delivery_methods: List[ContentDeliveryMethod] = Field(
+        default_factory=lambda: [ContentDeliveryMethod.FEED_INTEGRATION],
+        sa_column=Column(JSON),
+        description="How this content can be delivered"
+    )
+    optimal_delivery_time: Optional[str] = Field(
+        default=None,
+        description="Optimal time of day for delivery (HH:MM)"
+    )
+    
+    # Status and versioning
+    is_active: bool = Field(default=True, description="Whether content is active")
+    version: int = Field(default=1, description="Content version number")
+    parent_content_id: Optional[str] = Field(
+        default=None,
+        foreign_key="pregnancy_content.id",
+        description="Parent content if this is a revision"
+    )
+    
+    # Analytics and engagement
+    view_count: int = Field(default=0, description="Number of times content was viewed")
+    helpful_count: int = Field(default=0, description="Number of 'helpful' reactions")
+    not_helpful_count: int = Field(default=0, description="Number of 'not helpful' reactions")
+    
+    # Timestamps
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    published_at: Optional[datetime] = Field(
+        default=None,
+        description="When content was published"
+    )

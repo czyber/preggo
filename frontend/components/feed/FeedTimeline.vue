@@ -1,9 +1,9 @@
 <template>
   <div ref="timelineRef" class="feed-timeline w-full max-w-2xl mx-auto space-y-6">
     <!-- Feed Header with Filters -->
-    <div ref="headerRef" class="sticky top-0 bg-white/95 backdrop-blur-sm z-20 pb-4 border-b border-warm-neutral/30">
+    <div ref="headerRef" class="sticky top-0 bg-off-white/95 backdrop-blur-sm z-20 pb-4 border-b border-light-gray/30">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-semibold font-primary text-gray-800">
+        <h2 class="text-xl font-semibold font-inter text-warm-graphite">
           Family Feed
         </h2>
         <div class="flex items-center gap-2">
@@ -18,11 +18,11 @@
       </div>
       
       <!-- Quick Stats -->
-      <div v-if="familyEngagementStats" class="flex items-center gap-4 text-sm text-gray-600">
+      <div v-if="familyEngagementStats" class="flex items-center gap-4 text-sm text-neutral-gray">
         <span>{{ totalCount }} posts</span>
         <span>{{ familyEngagementStats.totalReactions }} reactions</span>
         <span>{{ familyEngagementStats.totalComments }} comments</span>
-        <span v-if="needsAttentionPosts.length" class="text-soft-pink font-medium">
+        <span v-if="needsAttentionPosts.length" class="text-blush-rose font-medium">
           {{ needsAttentionPosts.length }} need attention
         </span>
       </div>
@@ -65,13 +65,13 @@
 
       <!-- Empty State -->
       <div v-else-if="!loading && filteredPosts.length === 0" class="text-center py-12">
-        <BaseCard variant="warm" class="max-w-md mx-auto">
+        <div class="max-w-md mx-auto bg-off-white rounded-lg p-6 shadow-sm border border-light-gray">
           <div class="space-y-4">
             <div class="text-4xl">👶</div>
-            <h3 class="text-lg font-semibold font-primary text-gray-800">
+            <h3 class="text-lg font-semibold font-inter text-warm-graphite">
               {{ getEmptyStateTitle() }}
             </h3>
-            <p class="text-gray-600 text-sm">
+            <p class="text-soft-charcoal text-sm">
               {{ getEmptyStateMessage() }}
             </p>
             <BaseButton
@@ -83,8 +83,8 @@
               View All Posts
             </BaseButton>
           </div>
-        </BaseCard>
-      </div>
+          </div>
+        </div>
 
       <!-- Posts -->
       <TransitionGroup
@@ -100,6 +100,7 @@
           :celebrations="getCelebrationsForPost(post.id)"
           :data-animation-delay="index * 100"
           @reaction="handleReaction"
+          @removeReaction="handleRemoveReaction"
           @view="handleView"
           @comment="handleComment"
           @share="handleShare"
@@ -119,11 +120,11 @@
       </div>
 
       <!-- End of Feed -->
-      <div v-else-if="filteredPosts.length > 0" class="text-center py-8 text-gray-500 text-sm">
+      <div v-else-if="filteredPosts.length > 0" class="text-center py-8 text-neutral-gray text-sm">
         <div class="flex items-center justify-center gap-2">
-          <div class="w-8 h-px bg-gray-300"></div>
+          <div class="w-8 h-px bg-light-gray"></div>
           <span>You're all caught up!</span>
-          <div class="w-8 h-px bg-gray-300"></div>
+          <div class="w-8 h-px bg-light-gray"></div>
         </div>
       </div>
     </div>
@@ -134,7 +135,7 @@
         v-if="showScrollToTop"
         ref="scrollTopBtnRef"
         @click="scrollToTop"
-        class="fixed bottom-6 right-6 z-30 p-3 bg-gentle-mint text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 hover-gentle-lift"
+        class="fixed bottom-6 right-6 z-30 p-3 bg-sage-green text-white rounded-full shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105"
         aria-label="Scroll to top"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -253,6 +254,15 @@ async function handleReaction(data: { postId: string, reactionType: string }) {
     emit('postInteraction', { type: 'reaction', postId: data.postId, data })
   } catch (error) {
     console.error('Failed to add reaction:', error)
+  }
+}
+
+async function handleRemoveReaction(postId: string) {
+  try {
+    await feedStore.removeReaction(postId)
+    emit('postInteraction', { type: 'reaction', postId, data: { isRemoving: true } })
+  } catch (error) {
+    console.error('Failed to remove reaction:', error)
   }
 }
 

@@ -29,14 +29,14 @@
       <!-- Author Details -->
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 flex-wrap">
-          <h4 class="font-semibold text-gray-900 font-primary">
+          <h4 class="font-semibold text-warm-graphite font-inter">
             {{ getAuthorName() }}
           </h4>
           
           <!-- "You" Badge for current user -->
           <span
             v-if="isCurrentUser"
-            class="px-2 py-1 bg-soft-pink/20 text-pink-700 text-xs font-bold rounded-full border border-soft-pink/30"
+            class="px-2 py-1 bg-blush-rose/20 text-warm-graphite text-xs font-bold rounded-full border border-blush-rose/30"
           >
             You
           </span>
@@ -44,7 +44,7 @@
           <!-- Relationship Badge -->
           <span
             v-else-if="authorRelationship"
-            class="px-2 py-1 bg-gentle-mint/20 text-gray-700 text-xs font-medium rounded-full"
+            class="px-2 py-1 bg-sage-green/20 text-soft-charcoal text-xs font-medium rounded-full"
           >
             {{ authorRelationship }}
           </span>
@@ -62,33 +62,34 @@
         </div>
 
         <!-- Pregnancy Context -->
-        <div v-if="post.pregnancy_context?.current_week || post.pregnancy_context?.trimester" class="flex items-center gap-2 mt-1 text-sm text-gray-600">
+        <div v-if="post.pregnancy_context?.current_week || post.pregnancy_context?.trimester" class="flex items-center gap-2 mt-1 text-sm text-soft-charcoal">
           <span v-if="post.pregnancy_context.current_week" class="font-medium">
             Week {{ post.pregnancy_context.current_week }}
           </span>
-          <span v-if="post.pregnancy_context.current_week && post.pregnancy_context.trimester" class="text-gray-400">•</span>
+          <span v-if="post.pregnancy_context.current_week && post.pregnancy_context.trimester" class="text-neutral-gray">•</span>
           <span v-if="post.pregnancy_context.trimester">
             Trimester {{ post.pregnancy_context.trimester }}
           </span>
-          <span v-if="post.pregnancy_context.is_milestone_week" class="text-gray-400">•</span>
-          <span v-if="post.pregnancy_context.is_milestone_week" class="text-soft-pink font-medium">
-            ✨ Milestone Week
+          <span v-if="post.pregnancy_context.is_milestone_week" class="text-neutral-gray">•</span>
+          <span v-if="post.pregnancy_context.is_milestone_week" class="text-blush-rose font-medium flex items-center gap-1">
+            <Star class="w-3 h-3" />
+            Milestone Week
           </span>
         </div>
 
         <!-- Timestamp and Mood -->
-        <div class="flex items-center gap-2 mt-1 text-sm text-gray-500">
+        <div class="flex items-center gap-2 mt-1 text-sm text-neutral-gray">
           <time :datetime="post.created_at" :title="getFullTimestamp()">
             {{ getRelativeTime() }}
           </time>
           
-          <span v-if="post.mood" class="text-gray-400">•</span>
+          <span v-if="post.mood" class="text-light-gray">•</span>
           <span v-if="post.mood" class="flex items-center gap-1">
             <span>{{ getMoodEmoji() }}</span>
             <span class="capitalize">{{ post.mood }}</span>
           </span>
           
-          <span v-if="post.privacy_level" class="text-gray-400">•</span>
+          <span v-if="post.privacy_level" class="text-light-gray">•</span>
           <div v-if="post.privacy_level" class="flex items-center gap-1">
             {{ getPrivacyIcon() }}
             <span class="capitalize text-xs">{{ post.privacy_level }}</span>
@@ -102,13 +103,11 @@
       <button
         ref="menuRef"
         @click="toggleMenu"
-        class="p-2 hover:bg-gray-100 rounded-full transition-colors"
+        class="p-2 hover:bg-warm-gray rounded-full transition-colors"
         :aria-expanded="isMenuOpen"
         aria-label="Post options"
       >
-        <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-        </svg>
+        <MoreVertical class="w-5 h-5 text-neutral-gray" />
       </button>
 
       <!-- Dropdown Menu -->
@@ -117,7 +116,7 @@
           v-if="isMenuOpen"
           ref="menuDropdownRef"
           :style="menuStyle"
-          class="fixed z-50 bg-white rounded-lg shadow-xl border border-gray-100 py-2 min-w-48"
+          class="fixed z-50 bg-off-white rounded-lg shadow-lg border border-light-gray py-2 min-w-48"
           @click.stop
         >
           <button
@@ -125,8 +124,8 @@
             :key="action.key"
             @click="handleMenuAction(action.key)"
             :class="cn(
-              'w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors flex items-center gap-2',
-              action.destructive && 'text-red-600 hover:bg-red-50'
+              'w-full px-4 py-2 text-left text-sm hover:bg-warm-gray transition-colors flex items-center gap-2 text-soft-charcoal',
+              action.destructive && 'text-error hover:bg-error/10'
             )"
           >
             <span class="text-base">{{ action.icon }}</span>
@@ -149,6 +148,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { cn } from '~/components/ui/utils'
 import type { components } from '~/types/api'
+import { MoreVertical, Star } from 'lucide-vue-next'
 
 type EnrichedPost = components['schemas']['EnrichedPost']
 
@@ -237,6 +237,19 @@ function getInitials() {
     return '?'
   }
   
+  // Check if it's an email address
+  if (name.includes('@')) {
+    // For emails, try to get meaningful initials
+    const emailPart = name.split('@')[0]
+    // Check if email has dots or underscores
+    const parts = emailPart.split(/[._-]/).filter(part => part.length > 0)
+    if (parts.length >= 2) {
+      return parts.slice(0, 2).map(part => part.charAt(0)).join('').toUpperCase()
+    }
+    // Otherwise use first two letters of email
+    return emailPart.slice(0, 2).toUpperCase()
+  }
+  
   const words = name.split(' ').filter(word => word.length > 0)
   
   if (words.length === 0) {
@@ -256,9 +269,9 @@ function getInitials() {
 
 function getAvatarColor() {
   const colors = [
-    'bg-soft-pink',
-    'bg-gentle-mint', 
-    'bg-muted-lavender',
+    'bg-blush-rose',
+    'bg-sage-green', 
+    'bg-dusty-lavender',
     'bg-light-coral',
     'bg-soft-blue'
   ]
@@ -277,12 +290,12 @@ function getMoodColor() {
   if (!mood) return 'bg-gray-400'
   
   const moodColors = {
-    happy: 'bg-soft-pink',
-    excited: 'bg-light-coral',
-    peaceful: 'bg-gentle-mint',
-    tired: 'bg-muted-lavender',
-    anxious: 'bg-soft-blue',
-    grateful: 'bg-gray-100'
+    happy: 'bg-blush-rose',
+    excited: 'bg-blush-rose',
+    peaceful: 'bg-sage-green',
+    tired: 'bg-dusty-lavender',
+    anxious: 'bg-info',
+    grateful: 'bg-warm-gray'
   }
   
   return moodColors[mood] || 'bg-gray-400'
@@ -318,15 +331,15 @@ function getPostTypeBadgeColor() {
   const type = props.post.type
   
   const typeColors = {
-    milestone: 'bg-soft-pink/20 text-soft-pink',
-    update: 'bg-gentle-mint/20 text-gray-700',
-    photo: 'bg-muted-lavender/20 text-muted-lavender-dark',
-    journal: 'bg-blue-50 text-blue-700',
-    question: 'bg-light-coral/20 text-light-coral-dark',
-    celebration: 'bg-soft-pink/20 text-soft-pink'
+    milestone: 'bg-blush-rose/20 text-warm-graphite',
+    update: 'bg-sage-green/20 text-soft-charcoal',
+    photo: 'bg-dusty-lavender/20 text-soft-charcoal',
+    journal: 'bg-info/20 text-soft-charcoal',
+    question: 'bg-warning/20 text-soft-charcoal',
+    celebration: 'bg-blush-rose/20 text-warm-graphite'
   }
   
-  return typeColors[type || 'update'] || 'bg-gray-100 text-gray-600'
+  return typeColors[type || 'update'] || 'bg-warm-gray text-neutral-gray'
 }
 
 function getMoodEmoji() {

@@ -3,13 +3,14 @@
 # Import all models for Alembic to detect them
 from .user import User, UserPreferences, NotificationSettings, DefaultPrivacyLevel, SharingDefaults
 from .pregnancy import Pregnancy, PregnancyDetails, BabyInfo, WeeklyUpdate, RiskLevel, PregnancyStatus, BabyGender, PregnancyPreferences
+from .baby_development import BabyDevelopment, TrimesterType
 from .family import (
     FamilyGroup, FamilyMember, FamilyInvitation, EmergencyContact,
     GroupType, RelationshipType, MemberRole, MemberPermission, MemberStatus, InvitationStatus,
     GroupPermissions, GroupSettings, MemberPreferences
 )
 from .content import (
-    Post, PostContent, PostPrivacy, MediaItem, MediaMetadata, Comment, Reaction, PostView, PostShare,
+    Post, PostContent, PostPrivacy, MediaItem, MediaMetadata, Comment, Reaction, PostView, PostShare, FeedActivity,
     PostType, MoodType, VisibilityLevel, PostStatus, ReactionType, MediaType
 )
 from .milestone import (

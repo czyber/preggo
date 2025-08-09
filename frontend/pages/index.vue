@@ -48,39 +48,32 @@
               <div class="relative hero-visual w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96">
                 <!-- Pregnancy silhouette with glow -->
                 <div class="absolute inset-0 flex items-center justify-center">
-                  <div class="pregnancy-silhouette w-32 h-48 bg-gradient-to-b from-warm-gray/60 to-blush-rose/40 rounded-full relative">
-                    <div class="absolute inset-2 bg-gradient-to-b from-warm-gray/40 to-blush-rose/30 rounded-full">
-                      <div class="absolute top-8 left-1/2 transform -translate-x-1/2 w-16 h-20 bg-gradient-to-b from-blush-rose/50 to-warm-gray/50 rounded-full"></div>
+                  <div class="pregnancy-silhouette w-32 h-48 bg-pink-200 rounded-full relative">
+                    <div class="absolute inset-2 bg-pink-100 rounded-full">
+                      <div class="absolute top-8 left-1/2 transform -translate-x-1/2 w-16 h-20 bg-pink-300 rounded-full"></div>
                     </div>
                   </div>
                 </div>
                 
                 <!-- Family connection circles -->
-                <div class="absolute top-4 left-4 w-12 h-12 bg-sage-green/30 rounded-full flex items-center justify-center animate-pulse" style="animation-delay: 1s;">
-                  <div class="w-6 h-6 bg-sage-green/50 rounded-full"></div>
+                <div class="absolute top-4 left-4 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center animate-pulse" style="animation-delay: 1s;">
+                  <div class="w-6 h-6 bg-green-200 rounded-full"></div>
                 </div>
-                <div class="absolute top-8 right-8 w-14 h-14 bg-blush-rose/30 rounded-full flex items-center justify-center animate-pulse" style="animation-delay: 1.5s;">
-                  <div class="w-7 h-7 bg-blush-rose/50 rounded-full"></div>
+                <div class="absolute top-8 right-8 w-14 h-14 bg-pink-100 rounded-full flex items-center justify-center animate-pulse" style="animation-delay: 1.5s;">
+                  <div class="w-7 h-7 bg-pink-200 rounded-full"></div>
                 </div>
-                <div class="absolute bottom-12 left-8 w-10 h-10 bg-dusty-lavender/30 rounded-full flex items-center justify-center animate-pulse" style="animation-delay: 2s;">
-                  <div class="w-5 h-5 bg-dusty-lavender/50 rounded-full"></div>
+                <div class="absolute bottom-12 left-8 w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center animate-pulse" style="animation-delay: 2s;">
+                  <div class="w-5 h-5 bg-purple-200 rounded-full"></div>
                 </div>
-                <div class="absolute bottom-8 right-12 w-16 h-16 bg-warm-gray/40 rounded-full flex items-center justify-center animate-pulse" style="animation-delay: 0.5s;">
-                  <div class="w-8 h-8 bg-warm-gray/60 rounded-full"></div>
+                <div class="absolute bottom-8 right-12 w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center animate-pulse" style="animation-delay: 0.5s;">
+                  <div class="w-8 h-8 bg-gray-200 rounded-full"></div>
                 </div>
                 
                 <!-- Connection lines -->
                 <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 400">
-                  <defs>
-                    <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" style="stop-color:#E8B4B8;stop-opacity:0.4" />
-                      <stop offset="50%" style="stop-color:#C3B5D1;stop-opacity:0.3" />
-                      <stop offset="100%" style="stop-color:#A8C09A;stop-opacity:0.4" />
-                    </linearGradient>
-                  </defs>
-                  <path d="M50 50 Q200 200 350 100" stroke="url(#connectionGradient)" stroke-width="2" fill="none" opacity="0.6"/>
-                  <path d="M100 350 Q200 200 50 120" stroke="url(#connectionGradient)" stroke-width="2" fill="none" opacity="0.6"/>
-                  <path d="M350 350 Q200 200 350 100" stroke="url(#connectionGradient)" stroke-width="2" fill="none" opacity="0.6"/>
+                  <path d="M50 50 Q200 200 350 100" stroke="#f9a8d4" stroke-width="2" fill="none" opacity="0.4"/>
+                  <path d="M100 350 Q200 200 50 120" stroke="#f9a8d4" stroke-width="2" fill="none" opacity="0.4"/>
+                  <path d="M350 350 Q200 200 350 100" stroke="#f9a8d4" stroke-width="2" fill="none" opacity="0.4"/>
                 </svg>
               </div>
             </div>
@@ -237,12 +230,12 @@
         <!-- Setup reminder - only show if user doesn't have any active pregnancies -->
         <div
           v-if="!hasActivePregnancy"
-          class="mb-8 bg-off-white rounded-2xl p-6 shadow-sm border border-dusty-lavender/30"
+          class="mb-8 bg-off-white rounded-2xl p-6 shadow-sm border border-purple-200"
         >
           <div class="flex items-start space-x-4">
             <div class="flex-shrink-0">
-              <div class="w-10 h-10 bg-dusty-lavender/20 rounded-full flex items-center justify-center">
-                <svg class="w-5 h-5 text-dusty-lavender" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>

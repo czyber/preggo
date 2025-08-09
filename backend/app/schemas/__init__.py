@@ -6,6 +6,11 @@ from .pregnancy import (
     PregnancyBase, PregnancyCreate, PregnancyUpdate, PregnancyResponse,
     WeeklyUpdateBase, WeeklyUpdateCreate, WeeklyUpdateResponse
 )
+from .baby_development import (
+    BabyDevelopmentBase, BabyDevelopmentCreate, BabyDevelopmentUpdate, BabyDevelopmentResponse,
+    BabyDevelopmentSummary, BabyDevelopmentByWeek, BabyDevelopmentByTrimester,
+    BabyDevelopmentStats, BabyDevelopmentSearch
+)
 from .family import (
     FamilyGroupBase, FamilyGroupCreate, FamilyGroupUpdate, FamilyGroupResponse,
     FamilyMemberBase, FamilyMemberCreate, FamilyMemberUpdate, FamilyMemberResponse,

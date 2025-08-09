@@ -163,15 +163,14 @@ export const useApi = () => {
       }),
 
     // ==================== POST INTERACTIONS ====================
-    addPostReaction: (postId: string, reactionType: string) =>
-      loggedPOST('/posts/{post_id}/reactions', {
-        params: { path: { post_id: postId } },
-        body: { type: reactionType }
+    addPostReaction: (postId: string, reactionData: any) =>
+      loggedPOST('/feed/reactions', {
+        body: reactionData
       }),
     
     removePostReaction: (postId: string) =>
-      loggedDELETE('/posts/{post_id}/reactions', {
-        params: { path: { post_id: postId } }
+      loggedDELETE('/feed/reactions', {
+        body: { post_id: postId }
       }),
     
     recordPostView: (postId: string, data?: { time_spent?: number, source?: string }) =>

@@ -261,10 +261,7 @@
           <FeedTimeline
             v-else
             :pregnancy-id="pregnancyId"
-            :initial-filter="route.query.filter as string"
-            @post-interaction="handlePostInteraction"
-            @filter-changed="handleFilterChanged"
-            @celebration-viewed="handleCelebrationViewed"
+            @postInteraction="handlePostInteraction"
           />
         </div>
       </div>
@@ -312,6 +309,7 @@ import { useFamilyStore } from "@/stores/family"
 import { useAuth } from '@/composables/useAuth'
 import { useToast } from '@/composables/useToast'
 import UserAvatar from '@/components/ui/UserAvatar.vue'
+import FeedTimeline from '~/components/feed/FeedTimeline.vue'
 
 // Composables
 const route = useRoute()
@@ -349,6 +347,40 @@ const getPageTitle = () => {
     return `${currentPregnancy.value.pregnancy_details?.current_week ? `Week ${currentPregnancy.value.pregnancy_details.current_week}` : 'Family'} Feed`
   }
   return 'Family Feed'
+}
+
+// Helper methods for FeedJourney component
+const getUserName = () => {
+  return user.value?.display_name || user.value?.first_name || 'You'
+}
+
+const getCurrentWeek = () => {
+  return currentPregnancy.value?.pregnancy_details?.current_week || 0
+}
+
+const getBabyDevelopment = () => {
+  return currentPregnancy.value?.pregnancy_details?.baby_development || ''
+}
+
+const getUserMood = () => {
+  // This could come from recent posts or user settings
+  return undefined // TODO: Implement mood tracking
+}
+
+const getTimeOfDay = (): 'morning' | 'afternoon' | 'evening' | 'night' => {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'morning'
+  if (hour < 17) return 'afternoon'
+  if (hour < 21) return 'evening'
+  return 'night'
+}
+
+const getFamilyActivity = (): 'high' | 'medium' | 'low' => {
+  // Based on recent family member activity
+  const recentlyActive = familyMembers.value.filter(member => member.is_online).length
+  if (recentlyActive >= 3) return 'high'
+  if (recentlyActive >= 1) return 'medium'
+  return 'low'
 }
 
 
@@ -395,9 +427,14 @@ function handlePostInteraction(interaction: { type: string, postId: string, data
   // Handle different interaction types
   switch (interaction.type) {
     case 'reaction':
+      if (interaction.data?.isRemoving) {
+        feedStore.removeReaction(interaction.postId)
+      } else {
+        feedStore.addReaction(interaction.postId, interaction.data?.reactionType || 'love')
+      }
       showToast({
-        title: 'Reaction added!',
-        description: 'Your reaction has been shared with the family.',
+        title: interaction.data?.isRemoving ? 'Love removed' : 'Love shared! 💕',
+        description: interaction.data?.isRemoving ? 'Your love has been removed.' : 'Your family will feel the love you shared.',
         type: 'success'
       })
       break
@@ -405,8 +442,53 @@ function handlePostInteraction(interaction: { type: string, postId: string, data
       // Navigate to post detail or open comment modal
       break
     case 'share':
-      // Handle sharing
+      handleShare(interaction.postId)
       break
+  }
+}
+
+async function handleShare(postId: string) {
+  try {
+    const shareUrl = `${window.location.origin}/feed/${route.params.pregnancyId}/post/${postId}`
+    const shareData = {
+      title: 'Pregnancy Update',
+      text: 'Check out this pregnancy milestone!',
+      url: shareUrl
+    }
+
+    if (navigator.share && navigator.canShare?.(shareData)) {
+      await navigator.share(shareData)
+      showToast({
+        title: 'Beautiful moment shared! ✨',
+        description: 'Your precious memory will bring joy to your loved ones.',
+        type: 'success'
+      })
+    } else {
+      await navigator.clipboard.writeText(shareUrl)
+      showToast({
+        title: 'Link ready to share! 🔗',
+        description: 'Spread the joy by sharing this special moment.',
+        type: 'success'
+      })
+    }
+  } catch (error) {
+    console.error('Failed to share:', error)
+    // Fallback to copying link
+    try {
+      const shareUrl = `${window.location.origin}/feed/${route.params.pregnancyId}/post/${postId}`
+      await navigator.clipboard.writeText(shareUrl)
+      showToast({
+        title: 'Link ready to share! 🔗',
+        description: 'Spread the joy by sharing this special moment.',
+        type: 'success'
+      })
+    } catch (clipboardError) {
+      showToast({
+        title: 'Sharing needs a little help',
+        description: 'Please copy the link from your browser to share this moment.',
+        type: 'info'
+      })
+    }
   }
 }
 
@@ -426,6 +508,30 @@ function handleFilterChanged(filterData: { filter: string, count: number }) {
 
 function handleCelebrationViewed(celebrationData: { celebrationId: string, postId: string }) {
   console.log('Celebration viewed:', celebrationData)
+}
+
+function handleMemoryPromptAction(data: { action: string, data?: any }) {
+  console.log('Memory prompt action:', data)
+  
+  switch (data.action) {
+    case 'take_photo':
+      router.push(`/posts/create?pregnancyId=${pregnancyId.value}&type=photo&prompt=weekly`)
+      break
+    case 'celebrate':
+      router.push(`/posts/create?pregnancyId=${pregnancyId.value}&type=milestone&week=${getCurrentWeek()}`)
+      break
+    case 'ask_family':
+      router.push(`/posts/create?pregnancyId=${pregnancyId.value}&type=question&prompt=family`)
+      break
+    case 'write_reflection':
+      router.push(`/posts/create?pregnancyId=${pregnancyId.value}&type=journal&prompt=reflection`)
+      break
+    case 'create_first_story':
+      router.push(`/posts/create?pregnancyId=${pregnancyId.value}`)
+      break
+    default:
+      console.log('Unknown memory prompt action:', data.action)
+  }
 }
 
 function toggleNotifications() {

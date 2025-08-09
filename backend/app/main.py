@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 import asyncio
@@ -233,3 +233,19 @@ async def options_handler(full_path: str):
     This ensures preflight requests get proper CORS headers.
     """
     return {"message": "OK"}
+
+
+@app.websocket("/ws/feed/{pregnancy_id}")
+async def websocket_feed_endpoint(websocket: WebSocket, pregnancy_id: str):
+    """
+    WebSocket endpoint for real-time Instagram-like feed features.
+    
+    Handles real-time updates for:
+    - Optimistic reactions and comments
+    - Family member presence
+    - Milestone celebrations
+    - Live feed updates
+    """
+    from app.websocket import websocket_handler
+    
+    await websocket_handler.handle_connection(websocket, pregnancy_id)

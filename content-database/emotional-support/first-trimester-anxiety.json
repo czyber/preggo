@@ -1,0 +1,77 @@
+{
+  "content_type": "emotional_support",
+  "category": "anxiety_management",
+  "title": "Navigating First Trimester Worries",
+  "subtitle": "It's normal to feel anxious - you're not alone",
+  "applicable_weeks": [4, 5, 6, 7, 8, 9, 10, 11, 12],
+  "main_content": {
+    "introduction": "The first trimester can feel like an emotional rollercoaster. Between the physical symptoms, hormonal changes, and the weight of this life-changing news, it's completely normal to feel overwhelmed, anxious, or uncertain at times.",
+    "validation_statements": [
+      "Your worries don't make you a bad parent - they make you a caring one",
+      "Feeling anxious about pregnancy is one of the most normal human responses",
+      "Every pregnant person worries - you're in excellent company",
+      "Anxiety often comes from love and the deep desire for everything to be okay"
+    ],
+    "coping_strategies": [
+      {
+        "strategy": "Information Balance",
+        "description": "Learn enough to feel informed, but avoid information overload. Choose one or two trusted sources rather than endless googling.",
+        "action": "Set specific times for pregnancy research rather than constant searching."
+      },
+      {
+        "strategy": "Mindful Moments",
+        "description": "When worry spirals start, bring yourself back to the present moment. Focus on what you can control right now.",
+        "action": "Try the 5-4-3-2-1 technique: name 5 things you can see, 4 you can touch, 3 you can hear, 2 you can smell, 1 you can taste."
+      },
+      {
+        "strategy": "Support Connection",
+        "description": "Share your worries with trusted people. Anxiety often loses power when spoken aloud to someone who cares.",
+        "action": "Identify 2-3 people you can talk to honestly about your pregnancy concerns."
+      },
+      {
+        "strategy": "Professional Guidance",
+        "description": "Your healthcare provider has heard every worry before. Don't hesitate to call with questions or concerns.",
+        "action": "Write down questions between appointments so you remember to ask them."
+      }
+    ],
+    "when_to_seek_help": [
+      "If anxiety is interfering with sleep, eating, or daily activities",
+      "If you're having panic attacks or persistent intrusive thoughts",
+      "If worry is preventing you from taking care of yourself",
+      "If you feel hopeless or overwhelmed most of the time"
+    ]
+  },
+  "partner_guidance": {
+    "title": "How Partners Can Help",
+    "suggestions": [
+      "Listen without trying to fix - sometimes she just needs to voice her worries",
+      "Offer reassurance without dismissing concerns",
+      "Help with practical tasks to reduce overall stress",
+      "Attend appointments when possible for shared reassurance",
+      "Encourage professional help if anxiety seems overwhelming"
+    ]
+  },
+  "family_sharing_guidance": {
+    "what_to_share": "It's okay to tell trusted family members that you're feeling anxious - they can provide support",
+    "boundaries": "You don't need to share every worry with everyone - choose your confidants wisely",
+    "asking_for_help": "Let family know specific ways they can support you during this time"
+  },
+  "personalization_tags": [
+    "first_trimester",
+    "anxiety_management",
+    "emotional_support",
+    "coping_strategies",
+    "professional_help"
+  ],
+  "cultural_adaptations": {
+    "universal_themes": "Worry as expression of love, community support during vulnerable times",
+    "cultural_considerations": "Some cultures have specific practices for managing pregnancy anxiety - incorporate what feels meaningful to you"
+  },
+  "delivery_triggers": [
+    "user_reports_high_anxiety",
+    "frequent_symptom_checking_behavior",
+    "first_appointment_approaching",
+    "after_concerning_symptoms_reported"
+  ],
+  "tone": "warm, understanding, normalizing, gently encouraging"
+}

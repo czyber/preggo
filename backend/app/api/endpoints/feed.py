@@ -24,9 +24,9 @@ from app.services.pregnancy_service import pregnancy_service
 from app.services.family_service import family_member_service
 from app.db.session import get_session
 from app.schemas.feed import (
-    FeedRequest, FeedResponse, PersonalTimelineResponse,
-    ReactionRequest, ReactionResponse, FeedFiltersResponse,
-    FeedFilterType, FeedSortType, PregnancyReactionType,
+    FeedRequest, FeedResponse, PersonalTimelineResponse, FeedCursor, FamilyContext,
+    ReactionRequest, ReactionResponse, OptimisticReactionRequest, OptimisticReactionResponse,
+    FeedFiltersResponse, FeedFilterType, FeedSortType, PregnancyReactionType,
     CelebrationPost, FeedAnalytics
 )
 from app.models.content import ReactionType
@@ -38,13 +38,16 @@ router = APIRouter(prefix="/feed", tags=["feed"])
 async def get_family_feed(
     pregnancy_id: str,
     response: Response,
-    limit: int = Query(20, ge=1, le=100, description="Number of posts to return"),
-    offset: int = Query(0, ge=0, description="Number of posts to skip"),
+    limit: int = Query(20, ge=1, le=50, description="Number of posts to return"),
+    cursor: Optional[str] = Query(None, description="Cursor for pagination (replaces offset)"),
     filter_type: FeedFilterType = Query(FeedFilterType.ALL, description="Type of content to show"),
     sort_by: FeedSortType = Query(FeedSortType.CHRONOLOGICAL, description="How to sort the feed"),
     include_reactions: bool = Query(True, description="Include reaction counts and types"),
     include_comments: bool = Query(True, description="Include comment previews"),
     include_media: bool = Query(True, description="Include media metadata"),
+    include_content: bool = Query(False, description="Include integrated pregnancy content"),
+    include_warmth: bool = Query(True, description="Include family warmth visualizations"),
+    real_time: bool = Query(False, description="Enable real-time updates via WebSocket upgrade"),
     since: Optional[str] = Query(None, description="ISO timestamp - only show posts after this time"),
     current_user: Dict[str, Any] = Depends(get_current_active_user),
     session: Session = Depends(get_session)
@@ -92,26 +95,48 @@ async def get_family_feed(
                     detail="Invalid since timestamp format. Use ISO 8601 format."
                 )
         
-        # Build feed request
+        # Parse cursor if provided
+        cursor_obj = None
+        if cursor:
+            try:
+                cursor_obj = FeedCursor.decode(cursor)
+            except ValueError as e:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Invalid cursor: {str(e)}"
+                )
+        
+        # Build enhanced feed request
         feed_request = FeedRequest(
             limit=limit,
-            offset=offset,
+            cursor=cursor,
             filter_type=filter_type,
             sort_by=sort_by,
             include_reactions=include_reactions,
             include_comments=include_comments,
             include_media=include_media,
+            include_content=include_content,
+            include_warmth=include_warmth,
+            real_time=real_time,
             since=since_datetime
         )
         
-        # Get the family feed
-        feed_response = await feed_service.get_family_feed(
+        # Get the enhanced family feed with Instagram-like features
+        feed_response = await feed_service.get_instagram_like_family_feed(
             session, user_id, pregnancy_id, feed_request
         )
         
-        # Add caching headers for better performance
-        # Cache for 2 minutes for first page, 5 minutes for subsequent pages
-        cache_duration = 120 if offset == 0 else 300
+        # Add family context for Instagram-like experience
+        family_context = await _get_family_context(session, pregnancy_id)
+        feed_response.family_context = family_context
+        
+        # Generate WebSocket token if real-time is requested
+        if real_time:
+            feed_response.real_time_token = f"wss://api.preggo.com/ws/feed/{pregnancy_id}?token={_generate_ws_token(user_id)}"
+        
+        # Add performance-optimized caching headers
+        # Shorter cache for cursor-based pagination to ensure real-time feel
+        cache_duration = 60 if not cursor else 120  # 1-2 minutes
         response.headers["Cache-Control"] = f"private, max-age={cache_duration}"
         response.headers["ETag"] = _generate_etag(feed_response, user_id)
         
@@ -653,6 +678,327 @@ async def get_feed_analytics(
         )
 
 
+@router.get("/integrated/{pregnancy_id}")
+async def get_integrated_feed(
+    pregnancy_id: str,
+    limit: int = Query(10, ge=1, le=50, description="Number of feed items to return"),
+    include_content: bool = Query(True, description="Include pregnancy content cards"),
+    include_warmth: bool = Query(True, description="Include family warmth data"),
+    user_id: str = Query(..., description="User ID"),
+    session: Session = Depends(get_session)
+):
+    """
+    Get integrated feed combining posts with pregnancy content for StoryCard format.
+    This endpoint is optimized for the new feed redesign with content integration.
+    """
+    try:
+        from app.services.content_service import content_service
+        from app.services.family_warmth_service import family_warmth_service
+        from app.services.memory_book_service import memory_book_service
+        from app.models.content import Post, PostType
+        from app.models.pregnancy import Pregnancy
+        from sqlmodel import select, desc
+        
+        # Verify pregnancy exists and user has access (simplified for now)
+        pregnancy = session.get(Pregnancy, pregnancy_id)
+        if not pregnancy:
+            raise HTTPException(status_code=404, detail="Pregnancy not found")
+        
+        # Get recent posts
+        posts_query = select(Post).where(
+            Post.pregnancy_id == pregnancy_id
+        ).order_by(desc(Post.created_at)).limit(limit // 2)
+        
+        posts = list(session.exec(posts_query).all())
+        
+        # Get personalized content if requested
+        personalized_content = []
+        if include_content:
+            personalized_content = content_service.get_personalized_feed_content(
+                session, user_id, pregnancy_id, limit // 2
+            )
+        
+        # Build integrated feed items
+        feed_items = []
+        
+        # Add posts as StoryCard items
+        for post in posts:
+            # Get family warmth data if requested
+            warmth_data = None
+            if include_warmth and post.family_warmth_score > 0:
+                warmth_data = {
+                    "overall_score": post.family_warmth_score,
+                    "visualization_type": "hearts_growing" if post.family_warmth_score > 0.6 else "hearts_emerging"
+                }
+            
+            # Check if post is memory-eligible
+            memory_eligible = post.memory_book_eligible
+            memory_priority = post.memory_book_priority
+            
+            # Build pregnancy context
+            current_week = pregnancy.pregnancy_details.current_week if pregnancy.pregnancy_details else None
+            pregnancy_context = None
+            if current_week:
+                pregnancy_context = {
+                    "week_number": current_week,
+                    "trimester": 1 if current_week <= 13 else (2 if current_week <= 27 else 3),
+                    "is_milestone_week": current_week in [12, 20, 28, 37],  # Example milestone weeks
+                    "development_highlight": None,  # Would get from baby development content
+                    "size_comparison": None  # Would get from baby development content
+                }
+            
+            feed_item = {
+                "id": post.id,
+                "type": "user_post",
+                "story_card_type": "pregnancy_moment",
+                "content": {
+                    "title": post.content.title,
+                    "text": post.content.text,
+                    "post_type": post.type.value,
+                    "mood": post.content.mood.value if post.content.mood else None,
+                    "week": post.content.week,
+                    "tags": post.content.tags
+                },
+                "pregnancy_context": pregnancy_context,
+                "family_warmth": warmth_data,
+                "memory_book": {
+                    "eligible": memory_eligible,
+                    "priority": memory_priority,
+                    "auto_curate": memory_priority > 0.7
+                } if memory_eligible else None,
+                "emotional_context": post.emotional_context,
+                "celebration_data": post.celebration_trigger_data,
+                "engagement": {
+                    "reaction_count": post.reaction_count,
+                    "comment_count": post.comment_count,
+                    "view_count": post.view_count
+                },
+                "created_at": post.created_at.isoformat(),
+                "updated_at": post.updated_at.isoformat()
+            }
+            
+            feed_items.append(feed_item)
+        
+        # Add personalized content as StoryCard items
+        for content_item in personalized_content:
+            feed_item = {
+                "id": content_item.get("id"),
+                "type": "pregnancy_content",
+                "story_card_type": "educational_tip" if content_item.get("content_type") == "weekly_tip" else "development_info",
+                "content": {
+                    "title": content_item.get("title"),
+                    "subtitle": content_item.get("subtitle"),
+                    "text": content_item.get("content"),
+                    "content_summary": content_item.get("content_summary"),
+                    "content_type": content_item.get("content_type"),
+                    "reading_time_minutes": content_item.get("reading_time_minutes"),
+                    "featured_image": content_item.get("featured_image"),
+                    "tags": content_item.get("tags", [])
+                },
+                "pregnancy_context": {
+                    "week_number": content_item.get("week_number"),
+                    "trimester": content_item.get("trimester"),
+                    "personalization_score": content_item.get("personalization_score", 0.0)
+                },
+                "interaction_prompts": {
+                    "can_save_to_memory": True,
+                    "can_share_with_family": True,
+                    "feedback_options": ["helpful", "not_helpful", "saved"]
+                },
+                "created_at": datetime.utcnow().isoformat()
+            }
+            
+            feed_items.append(feed_item)
+        
+        # Sort integrated feed by relevance and recency
+        feed_items.sort(key=lambda x: (
+            x.get("pregnancy_context", {}).get("personalization_score", 0.0) if x["type"] == "pregnancy_content" else 0.5,
+            x["created_at"]
+        ), reverse=True)
+        
+        return {
+            "pregnancy_id": pregnancy_id,
+            "feed_items": feed_items[:limit],
+            "total_count": len(feed_items[:limit]),
+            "has_more": len(posts) + len(personalized_content) > limit,
+            "integration_features": {
+                "content_included": include_content,
+                "warmth_included": include_warmth,
+                "memory_prompts_enabled": True
+            },
+            "generated_at": datetime.utcnow().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting integrated feed: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get integrated feed")
+
+
+@router.get("/story-cards/{pregnancy_id}")
+async def get_story_card_feed(
+    pregnancy_id: str,
+    limit: int = Query(15, ge=5, le=30, description="Number of story cards to return"),
+    user_id: str = Query(..., description="User ID"),
+    session: Session = Depends(get_session)
+):
+    """
+    Get feed optimized specifically for StoryCard UI components.
+    Returns a mix of user posts and pregnancy content formatted for story card display.
+    """
+    try:
+        from app.services.content_service import content_service
+        from app.services.family_warmth_service import family_warmth_service
+        from app.models.pregnancy import Pregnancy
+        
+        # Verify pregnancy exists
+        pregnancy = session.get(Pregnancy, pregnancy_id)
+        if not pregnancy:
+            raise HTTPException(status_code=404, detail="Pregnancy not found")
+        
+        current_week = pregnancy.pregnancy_details.current_week if pregnancy.pregnancy_details else 1
+        
+        # Get story cards from multiple sources
+        story_cards = []
+        
+        # 1. Weekly pregnancy content card (always first if available)
+        weekly_content = content_service.get_weekly_pregnancy_content(
+            session, user_id, pregnancy_id, current_week
+        )
+        
+        if weekly_content and weekly_content.get("baby_development"):
+            development = weekly_content["baby_development"]
+            story_cards.append({
+                "id": f"weekly_development_{current_week}",
+                "type": "baby_development",
+                "priority": 10,  # High priority
+                "content": {
+                    "title": f"Week {current_week}: Your Baby This Week",
+                    "subtitle": development.get("size_comparison", ""),
+                    "amazing_fact": development.get("amazing_fact", ""),
+                    "connection_moment": development.get("connection_moment", ""),
+                    "size_comparison": development.get("size_comparison"),
+                    "size_comparison_image": development.get("size_comparison_image"),
+                    "major_developments": development.get("major_developments", []),
+                    "what_baby_can_do": development.get("what_baby_can_do", "")
+                },
+                "pregnancy_context": {
+                    "week_number": current_week,
+                    "trimester": weekly_content.get("trimester"),
+                    "is_development_highlight": True
+                },
+                "interaction_prompts": {
+                    "share_with_family": True,
+                    "save_to_memory": True,
+                    "start_conversation": True
+                }
+            })
+        
+        # 2. Recent posts as story cards
+        from sqlmodel import select, desc
+        from app.models.content import Post
+        
+        recent_posts_query = select(Post).where(
+            Post.pregnancy_id == pregnancy_id
+        ).order_by(desc(Post.created_at)).limit(8)
+        
+        recent_posts = list(session.exec(recent_posts_query).all())
+        
+        for post in recent_posts:
+            story_card = {
+                "id": post.id,
+                "type": "user_moment",
+                "priority": 5 + post.family_warmth_score * 5,  # Priority based on family warmth
+                "content": {
+                    "title": post.content.title or f"{post.type.value.title()} Moment",
+                    "text": post.content.text,
+                    "mood": post.content.mood.value if post.content.mood else None,
+                    "post_type": post.type.value,
+                    "tags": post.content.tags
+                },
+                "family_warmth": {
+                    "score": post.family_warmth_score,
+                    "visualization": "hearts_growing" if post.family_warmth_score > 0.6 else "hearts_emerging"
+                } if post.family_warmth_score > 0 else None,
+                "memory_book": {
+                    "eligible": post.memory_book_eligible,
+                    "priority": post.memory_book_priority
+                } if post.memory_book_eligible else None,
+                "created_at": post.created_at.isoformat()
+            }
+            story_cards.append(story_card)
+        
+        # 3. Personalized tips as story cards
+        personalized_tips = content_service.get_personalized_feed_content(
+            session, user_id, pregnancy_id, 5
+        )
+        
+        for tip in personalized_tips:
+            if tip.get("content_type") in ["weekly_tip", "emotional_support", "health_wellness"]:
+                story_cards.append({
+                    "id": tip["id"],
+                    "type": "pregnancy_tip",
+                    "priority": tip.get("personalization_score", 0.5) * 10,
+                    "content": {
+                        "title": tip["title"],
+                        "subtitle": tip.get("subtitle"),
+                        "text": tip["content"],
+                        "tip_type": tip["content_type"],
+                        "reading_time": tip.get("reading_time_minutes"),
+                        "featured_image": tip.get("featured_image")
+                    },
+                    "interaction_prompts": {
+                        "mark_helpful": True,
+                        "save_to_memory": True,
+                        "share_with_family": True
+                    }
+                })
+        
+        # 4. Family warmth summary card (if there's recent activity)
+        warmth_summary = family_warmth_service.get_family_warmth_summary(
+            session, pregnancy_id, 7
+        )
+        
+        if warmth_summary and warmth_summary.get("overall_warmth_score", 0) > 0.3:
+            story_cards.append({
+                "id": f"warmth_summary_{pregnancy_id}",
+                "type": "family_warmth_summary",
+                "priority": 8,
+                "content": {
+                    "title": "Your Family's Love",
+                    "subtitle": f"Family warmth score: {warmth_summary['overall_warmth_score']:.1%}",
+                    "insights": warmth_summary.get("insights", [])[:2],
+                    "active_family_members": warmth_summary.get("active_family_members", 0),
+                    "recent_highlights": warmth_summary.get("family_activity", {}).get("most_supportive_interactions", [])[:1]
+                },
+                "visualization_data": {
+                    "warmth_score": warmth_summary["overall_warmth_score"],
+                    "warmth_breakdown": warmth_summary.get("warmth_breakdown", {}),
+                    "trend": warmth_summary.get("warmth_trend", "stable")
+                }
+            })
+        
+        # Sort by priority and limit results
+        story_cards.sort(key=lambda x: x["priority"], reverse=True)
+        final_story_cards = story_cards[:limit]
+        
+        return {
+            "pregnancy_id": pregnancy_id,
+            "story_cards": final_story_cards,
+            "total_count": len(final_story_cards),
+            "current_week": current_week,
+            "card_types_included": list(set(card["type"] for card in final_story_cards)),
+            "generated_at": datetime.utcnow().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting story card feed: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get story card feed")
+
+
 def _generate_etag(data: Any, user_id: str) -> str:
     """Generate ETag for caching based on data and user."""
     content = json.dumps({
@@ -661,3 +1007,203 @@ def _generate_etag(data: Any, user_id: str) -> str:
         "timestamp": datetime.utcnow().replace(second=0, microsecond=0).isoformat()
     }, sort_keys=True)
     return hashlib.md5(content.encode()).hexdigest()
+
+
+async def _get_family_context(session: Session, pregnancy_id: str) -> FamilyContext:
+    """Get family context information for Instagram-like feed."""
+    try:
+        from app.services.family_warmth_service import family_warmth_service
+        
+        # Get family warmth summary for the past 7 days
+        warmth_summary = family_warmth_service.get_family_warmth_summary(
+            session, pregnancy_id, 7
+        )
+        
+        # Count active family members (simplified)
+        active_members = warmth_summary.get("active_family_members", 0) if warmth_summary else 3
+        
+        # Count recent interactions (simplified)
+        recent_interactions = warmth_summary.get("total_interactions", 0) if warmth_summary else 15
+        
+        # Get overall warmth score
+        warmth_score = warmth_summary.get("overall_warmth_score", 0.5) if warmth_summary else 0.5
+        
+        return FamilyContext(
+            active_members=active_members,
+            recent_interactions=recent_interactions,
+            warmth_score=warmth_score,
+            celebration_count=2  # Placeholder
+        )
+    except Exception as e:
+        # Fallback values if warmth service fails
+        return FamilyContext(
+            active_members=3,
+            recent_interactions=10,
+            warmth_score=0.6,
+            celebration_count=1
+        )
+
+
+def _generate_ws_token(user_id: str) -> str:
+    """Generate WebSocket token for real-time features."""
+    # In production, this would be a proper JWT or session token
+    import secrets
+    import base64
+    token_data = {
+        "user_id": user_id,
+        "timestamp": datetime.utcnow().isoformat(),
+        "nonce": secrets.token_hex(16)
+    }
+    token_json = json.dumps(token_data, sort_keys=True)
+    return base64.b64encode(token_json.encode()).decode()
+
+
+@router.post("/reactions/optimistic", response_model=OptimisticReactionResponse)
+async def add_optimistic_reaction(
+    reaction_request: OptimisticReactionRequest,
+    current_user: Dict[str, Any] = Depends(get_current_active_user),
+    session: Session = Depends(get_session)
+):
+    """
+    Add reaction with optimistic updates and sub-50ms response target.
+    
+    Optimized for Instagram-like immediate feedback with:
+    - Client-side deduplication via client_id
+    - Minimal validation for speed
+    - Background processing for family warmth calculations
+    - Real-time activity broadcasting
+    """
+    start_time = datetime.utcnow()
+    
+    try:
+        user_id = current_user["sub"]
+        
+        # Fast validation - minimal checks for sub-50ms response
+        if not reaction_request.post_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="post_id is required for optimistic reactions"
+            )
+        
+        # Check for duplicate client_id to prevent double reactions
+        from sqlmodel import select
+        from app.models.content import Reaction
+        
+        existing_reaction_query = select(Reaction).where(
+            Reaction.client_id == reaction_request.client_id,
+            Reaction.created_at >= start_time - timedelta(minutes=5)  # 5-minute dedup window
+        )
+        existing_reaction = session.exec(existing_reaction_query).first()
+        
+        if existing_reaction:
+            # Return existing reaction to prevent duplicates
+            latency_ms = (datetime.utcnow() - start_time).total_seconds() * 1000
+            return OptimisticReactionResponse(
+                success=True,
+                reaction_id=existing_reaction.id,
+                optimistic=False,  # Already processed
+                updated_counts={reaction_request.reaction_type: 1},
+                family_warmth_delta=0.0,
+                latency_ms=latency_ms,
+                client_dedup_id=reaction_request.client_id,
+                broadcast_queued=False
+            )
+        
+        # Map pregnancy reaction type to standard reaction type
+        reaction_type_mapping = {
+            PregnancyReactionType.LOVE: ReactionType.LOVE,
+            PregnancyReactionType.EXCITED: ReactionType.EXCITED,
+            PregnancyReactionType.CARE: ReactionType.CARE,
+            PregnancyReactionType.SUPPORT: ReactionType.SUPPORT,
+            PregnancyReactionType.BEAUTIFUL: ReactionType.BEAUTIFUL,
+            PregnancyReactionType.FUNNY: ReactionType.FUNNY,
+            PregnancyReactionType.PRAYING: ReactionType.PRAYING,
+            PregnancyReactionType.PROUD: ReactionType.SUPPORT,  # Map to existing
+            PregnancyReactionType.GRATEFUL: ReactionType.PRAYING,  # Map to existing
+        }
+        
+        mapped_reaction_type = reaction_type_mapping.get(
+            reaction_request.reaction_type, ReactionType.LOVE
+        )
+        
+        # Calculate family warmth contribution based on intensity and reaction type
+        base_warmth_values = {
+            ReactionType.LOVE: 0.1,
+            ReactionType.EXCITED: 0.08,
+            ReactionType.CARE: 0.12,
+            ReactionType.SUPPORT: 0.15,
+            ReactionType.BEAUTIFUL: 0.08,
+            ReactionType.FUNNY: 0.05,
+            ReactionType.PRAYING: 0.12,
+        }
+        
+        base_warmth = base_warmth_values.get(mapped_reaction_type, 0.05)
+        family_warmth_contribution = base_warmth * (reaction_request.intensity / 2.0)
+        
+        # Create reaction with enhanced fields
+        import uuid
+        reaction_id = str(uuid.uuid4())
+        
+        new_reaction = Reaction(
+            id=reaction_id,
+            user_id=user_id,
+            post_id=reaction_request.post_id,
+            type=mapped_reaction_type,
+            intensity=reaction_request.intensity,
+            custom_message=reaction_request.custom_message,
+            is_milestone_reaction=reaction_request.is_milestone_reaction,
+            family_warmth_contribution=family_warmth_contribution,
+            client_id=reaction_request.client_id,
+            created_at=datetime.utcnow()
+        )
+        
+        # Fast database insert
+        session.add(new_reaction)
+        session.commit()
+        
+        # Queue background tasks for performance (don't wait for them)
+        from app.models.content import FeedActivity
+        activity = FeedActivity(
+            pregnancy_id="",  # Will be populated by background job
+            user_id=user_id,
+            activity_type="reaction",
+            target_id=reaction_request.post_id,
+            target_type="post",
+            activity_data={
+                "reaction_type": reaction_request.reaction_type,
+                "intensity": reaction_request.intensity,
+                "is_milestone": reaction_request.is_milestone_reaction
+            },
+            client_timestamp=reaction_request.timestamp,
+            broadcast_priority=3 if reaction_request.is_milestone_reaction else 2
+        )
+        session.add(activity)
+        session.commit()
+        
+        # Calculate response time
+        end_time = datetime.utcnow()
+        latency_ms = (end_time - start_time).total_seconds() * 1000
+        
+        # Build optimistic response with minimal data for speed
+        updated_counts = {reaction_request.reaction_type: 1}  # Simplified for speed
+        
+        return OptimisticReactionResponse(
+            success=True,
+            reaction_id=reaction_id,
+            optimistic=True,
+            updated_counts=updated_counts,
+            family_warmth_delta=family_warmth_contribution,
+            latency_ms=latency_ms,
+            client_dedup_id=reaction_request.client_id,
+            broadcast_queued=True
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        # Fast error response
+        latency_ms = (datetime.utcnow() - start_time).total_seconds() * 1000
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to add optimistic reaction (latency: {latency_ms:.1f}ms): {str(e)}"
+        )

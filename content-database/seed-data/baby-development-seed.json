@@ -1,0 +1,99 @@
+[
+  {
+    "content_type": "BABY_DEVELOPMENT",
+    "week_number": 4,
+    "trimester": 1,
+    "title": "Your Baby's Foundation is Being Built",
+    "subtitle": "From microscopic to miraculous",
+    "content_body": "# Week 4: The Beginning of Life\n\nThough your baby is smaller than the period at the end of this sentence, all the genetic instructions for their entire development are already in place. This week marks the incredible beginning of organ formation.\n\n## Development Highlights\n- All genetic information is present and accounted for\n- Cells are rapidly dividing every 12-15 hours\n- Three distinct cell layers are forming that will become all body systems\n- Your baby's biological sex has already been determined\n\n## Amazing Facts\n- Your baby already contains all the DNA they'll ever need\n- Though microscopic, they're already uniquely themselves\n- The foundation for every organ system is being laid\n\n## Connection Activities\n- Start talking to your belly - bonding begins now\n- Take your first pregnancy photo for memory keeping\n- Begin a pregnancy journal to document this incredible journey",
+    "content_summary": "Week 4: Though tiny beyond imagination, your baby already has all their genetic programming in place and is rapidly developing the foundation for all major organ systems.",
+    "reading_time_minutes": 3,
+    "priority": 100,
+    "tags": ["early_development", "genetic_programming", "organ_foundation", "bonding_start"],
+    "featured_image": null,
+    "media_urls": [],
+    "external_links": [],
+    "personalization_rules": {
+      "emotional_state_adaptations": {
+        "anxious": "Emphasize the incredible precision of early development",
+        "excited": "Amplify the wonder and uniqueness of genetic programming",
+        "tired": "Focus on the automatic nature of development - baby is building themselves"
+      },
+      "family_structure_adaptations": {
+        "single_parent": "Focus on personal connection and individual journey",
+        "partner_present": "Include both partners in early bonding activities"
+      }
+    },
+    "target_audience": ["first_time_parent", "all_pregnancies"],
+    "medical_review_status": "APPROVED",
+    "medical_reviewer_id": null,
+    "reviewed_at": null,
+    "review_notes": "Content aligns with standard embryological development at 4 weeks gestational age",
+    "expires_at": null,
+    "delivery_methods": ["FEED_INTEGRATION", "ON_DEMAND"],
+    "optimal_delivery_time": "09:00",
+    "is_active": true,
+    "version": 1,
+    "parent_content_id": null
+  },
+  {
+    "content_type": "BABY_DEVELOPMENT", 
+    "week_number": 6,
+    "trimester": 1,
+    "title": "Two Hearts Beating as One",
+    "subtitle": "Your baby's heart starts its lifelong rhythm",
+    "content_body": "# Week 6: The First Heartbeat\n\nThis week brings one of pregnancy's most magical milestones - your baby's heart begins beating at around 110 beats per minute, almost twice as fast as your own.\n\n## Development Highlights\n- Heart begins its lifelong rhythm at 110 BPM\n- Neural tube (future brain and spinal cord) closes\n- Tiny limb buds appear like small paddles\n- Head begins taking recognizable shape\n\n## Amazing Facts\n- Your baby's heart beats almost twice as fast as yours\n- Blood begins circulating through microscopic vessels\n- Brain cells are forming at 250,000 per minute\n- The heart already has four chambers forming\n\n## Connection Activities\n- Place your hand on your heart and think of your baby's beating inside you\n- Listen to calming music - your baby's nervous system is beginning to respond\n- Consider when you want to schedule your first appointment\n\n## What This Means\nTwo hearts are now beating in your body - yours and your baby's. This tiny heart will beat over 2.5 billion times throughout their lifetime, starting right now.",
+    "content_summary": "Week 6: Your baby's heart begins beating at 110 BPM while their brain develops at an incredible rate of 250,000 new cells per minute.",
+    "reading_time_minutes": 4,
+    "priority": 100,
+    "tags": ["heartbeat_milestone", "cardiac_development", "neural_development", "first_appointment"],
+    "featured_image": null,
+    "media_urls": [],
+    "external_links": [],
+    "personalization_rules": {
+      "emotional_state_adaptations": {
+        "anxious": "Emphasize the strength and reliability of the developing heart",
+        "excited": "Amplify the wonder of two hearts beating together",
+        "overwhelmed": "Focus on the automatic, natural process of heart development"
+      }
+    },
+    "target_audience": ["first_time_parent", "all_pregnancies"],
+    "medical_review_status": "APPROVED",
+    "delivery_methods": ["FEED_INTEGRATION", "MILESTONE_TRIGGER"],
+    "optimal_delivery_time": "09:00",
+    "is_active": true,
+    "version": 1
+  },
+  {
+    "content_type": "BABY_DEVELOPMENT",
+    "week_number": 12,
+    "trimester": 1,
+    "title": "First Trimester Victory - All Systems in Place",
+    "subtitle": "Your baby has reached a major milestone with all organs formed",
+    "content_body": "# Week 12: End of First Trimester Milestone\n\nCongratulations! You've reached one of pregnancy's most significant milestones. Your baby now has all major organs and body systems in place, and the risk of miscarriage drops dramatically.\n\n## Major Achievements This Week\n- All major organs and body systems formed\n- Miscarriage risk significantly reduced\n- Baby can make fists and suck their thumb\n- Unique fingerprints have developed\n- Vocal cords are forming (though silent for now)\n\n## Incredible Capabilities\n- Hiccupping (though you won't feel it)\n- Swallowing and 'breathing' amniotic fluid\n- Responding to touch with reflexive movements\n- Making facial expressions\n- Producing urine through developing kidneys\n\n## Time to Celebrate\nThis is often when families choose to share their pregnancy news. You've successfully navigated the challenging first trimester, and your baby is now a perfectly formed tiny human.\n\n## Looking Ahead\nThe second trimester often brings renewed energy, decreased nausea, and the exciting possibility of feeling baby's first movements in the coming weeks.",
+    "content_summary": "Week 12: Major milestone reached! All organs formed, miscarriage risk greatly reduced, and your baby can now suck their thumb and make fists.",
+    "reading_time_minutes": 4,
+    "priority": 100,
+    "tags": ["first_trimester_completion", "milestone_celebration", "announcement_time", "risk_reduction", "organ_completion"],
+    "delivery_methods": ["FEED_INTEGRATION", "MILESTONE_TRIGGER", "PUSH_NOTIFICATION"],
+    "optimal_delivery_time": "09:00",
+    "is_active": true,
+    "version": 1
+  },
+  {
+    "content_type": "BABY_DEVELOPMENT",
+    "week_number": 20,
+    "trimester": 2,
+    "title": "Halfway There - The Big Anatomy Scan",
+    "subtitle": "Your baby is now the size of a small cantaloupe and can hear your voice",
+    "content_body": "# Week 20: The Halfway Milestone\n\nYou're officially halfway through your pregnancy journey! This week typically brings the exciting anatomy scan where you'll see your baby in amazing detail.\n\n## Development Milestones\n- Halfway point of pregnancy reached\n- Major anatomy scan reveals incredible detail\n- Baby can hear and recognize voices\n- If having a girl, she has all her lifetime eggs already\n- Movements are becoming coordinated and purposeful\n\n## What Baby Can Do Now\n- Hear music and voices from outside the womb\n- Kick and punch with increasing strength\n- Grip the umbilical cord with tiny hands\n- Sleep and wake in regular patterns\n- Respond to sounds with movement\n\n## Amazing Facts\n- Your baby swallows several ounces of amniotic fluid daily\n- Hair is growing on head and eyebrows\n- Baby girls have about 6 million eggs in their ovaries\n- Protective vernix coating is forming on skin\n\n## Connection Time\nNow that baby can hear, start talking, singing, and playing music! This is real bonding time as your baby learns to recognize your voice.",
+    "content_summary": "Week 20: Halfway milestone! Baby can hear your voice, anatomy scan reveals incredible development, and movements are getting stronger.",
+    "reading_time_minutes": 4,
+    "priority": 100,
+    "tags": ["halfway_milestone", "anatomy_scan", "hearing_development", "gender_reveal", "voice_recognition"],
+    "delivery_methods": ["FEED_INTEGRATION", "MILESTONE_TRIGGER"],
+    "optimal_delivery_time": "14:00",
+    "is_active": true,
+    "version": 1
+  }
+]

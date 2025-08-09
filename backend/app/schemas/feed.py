@@ -2,6 +2,8 @@ from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field
 from datetime import datetime
 from enum import Enum
+import base64
+import json
 
 from app.models.content import ReactionType
 from app.schemas.content import PostResponse
@@ -40,15 +42,49 @@ class FeedSortType(str, Enum):
     MILESTONE_FIRST = "milestone_first"  # Milestone posts first
 
 
+class FeedCursor(BaseModel):
+    """Cursor for pagination in Instagram-like feed"""
+    timestamp: datetime = Field(description="Timestamp of the last item")
+    id: str = Field(description="ID of the last item for tie-breaking")
+    score: Optional[float] = Field(default=None, description="Score of the last item (for ranking-based feeds)")
+    
+    def encode(self) -> str:
+        """Encode cursor to base64 string for URL safety"""
+        cursor_data = {
+            "timestamp": self.timestamp.isoformat(),
+            "id": self.id,
+            "score": self.score
+        }
+        cursor_json = json.dumps(cursor_data, sort_keys=True)
+        return base64.b64encode(cursor_json.encode()).decode()
+    
+    @classmethod
+    def decode(cls, cursor_str: str) -> "FeedCursor":
+        """Decode cursor from base64 string"""
+        try:
+            cursor_json = base64.b64decode(cursor_str.encode()).decode()
+            cursor_data = json.loads(cursor_json)
+            return cls(
+                timestamp=datetime.fromisoformat(cursor_data["timestamp"]),
+                id=cursor_data["id"],
+                score=cursor_data.get("score")
+            )
+        except Exception as e:
+            raise ValueError(f"Invalid cursor format: {e}")
+
+
 class FeedRequest(BaseModel):
-    """Request parameters for feed queries"""
-    limit: int = Field(default=20, ge=1, le=100, description="Number of posts to return")
-    offset: int = Field(default=0, ge=0, description="Number of posts to skip")
+    """Enhanced request parameters for Instagram-like feed queries"""
+    limit: int = Field(default=20, ge=1, le=50, description="Number of posts to return (reduced max for performance)")
+    cursor: Optional[str] = Field(default=None, description="Cursor for pagination (replaces offset)")
     filter_type: FeedFilterType = Field(default=FeedFilterType.ALL, description="Type of content to show")
     sort_by: FeedSortType = Field(default=FeedSortType.CHRONOLOGICAL, description="How to sort the feed")
     include_reactions: bool = Field(default=True, description="Include reaction counts and types")
     include_comments: bool = Field(default=True, description="Include comment previews")
     include_media: bool = Field(default=True, description="Include media metadata")
+    include_content: bool = Field(default=False, description="Include integrated pregnancy content")
+    include_warmth: bool = Field(default=True, description="Include family warmth visualizations")
+    real_time: bool = Field(default=False, description="Enable real-time updates via WebSocket upgrade")
     since: Optional[datetime] = Field(default=None, description="Only show posts after this timestamp")
 
 
@@ -99,12 +135,20 @@ class EnrichedPost(PostResponse):
     requires_attention: bool = Field(default=False, description="Whether post needs family attention")
 
 
+class FamilyContext(BaseModel):
+    """Family context information for Instagram-like feed"""
+    active_members: int = Field(description="Number of active family members")
+    recent_interactions: int = Field(description="Recent interactions count")
+    warmth_score: float = Field(description="Overall family warmth score")
+    celebration_count: int = Field(default=0, description="Number of recent celebrations")
+    
+
 class FeedResponse(BaseModel):
-    """Response for feed queries"""
+    """Enhanced response for Instagram-like feed queries"""
     posts: List[EnrichedPost] = Field(description="Feed posts with enriched data")
-    total_count: int = Field(description="Total number of posts available")
-    has_more: bool = Field(description="Whether there are more posts to load")
-    next_offset: Optional[int] = Field(default=None, description="Offset for next page")
+    cursor: Optional[Dict[str, Any]] = Field(default=None, description="Cursor information for pagination")
+    family_context: Optional[FamilyContext] = Field(default=None, description="Family engagement context")
+    real_time_token: Optional[str] = Field(default=None, description="WebSocket token for real-time updates")
     feed_metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional feed metadata")
     pregnancy_summary: Optional[Dict[str, Any]] = Field(default=None, description="Current pregnancy summary")
 
@@ -126,12 +170,35 @@ class ReactionRequest(BaseModel):
     context: Optional[Dict[str, Any]] = Field(default=None, description="Additional reaction context")
 
 
+class OptimisticReactionRequest(BaseModel):
+    """Enhanced request for optimistic reactions with sub-50ms response target"""
+    post_id: str = Field(description="Post ID (required for optimistic reactions)")
+    reaction_type: PregnancyReactionType = Field(description="Type of reaction")
+    intensity: int = Field(default=2, ge=1, le=3, description="Reaction intensity (1-3)")
+    client_id: str = Field(description="Client-generated UUID for deduplication")
+    timestamp: datetime = Field(description="Client timestamp for latency calculation")
+    custom_message: Optional[str] = Field(default=None, max_length=200, description="Personal note with reaction")
+    is_milestone_reaction: bool = Field(default=False, description="Special milestone recognition")
+
+
 class ReactionResponse(BaseModel):
     """Response for reaction operations"""
     success: bool = Field(description="Whether reaction was successful")
     reaction_id: str = Field(description="ID of the reaction")
     updated_counts: Dict[ReactionType, int] = Field(description="Updated reaction counts")
     message: Optional[str] = Field(default=None, description="Success/error message")
+
+
+class OptimisticReactionResponse(BaseModel):
+    """Enhanced response for optimistic reactions with performance metrics"""
+    success: bool = Field(description="Whether reaction was successful")
+    reaction_id: str = Field(description="ID of the reaction")
+    optimistic: bool = Field(default=True, description="Whether this is an optimistic response")
+    updated_counts: Dict[str, int] = Field(description="Updated reaction counts by type")
+    family_warmth_delta: float = Field(description="Change in family warmth score")
+    latency_ms: Optional[float] = Field(default=None, description="Server processing latency")
+    client_dedup_id: str = Field(description="Client ID for deduplication")
+    broadcast_queued: bool = Field(default=True, description="Whether real-time broadcast is queued")
 
 
 class FeedFiltersResponse(BaseModel):

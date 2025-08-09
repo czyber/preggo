@@ -1,0 +1,173 @@
+{
+  "template_type": "weekly_content_structure",
+  "title": "Comprehensive Weekly Content Template",
+  "purpose": "Standardized structure for creating consistent, high-quality weekly pregnancy content",
+  "required_fields": {
+    "week": {
+      "type": "integer",
+      "range": "1-42",
+      "description": "Target pregnancy week"
+    },
+    "content_type": {
+      "type": "enum",
+      "options": ["baby_development", "weekly_tip", "health_wellness", "emotional_support", "preparation", "partner_family"],
+      "description": "Primary content category"
+    },
+    "title": {
+      "type": "string",
+      "max_length": 200,
+      "guidelines": "Clear, engaging, week-specific. Should inspire wonder or provide comfort."
+    },
+    "subtitle": {
+      "type": "string",
+      "max_length": 300,
+      "optional": true,
+      "guidelines": "Supportive elaboration on title theme"
+    }
+  },
+  "content_structure": {
+    "baby_development": {
+      "required_sections": [
+        {
+          "name": "size_comparison",
+          "structure": {
+            "creative": "Unique, personal comparison beyond traditional fruits",
+            "traditional": "Standard size reference for familiarity",
+            "personal": "Relatable to user's own body/possessions"
+          }
+        },
+        {
+          "name": "development_highlights",
+          "type": "array",
+          "description": "3-5 key developmental milestones for the week"
+        },
+        {
+          "name": "amazing_facts",
+          "type": "array", 
+          "description": "Wonder-inspiring facts about baby's development"
+        },
+        {
+          "name": "what_baby_can_do",
+          "type": "array",
+          "description": "Specific capabilities baby has gained"
+        },
+        {
+          "name": "connection_activities",
+          "type": "array",
+          "description": "Ways families can bond with baby at this stage"
+        }
+      ],
+      "optional_sections": [
+        "sensory_development",
+        "movement_patterns", 
+        "brain_development_focus"
+      ]
+    },
+    "weekly_tips": {
+      "required_sections": [
+        {
+          "name": "tips",
+          "type": "array",
+          "structure": {
+            "category": "health_wellness|emotional_support|preparation|partner_family|self_care|milestone_celebration",
+            "title": "Clear, actionable tip title",
+            "content": "Detailed, supportive explanation",
+            "actionable": "Specific action user can take"
+          },
+          "min_items": 5,
+          "max_items": 8
+        }
+      ]
+    }
+  },
+  "universal_fields": {
+    "family_sharing_prompt": {
+      "type": "string",
+      "description": "Ready-to-share text for family updates",
+      "tone": "excited, informative, personal"
+    },
+    "personalization_tags": {
+      "type": "array",
+      "description": "Tags for content filtering and personalization"
+    },
+    "cultural_adaptations": {
+      "type": "object",
+      "description": "Guidance for adapting content to different cultural contexts"
+    },
+    "delivery_timing": {
+      "type": "enum",
+      "options": ["morning", "afternoon", "evening", "flexible"],
+      "description": "Optimal time of day for content delivery"
+    },
+    "emotional_tone": {
+      "type": "string",
+      "description": "Primary emotional feeling content should evoke"
+    }
+  },
+  "quality_standards": {
+    "medical_accuracy": {
+      "required": "All health information must be evidence-based",
+      "review_needed": "Content with medical claims requires healthcare provider review",
+      "sources": "Based on ACOG, WHO, and current obstetric guidelines"
+    },
+    "emotional_intelligence": {
+      "tone": "Warm, supportive friend who is knowledgeable but not clinical",
+      "validation": "Acknowledge that every pregnancy experience is unique",
+      "encouragement": "Celebrate progress and normalize challenges"
+    },
+    "cultural_sensitivity": {
+      "language": "Inclusive of diverse family structures",
+      "assumptions": "Avoid economic, cultural, or religious assumptions",
+      "adaptability": "Content should be adaptable to various cultural contexts"
+    },
+    "accessibility": {
+      "reading_level": "8th grade or lower",
+      "length": "Scannable with key points easily identifiable",
+      "visual_descriptions": "Include alt text concepts for visual elements"
+    }
+  },
+  "content_review_process": {
+    "medical_review": {
+      "required_for": ["health_wellness", "baby_development", "symptom_guidance"],
+      "reviewer_qualifications": "Licensed healthcare provider with obstetric experience",
+      "review_frequency": "Annual or when medical guidelines change"
+    },
+    "cultural_sensitivity_review": {
+      "required_for": "All content",
+      "reviewer_qualifications": "Diverse community representatives",
+      "focus_areas": ["inclusive language", "cultural assumptions", "family structure representation"]
+    },
+    "user_testing": {
+      "test_groups": "Diverse pregnancy demographics",
+      "feedback_areas": ["helpfulness", "clarity", "emotional impact", "cultural appropriateness"],
+      "iteration_process": "Update content based on user feedback patterns"
+    }
+  },
+  "personalization_framework": {
+    "user_factors": [
+      "pregnancy_week",
+      "first_time_vs_experienced_parent",
+      "high_risk_vs_standard_pregnancy",
+      "family_structure",
+      "cultural_background",
+      "emotional_state",
+      "information_preference_level"
+    ],
+    "adaptation_methods": [
+      "Content filtering based on preferences",
+      "Language adjustments for family structure",
+      "Cultural celebration and tradition integration",
+      "Risk-level appropriate information depth"
+    ]
+  },
+  "content_versioning": {
+    "version_control": "Track all content changes and updates",
+    "update_triggers": [
+      "Medical guideline changes",
+      "User feedback indicating problems",
+      "Cultural sensitivity concerns",
+      "Accessibility improvements needed"
+    ],
+    "approval_process": "Medical and cultural review required for significant changes"
+  }
+}

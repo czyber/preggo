@@ -1,0 +1,45 @@
+[
+  {
+    "content_type": "EMOTIONAL_SUPPORT",
+    "week_number": null,
+    "trimester": 1,
+    "title": "Navigating First Trimester Anxiety",
+    "subtitle": "It's normal to feel worried - you're not alone",
+    "content_body": "# Understanding First Trimester Anxiety\n\nThe first trimester can feel like an emotional rollercoaster. Between physical symptoms, hormonal changes, and processing this life-changing news, feeling overwhelmed or anxious is completely normal.\n\n## Your Worries Are Valid\n- Your concerns don't make you a bad parent - they make you a caring one\n- Feeling anxious about pregnancy is one of the most normal human responses\n- Every pregnant person worries - you're in excellent company\n- Anxiety often comes from love and wanting everything to be okay\n\n## Helpful Strategies\n\n### Information Balance\nLearn enough to feel informed, but avoid information overload. Choose one or two trusted sources rather than endless internet searching.\n\n### Present Moment Focus\nWhen worry spirals start, bring yourself back to the present. Use the 5-4-3-2-1 technique: name 5 things you can see, 4 you can touch, 3 you can hear, 2 you can smell, 1 you can taste.\n\n### Support Connection\nShare worries with trusted people. Anxiety often loses power when spoken aloud to someone who cares about you.\n\n### Professional Guidance\nYour healthcare provider has heard every worry before. Never hesitate to call with questions or concerns.\n\n## When to Seek Additional Help\n- If anxiety interferes with sleep, eating, or daily activities\n- If you're having panic attacks or persistent intrusive thoughts\n- If worry prevents you from taking care of yourself\n- If you feel hopeless or overwhelmed most of the time\n\nRemember: Taking care of your mental health is taking care of your baby.",
+    "content_summary": "First trimester anxiety is completely normal. Validation, coping strategies, and knowing when to seek help can provide relief and support.",
+    "reading_time_minutes": 6,
+    "priority": 85,
+    "tags": ["first_trimester_anxiety", "emotional_support", "coping_strategies", "validation", "mental_health"],
+    "personalization_rules": {
+      "emotional_state_adaptations": {
+        "high_anxiety": "Emphasize validation and professional support options",
+        "moderate_anxiety": "Focus on practical coping strategies",
+        "low_anxiety": "Provide preventive information and normalization"
+      }
+    },
+    "target_audience": ["first_time_parent", "high_anxiety", "all_pregnancies"],
+    "medical_review_status": "APPROVED",
+    "delivery_methods": ["ON_DEMAND", "PUSH_NOTIFICATION"],
+    "optimal_delivery_time": "19:00",
+    "is_active": true,
+    "version": 1
+  },
+  {
+    "content_type": "EMOTIONAL_SUPPORT",
+    "week_number": null,
+    "trimester": null,
+    "title": "When Pregnancy Doesn't Feel Like the Movies",
+    "subtitle": "Real talk about mixed feelings and complex emotions",
+    "content_body": "# The Reality of Pregnancy Emotions\n\nPregnancy in real life rarely matches what we see in movies or social media. Having mixed feelings, difficult days, or moments of uncertainty doesn't make you ungrateful or a bad parent-to-be.\n\n## It's Okay to Feel:\n- Excited and scared at the same time\n- Happy about the baby but sad about life changes\n- Grateful but also overwhelmed\n- Connected to your baby some days and distant others\n- Confident in your decision but nervous about the future\n\n## Complex Emotions Are Normal\n\n### Ambivalence\nFeeling two opposing emotions simultaneously is incredibly common in pregnancy. You can love your baby deeply while also feeling anxious about parenthood.\n\n### Grief for Your Former Life\nMourning aspects of your pre-pregnancy life doesn't mean you don't want your baby. It means you're human and processing big changes.\n\n### Identity Shifts\nWondering who you'll be as a parent while trying to hold onto who you are now is a normal part of the psychological journey.\n\n## Finding Balance\n- Allow yourself to feel whatever comes up without judgment\n- Talk to trusted friends or family about the messy, real feelings\n- Remember that pregnancy emotions are temporary and influenced by hormones\n- Consider counseling if emotions feel overwhelming or interfere with daily life\n\n## You're Not Alone\nEvery honest parent will tell you they had complicated feelings during pregnancy. The 'glowing, blissful pregnant person' exists for some people some of the time, but it's not the full story for most.\n\nYour feelings are valid, your experience is real, and you're going to be a great parent - complex emotions and all.",
+    "content_summary": "Pregnancy emotions are complex and often contradictory. Having mixed feelings is completely normal and doesn't reflect on your ability to be a loving parent.",
+    "reading_time_minutes": 7,
+    "priority": 80,
+    "tags": ["complex_emotions", "ambivalence", "identity_shifts", "emotional_validation", "real_talk"],
+    "target_audience": ["all_pregnancies", "emotional_complexity"],
+    "medical_review_status": "APPROVED",
+    "delivery_methods": ["ON_DEMAND", "FEED_INTEGRATION"],
+    "optimal_delivery_time": "19:00",
+    "is_active": true,
+    "version": 1
+  }
+]
