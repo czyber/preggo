@@ -257,7 +257,23 @@
         <!-- Pregnancy Dashboard - show if user has active pregnancies -->
         <div v-else class="space-y-6">
           <!-- Top Action Cards Row -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <PregnancyOverviewCard
+              :current-week="currentPregnancyDetails?.current_week"
+              :current-day="currentPregnancyDetails?.current_day"
+              :trimester="currentPregnancyDetails?.trimester"
+              :due-date="currentPregnancyDetails?.due_date"
+            />
+            <BabyDevelopmentCard
+              :current-week="currentPregnancyDetails?.current_week"
+              :current-day="currentPregnancyDetails?.current_day"
+              :pregnancy-day="currentPregnancyDetails?.current_day ? (currentPregnancyDetails?.current_week * 7) + currentPregnancyDetails?.current_day : null"
+            />
+          </div>
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+
+            <!-- Main Pregnancy Overview -->
+
             <!-- Create Update Card -->
             <CreateUpdateCard 
               :current-pregnancy-week="currentPregnancyDetails?.current_week"
@@ -268,19 +284,6 @@
             <FamilyFeedCard 
               :current-pregnancy="pregnancyStore.currentPregnancy"
               @view-feed="handleViewFamilyFeed"
-            />
-          </div>
-
-          <!-- Main Pregnancy Overview -->
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <PregnancyOverviewCard
-              :current-week="currentPregnancyDetails?.current_week"
-              :current-day="currentPregnancyDetails?.current_day"
-              :trimester="currentPregnancyDetails?.trimester"
-              :due-date="currentPregnancyDetails?.due_date"
-            />
-            <BabyDevelopmentCard 
-              :current-week="currentPregnancyDetails?.current_week"
             />
           </div>
 
