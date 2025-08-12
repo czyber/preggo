@@ -8,6 +8,8 @@ members, invitations, and emergency contacts.
 from typing import Optional, List, Dict, Any
 from sqlmodel import Session, select
 from datetime import datetime, timedelta
+import secrets
+import string
 from app.models.family import (
     FamilyGroup, FamilyMember, FamilyInvitation, EmergencyContact,
     MemberStatus, InvitationStatus
@@ -374,6 +376,179 @@ class FamilyInvitationService(BaseService[FamilyInvitation]):
         except Exception as e:
             logger.error(f"Error cleaning up expired invitations: {e}")
             return 0
+    
+    def generate_secure_token(self, length: int = 32) -> str:
+        """Generate a cryptographically secure random token."""
+        alphabet = string.ascii_letters + string.digits
+        return ''.join(secrets.choice(alphabet) for _ in range(length))
+    
+    async def create_link_invitation(
+        self, 
+        session: Session, 
+        invitation_data: Dict[str, Any]
+    ) -> Optional[FamilyInvitation]:
+        """Create a new link-based family invitation with token."""
+        try:
+            # Generate unique token
+            max_attempts = 10
+            for _ in range(max_attempts):
+                token = self.generate_secure_token()
+                
+                # Check if token already exists
+                existing = session.exec(
+                    select(FamilyInvitation).where(FamilyInvitation.token == token)
+                ).first()
+                
+                if not existing:
+                    break
+            else:
+                logger.error("Failed to generate unique token after maximum attempts")
+                return None
+            
+            # Set token and expiry
+            invitation_data["token"] = token
+            invitation_data["expires_at"] = datetime.utcnow() + timedelta(days=7)
+            invitation_data["status"] = InvitationStatus.PENDING
+            
+            # Email is optional for link invites
+            if "email" not in invitation_data:
+                invitation_data["email"] = None
+            
+            return await self.create(session, invitation_data)
+        except Exception as e:
+            logger.error(f"Error creating link invitation: {e}")
+            return None
+    
+    async def get_invitation_by_token(
+        self, 
+        session: Session, 
+        token: str
+    ) -> Optional[FamilyInvitation]:
+        """Get invitation by token."""
+        try:
+            statement = select(FamilyInvitation).where(
+                FamilyInvitation.token == token
+            )
+            return session.exec(statement).first()
+        except Exception as e:
+            logger.error(f"Error getting invitation by token: {e}")
+            return None
+    
+    async def accept_invitation_by_token(
+        self, 
+        session: Session, 
+        token: str,
+        accepting_user_id: str
+    ) -> Optional[FamilyMember]:
+        """Accept a family invitation using token and create member."""
+        try:
+            invitation = await self.get_invitation_by_token(session, token)
+            if not invitation:
+                logger.warning(f"Invitation with token {token} not found")
+                return None
+            
+            if invitation.status != InvitationStatus.PENDING:
+                logger.warning(f"Invitation {invitation.id} is not pending")
+                return None
+            
+            if invitation.expires_at < datetime.utcnow():
+                logger.warning(f"Invitation {invitation.id} has expired")
+                await self.update_invitation_status(
+                    session, invitation.id, InvitationStatus.EXPIRED
+                )
+                return None
+            
+            # Check if user is already a member of this group
+            existing_member = session.exec(
+                select(FamilyMember).where(
+                    FamilyMember.user_id == accepting_user_id,
+                    FamilyMember.group_id == invitation.group_id
+                )
+            ).first()
+            
+            if existing_member:
+                logger.warning(f"User {accepting_user_id} is already a member of group {invitation.group_id}")
+                return None
+            
+            # Create family member
+            member_data = {
+                "user_id": accepting_user_id,
+                "pregnancy_id": invitation.pregnancy_id,
+                "group_id": invitation.group_id,
+                "relationship": invitation.relationship,
+                "custom_title": invitation.custom_title,
+                "role": invitation.role,
+                "invited_by": invitation.invited_by
+            }
+            
+            member = await family_member_service.add_member(session, member_data)
+            
+            if member:
+                # Update invitation status
+                await self.update_invitation_status(
+                    session, invitation.id, InvitationStatus.ACCEPTED
+                )
+                
+                # Update accepted_at timestamp
+                invitation_update = {"accepted_at": datetime.utcnow()}
+                await self.update(session, invitation, invitation_update)
+            
+            return member
+        except Exception as e:
+            logger.error(f"Error accepting invitation by token {token}: {e}")
+            return None
+    
+    async def resend_invitation(
+        self, 
+        session: Session, 
+        invitation_id: str
+    ) -> Optional[FamilyInvitation]:
+        """Resend an invitation by generating a new token and extending expiry."""
+        try:
+            invitation = await self.get_by_id(session, invitation_id)
+            if not invitation:
+                return None
+            
+            # Generate new token if it's a link invitation
+            if invitation.token:
+                # Generate new unique token
+                max_attempts = 10
+                for _ in range(max_attempts):
+                    new_token = self.generate_secure_token()
+                    
+                    # Check if token already exists
+                    existing = session.exec(
+                        select(FamilyInvitation).where(
+                            FamilyInvitation.token == new_token,
+                            FamilyInvitation.id != invitation_id
+                        )
+                    ).first()
+                    
+                    if not existing:
+                        break
+                else:
+                    logger.error("Failed to generate unique token for resend")
+                    return None
+                
+                # Update invitation with new token and expiry
+                update_data = {
+                    "token": new_token,
+                    "expires_at": datetime.utcnow() + timedelta(days=7),
+                    "status": InvitationStatus.PENDING,
+                    "updated_at": datetime.utcnow()
+                }
+            else:
+                # For email-based invitations, just extend expiry
+                update_data = {
+                    "expires_at": datetime.utcnow() + timedelta(days=7),
+                    "status": InvitationStatus.PENDING,
+                    "updated_at": datetime.utcnow()
+                }
+            
+            return await self.update(session, invitation, update_data)
+        except Exception as e:
+            logger.error(f"Error resending invitation {invitation_id}: {e}")
+            return None
 
 
 class EmergencyContactService(BaseService[EmergencyContact]):

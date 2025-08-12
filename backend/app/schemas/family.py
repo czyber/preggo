@@ -1,5 +1,6 @@
 from typing import Optional, List
 from pydantic import BaseModel, EmailStr
+from typing import Union
 from datetime import datetime
 from app.models.family import (
     GroupType, RelationshipType, MemberRole, MemberPermission, MemberStatus,
@@ -84,7 +85,7 @@ class FamilyMemberResponse(FamilyMemberBase):
 
 class FamilyInvitationBase(BaseModel):
     """Base family invitation schema"""
-    email: EmailStr
+    email: Optional[EmailStr] = None  # Optional for link-based invites
     relationship: RelationshipType
     custom_title: Optional[str] = None
     role: MemberRole
@@ -102,6 +103,38 @@ class FamilyInvitationUpdate(BaseModel):
     status: InvitationStatus
 
 
+class FamilyInvitationLinkCreate(BaseModel):
+    """Schema for creating link-based family invitation"""
+    pregnancy_id: str
+    relationship: RelationshipType
+    custom_title: Optional[str] = None
+    message: Optional[str] = None
+
+
+class FamilyInvitationLinkResponse(BaseModel):
+    """Schema for link invitation generation response"""
+    url: str
+    token: str
+    expires_at: datetime
+
+
+class FamilyInvitationDetailsResponse(BaseModel):
+    """Schema for invitation details from token"""
+    id: str
+    pregnancy_id: str
+    relationship: RelationshipType
+    custom_title: Optional[str] = None
+    message: Optional[str] = None
+    expires_at: datetime
+    status: InvitationStatus
+    # Inviter information
+    inviter_name: str
+    inviter_email: str
+    # Pregnancy information for context
+    pregnancy_details: Optional[dict] = None
+    created_at: datetime
+
+
 class FamilyInvitationResponse(FamilyInvitationBase):
     """Schema for family invitation responses"""
     id: str
@@ -111,6 +144,7 @@ class FamilyInvitationResponse(FamilyInvitationBase):
     status: InvitationStatus
     expires_at: datetime
     accepted_at: Optional[datetime]
+    token: Optional[str]
     created_at: datetime
     updated_at: datetime
 

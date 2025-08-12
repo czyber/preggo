@@ -193,6 +193,58 @@ const emailError = ref('')
 const passwordError = ref('')
 const confirmPasswordError = ref('')
 
+// Helper functions for invite context
+const getRelationshipLabel = (relationship: string) => {
+  const labels: { [key: string]: string } = {
+    PARTNER: 'their partner',
+    MOTHER: 'their mother',
+    FATHER: 'their father',
+    SISTER: 'their sister',
+    BROTHER: 'their brother',
+    GRANDMOTHER: 'their grandmother',
+    GRANDFATHER: 'their grandfather',
+    MOTHER_IN_LAW: 'their mother-in-law',
+    FATHER_IN_LAW: 'their father-in-law',
+    AUNT: 'their aunt',
+    UNCLE: 'their uncle',
+    FRIEND: 'their close friend',
+    OTHER: 'family'
+  }
+  return labels[relationship] || 'family'
+}
+
+const getAccessibleCircles = (relationship: string) => {
+  const circles = []
+  
+  // Everyone gets to see "Everyone" level posts
+  circles.push({
+    level: 'ALL_FAMILY',
+    icon: '🌟',
+    name: 'Everyone'
+  })
+  
+  // Inner circle members
+  const innerCircleRelations = ['MOTHER', 'FATHER', 'SISTER', 'BROTHER']
+  if (innerCircleRelations.includes(relationship)) {
+    circles.unshift({
+      level: 'IMMEDIATE',
+      icon: '👨‍👩‍👧‍👦',
+      name: 'Inner Circle'
+    })
+  }
+  
+  // Partners get the most access
+  if (relationship === 'PARTNER') {
+    circles.unshift({
+      level: 'PARTNER_ONLY',
+      icon: '💕',
+      name: 'Partner'
+    })
+  }
+  
+  return circles
+}
+
 // Form validation functions
 const validateFullName = () => {
   if (!fullName.value.trim()) {

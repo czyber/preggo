@@ -181,25 +181,72 @@
                   </button>
                 </div>
 
-                <!-- Simplified privacy picker inline -->
-                <div v-if="showPrivacyPicker" class="space-y-2 p-3 bg-gray-50 rounded-lg">
-                  <button
-                    v-for="option in simplePrivacyOptions"
-                    :key="option.value"
-                    @click="selectPrivacy(option.value)"
-                    :class="[
-                      'w-full p-2 rounded text-left flex items-center gap-3 transition-all',
-                      privacy.visibility === option.value
-                        ? 'bg-soft-pink/20'
-                        : 'hover:bg-gray-200'
-                    ]"
-                  >
-                    <span>{{ option.icon }}</span>
-                    <div>
-                      <p class="text-sm font-medium text-gray-800">{{ option.label }}</p>
-                      <p class="text-xs text-gray-600">{{ option.description }}</p>
+                <!-- Enhanced privacy picker with invite functionality -->
+                <div v-if="showPrivacyPicker" class="space-y-3 p-4 bg-gray-50 rounded-lg">
+                  <!-- Privacy Options Grid -->
+                  <div class="grid grid-cols-2 gap-2">
+                    <button
+                      v-for="option in simplePrivacyOptions"
+                      :key="option.value"
+                      @click="selectPrivacy(option.value)"
+                      :class="[
+                        'p-3 rounded-lg text-left transition-all border',
+                        privacy.visibility === option.value
+                          ? 'border-gentle-mint bg-gentle-mint/10 shadow-sm'
+                          : 'border-gray-200 hover:border-gentle-mint/50 hover:bg-gentle-mint/5'
+                      ]"
+                    >
+                      <div class="space-y-2">
+                        <div class="flex items-center space-x-3">
+                          <span class="text-xl">{{ option.icon }}</span>
+                          <h3 class="font-medium text-gray-800 text-sm">{{ option.label }}</h3>
+                        </div>
+                        <p class="text-xs text-gray-600">{{ option.description }}</p>
+                        <p class="text-xs text-gray-500">{{ option.count }} {{ option.count === 1 ? 'person' : 'people' }}</p>
+                      </div>
+                    </button>
+                  </div>
+                  
+                  <!-- Invite Section when Everyone is selected -->
+                  <div v-if="privacy.visibility === 'ALL_FAMILY'" class="mt-4 p-3 bg-gradient-to-r from-soft-pink/10 to-gentle-mint/10 rounded-lg border border-gentle-mint/20">
+                    <div class="flex items-center justify-between">
+                      <div class="space-y-1">
+                        <h4 class="font-medium text-gray-800 text-sm">Want to share with more family?</h4>
+                        <p class="text-xs text-gray-600">Invite family members to join your pregnancy journey</p>
+                      </div>
+                      <button
+                        @click="openInviteModal"
+                        class="flex items-center space-x-1 px-3 py-2 bg-gentle-mint text-white rounded-lg hover:bg-gentle-mint/90 transition-colors text-xs font-medium"
+                      >
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <span>Invite</span>
+                      </button>
                     </div>
-                  </button>
+                  </div>
+                  
+                  <!-- Selected Privacy Preview -->
+                  <div v-if="privacy.visibility !== 'PRIVATE'" class="mt-3 p-3 bg-white rounded-lg border">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <h4 class="font-medium text-gray-800 text-sm mb-1">Who will see this:</h4>
+                        <div class="flex -space-x-1">
+                          <!-- Mock avatar previews - replace with actual family member avatars -->
+                          <div v-for="n in Math.min(5, getSelectedPrivacyOption()?.count || 0)" :key="n" class="w-6 h-6 bg-gentle-mint/20 rounded-full border-2 border-white flex items-center justify-center text-xs text-gray-700">
+                            {{ n }}
+                          </div>
+                          <div v-if="(getSelectedPrivacyOption()?.count || 0) > 5" class="w-6 h-6 bg-gray-300 rounded-full border-2 border-white flex items-center justify-center text-xs text-gray-600">
+                            +{{ (getSelectedPrivacyOption()?.count || 0) - 5 }}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <div class="text-lg font-semibold text-gray-800">{{ getSelectedPrivacyOption()?.count || 0 }}</div>
+                        <div class="text-xs text-gray-500">people</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <!-- Media preview if any -->
@@ -251,6 +298,120 @@
                 <!-- Upload error message -->
                 <div v-if="uploadError" class="p-2 bg-red-50 border border-red-200 rounded-lg">
                   <p class="text-sm text-red-600">{{ uploadError }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Teleport>
+      
+      <!-- Invite Modal -->
+      <Teleport to="body">
+        <div v-if="showInviteModal" class="fixed inset-0 z-50 overflow-y-auto">
+          <!-- Backdrop -->
+          <div class="fixed inset-0 bg-black/50" @click="showInviteModal = false"></div>
+          
+          <!-- Modal content -->
+          <div class="relative min-h-screen sm:flex sm:items-center sm:justify-center p-0 sm:p-4">
+            <div class="relative bg-white w-full sm:max-w-md sm:rounded-xl shadow-xl">
+              <!-- Header -->
+              <div class="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3 sm:rounded-t-xl">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-lg font-semibold text-gray-800">Invite Family</h3>
+                  <button
+                    @click="showInviteModal = false"
+                    class="p-2 -mr-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Quick Invite Form -->
+              <div class="p-4 space-y-4">
+                <p class="text-sm text-gray-600">Share your pregnancy journey with family members</p>
+                
+                <!-- Relationship Selection -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Who are you inviting?</label>
+                  <select 
+                    v-model="selectedRelationship"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-gentle-mint focus:border-gentle-mint text-sm"
+                  >
+                    <option value="">Select relationship...</option>
+                    <option value="partner">Partner/Spouse</option>
+                    <option value="mother">Mother</option>
+                    <option value="father">Father</option>
+                    <option value="sister">Sister</option>
+                    <option value="brother">Brother</option>
+                    <option value="grandmother">Grandmother</option>
+                    <option value="grandfather">Grandfather</option>
+                    <option value="mother_in_law">Mother-in-law</option>
+                    <option value="father_in_law">Father-in-law</option>
+                    <option value="aunt">Aunt</option>
+                    <option value="uncle">Uncle</option>
+                    <option value="friend">Close Friend</option>
+                    <option value="mentor">Mentor</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                
+                <!-- Custom Name -->
+                <div v-if="selectedRelationship">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Custom name (optional)</label>
+                  <input
+                    v-model="customTitle"
+                    type="text"
+                    placeholder="e.g., 'Grandma Mary', 'Aunt Sarah'"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-gentle-mint focus:border-gentle-mint text-sm"
+                  />
+                </div>
+                
+                <!-- Generate Link Button -->
+                <button
+                  v-if="selectedRelationship"
+                  @click="generateInviteLink"
+                  :disabled="generatingLink"
+                  class="w-full py-3 bg-gradient-to-r from-soft-pink to-gentle-mint text-white rounded-lg hover:from-soft-pink/90 hover:to-gentle-mint/90 transition-all font-medium disabled:opacity-50"
+                >
+                  {{ generatingLink ? 'Generating...' : 'Generate Invite Link' }}
+                </button>
+                
+                <!-- Generated Link -->
+                <div v-if="generatedLink" class="mt-4 p-3 bg-gray-50 rounded-lg">
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="text-sm font-medium text-gray-800">Share this link:</span>
+                    <button
+                      @click="copyInviteLink"
+                      class="px-2 py-1 text-xs bg-gentle-mint text-white rounded hover:bg-gentle-mint/90 transition-colors"
+                    >
+                      {{ linkCopied ? 'Copied!' : 'Copy' }}
+                    </button>
+                  </div>
+                  
+                  <div class="grid grid-cols-2 gap-2">
+                    <button
+                      @click="shareViaWhatsApp"
+                      class="flex items-center justify-center space-x-2 p-2 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-colors"
+                    >
+                      <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                      </svg>
+                      <span class="text-xs font-medium text-green-800">WhatsApp</span>
+                    </button>
+                    
+                    <button
+                      @click="shareViaSMS"
+                      class="flex items-center justify-center space-x-2 p-2 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors"
+                    >
+                      <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                      </svg>
+                      <span class="text-xs font-medium text-blue-800">Text</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -344,13 +505,61 @@ const simpleMoods = [
   { value: 'uncomfortable' as MoodType, emoji: '😣', label: 'Uncomfortable' }
 ]
 
-// Simplified privacy options
-const simplePrivacyOptions = [
-  { value: 'private' as VisibilityLevel, icon: '🔒', label: 'Just me', description: 'Save privately' },
-  { value: 'partner_only' as VisibilityLevel, icon: '💕', label: 'Partner', description: 'Share with partner' },
-  { value: 'immediate' as VisibilityLevel, icon: '👨‍👩‍👧', label: 'Close family', description: 'Parents & siblings' },
-  { value: 'all_family' as VisibilityLevel, icon: '👪', label: 'All family', description: 'Everyone in family' }
-]
+// Enhanced 4-tier privacy options with member counts
+const simplePrivacyOptions = computed(() => [
+  { 
+    value: 'PRIVATE' as VisibilityLevel, 
+    icon: '🔒', 
+    label: 'Just me', 
+    description: 'Keep this private',
+    count: 1
+  },
+  { 
+    value: 'PARTNER_ONLY' as VisibilityLevel, 
+    icon: '💕', 
+    label: 'Partner only', 
+    description: 'Just us two',
+    count: getPartnerCount()
+  },
+  { 
+    value: 'IMMEDIATE' as VisibilityLevel, 
+    icon: '👨‍👩‍👧‍👦', 
+    label: 'Inner circle', 
+    description: 'Close family (parents, siblings, partner)',
+    count: getInnerCircleCount()
+  },
+  { 
+    value: 'ALL_FAMILY' as VisibilityLevel, 
+    icon: '🌟', 
+    label: 'Everyone', 
+    description: 'All family members and friends',
+    count: getEveryoneCount()
+  }
+])
+
+// Member count helpers (you'll need to implement these based on your family system)
+const getPartnerCount = () => {
+  // TODO: Get actual partner count from family store
+  return 2 // You + Partner
+}
+
+const getInnerCircleCount = () => {
+  // TODO: Get actual inner circle count
+  return 6 // Example count
+}
+
+const getEveryoneCount = () => {
+  // TODO: Get actual total family member count
+  return 18 // Example count
+}
+
+// Show invite modal state
+const showInviteModal = ref(false)
+const selectedRelationship = ref('')
+const customTitle = ref('')
+const generatingLink = ref(false)
+const generatedLink = ref<string | null>(null)
+const linkCopied = ref(false)
 
 // Computed
 const canPublish = computed(() => {
@@ -470,6 +679,124 @@ const selectMood = (mood: MoodType) => {
 const selectPrivacy = (visibility: VisibilityLevel) => {
   privacy.value.visibility = visibility
   showPrivacyPicker.value = false
+}
+
+const getSelectedPrivacyOption = () => {
+  return simplePrivacyOptions.value.find(option => option.value === privacy.value.visibility)
+}
+
+const openInviteModal = () => {
+  showInviteModal.value = true
+  showPrivacyPicker.value = false
+}
+
+const generateInviteLink = async () => {
+  if (!selectedRelationship.value || !pregnancyStore.currentPregnancy) return
+  
+  generatingLink.value = true
+  
+  try {
+    const api = useApi()
+    const response = await api.generateFamilyInviteLink({
+      pregnancy_id: pregnancyStore.currentPregnancy.id,
+      relationship: selectedRelationship.value,
+      custom_title: customTitle.value || null,
+      message: 'Join me on my pregnancy journey!'
+    })
+    
+    generatedLink.value = response.data?.url
+    
+    // Show success feedback
+    const toast = useToast()
+    toast.add({
+      title: 'Invite link generated!',
+      description: 'You can now share this link with your family member',
+      color: 'green'
+    })
+    
+  } catch (error: any) {
+    console.error('Failed to generate invite link:', error)
+    
+    // Show detailed error information
+    const toast = useToast()
+    let errorMessage = 'Please try again'
+    
+    if (error.status === 404) {
+      errorMessage = 'API endpoint not found. Backend may not be running.'
+    } else if (error.status === 500) {
+      errorMessage = 'Server error. Check backend logs.'
+    } else if (error.message) {
+      errorMessage = error.message
+    }
+    
+    toast.add({
+      title: 'Failed to generate link',
+      description: errorMessage,
+      color: 'red'
+    })
+  } finally {
+    generatingLink.value = false
+  }
+}
+
+const copyInviteLink = async () => {
+  if (!generatedLink.value) return
+  
+  try {
+    await navigator.clipboard.writeText(generatedLink.value)
+    linkCopied.value = true
+    setTimeout(() => { linkCopied.value = false }, 2000)
+    
+    const toast = useToast()
+    toast.add({
+      title: 'Link copied!',
+      description: 'You can now paste it anywhere to share',
+      color: 'green'
+    })
+  } catch (error) {
+    console.error('Failed to copy link:', error)
+  }
+}
+
+const shareViaWhatsApp = () => {
+  if (!generatedLink.value) return
+  
+  const relationshipLabel = getRelationshipLabel(selectedRelationship.value)
+  const babyName = pregnancyStore.currentPregnancy?.baby_name || 'our baby'
+  const message = `Hi! I'd love to share ${babyName}'s pregnancy journey with you. Join me here: ${generatedLink.value}`
+  
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
+  window.open(whatsappUrl, '_blank')
+}
+
+const shareViaSMS = () => {
+  if (!generatedLink.value) return
+  
+  const babyName = pregnancyStore.currentPregnancy?.baby_name || 'our baby'
+  const message = `Hi! I'd love to share ${babyName}'s pregnancy journey with you. Join me here: ${generatedLink.value}`
+  
+  const smsUrl = `sms:?body=${encodeURIComponent(message)}`
+  window.location.href = smsUrl
+}
+
+const getRelationshipLabel = (relationship: string) => {
+  const labels: { [key: string]: string } = {
+    partner: 'Partner',
+    mother: 'Mother',
+    father: 'Father',
+    sister: 'Sister',
+    brother: 'Brother',
+    grandmother: 'Grandmother',
+    grandfather: 'Grandfather',
+    mother_in_law: 'Mother-in-law',
+    father_in_law: 'Father-in-law',
+    aunt: 'Aunt',
+    uncle: 'Uncle',
+    friend: 'Friend',
+    mentor: 'Mentor',
+    other: 'Family Member'
+  }
+  return labels[relationship] || 'Family Member'
 }
 
 const triggerMediaUpload = () => {
@@ -592,7 +919,7 @@ const getMoodLabel = (mood: string) => {
 }
 
 const getPrivacyLabel = (visibility: string) => {
-  const privacyData = simplePrivacyOptions.find(o => o.value === visibility)
+  const privacyData = simplePrivacyOptions.value.find(o => o.value === visibility)
   return privacyData?.label || 'Privacy'
 }
 

@@ -181,11 +181,14 @@ class FamilyInvitation(SQLModel, table=True):
     invited_by: str = Field(foreign_key="users.id", description="User who sent the invitation")
     
     # Invitation details
-    email: str = Field(description="Email address of invitee")
+    email: Optional[str] = Field(default=None, description="Email address of invitee (optional for link invites)")
     relationship: RelationshipType = Field(description="Expected relationship")
     custom_title: Optional[str] = Field(default=None, description="Custom title for invitee")
     role: MemberRole = Field(description="Intended role for invitee")
     message: Optional[str] = Field(default=None, description="Personal message with invitation")
+    
+    # Token-based invite support
+    token: Optional[str] = Field(default=None, index=True, unique=True, description="Secure token for invite links")
     
     # Status and timing
     status: InvitationStatus = InvitationStatus.PENDING
@@ -229,3 +232,5 @@ class EmergencyContact(SQLModel, table=True):
     # Timestamps
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+

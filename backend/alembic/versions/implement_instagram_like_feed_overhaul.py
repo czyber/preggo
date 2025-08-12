@@ -13,7 +13,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = 'instagram_feed_overhaul'
-down_revision = None  # Will be updated automatically
+down_revision = '20250807_baby_dev'
 branch_labels = None
 depends_on = None
 
@@ -33,24 +33,28 @@ def upgrade() -> None:
     op.add_column('posts', sa.Column('last_family_interaction', sa.DateTime(), nullable=True))
     op.add_column('posts', sa.Column('trending_score', sa.Float(), nullable=False, server_default='0.0'))
     
-    # Create new feed_activities table for real-time activity tracking
-    op.create_table('feed_activities',
-        sa.Column('id', sa.String(), nullable=False),
-        sa.Column('pregnancy_id', sa.String(), nullable=False),
-        sa.Column('user_id', sa.String(), nullable=False),
-        sa.Column('activity_type', sa.String(), nullable=False),
-        sa.Column('target_id', sa.String(), nullable=False),
-        sa.Column('target_type', sa.String(), nullable=False),
-        sa.Column('activity_data', postgresql.JSON(astext_type=sa.Text()), nullable=False),
-        sa.Column('broadcast_to_family', sa.Boolean(), nullable=False, server_default='true'),
-        sa.Column('broadcast_priority', sa.Integer(), nullable=False, server_default='1'),
-        sa.Column('client_timestamp', sa.DateTime(), nullable=True),
-        sa.Column('processed_at', sa.DateTime(), nullable=True),
-        sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
-        sa.ForeignKeyConstraint(['pregnancy_id'], ['pregnancies.id'], ),
-        sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-        sa.PrimaryKeyConstraint('id')
-    )
+    # Create new feed_activities table for real-time activity tracking (if it doesn't exist)
+    from sqlalchemy import inspect
+    bind = op.get_bind()
+    inspector = inspect(bind)
+    if 'feed_activities' not in inspector.get_table_names():
+        op.create_table('feed_activities',
+            sa.Column('id', sa.String(), nullable=False),
+            sa.Column('pregnancy_id', sa.String(), nullable=False),
+            sa.Column('user_id', sa.String(), nullable=False),
+            sa.Column('activity_type', sa.String(), nullable=False),
+            sa.Column('target_id', sa.String(), nullable=False),
+            sa.Column('target_type', sa.String(), nullable=False),
+            sa.Column('activity_data', postgresql.JSON(astext_type=sa.Text()), nullable=False),
+            sa.Column('broadcast_to_family', sa.Boolean(), nullable=False, server_default='true'),
+            sa.Column('broadcast_priority', sa.Integer(), nullable=False, server_default='1'),
+            sa.Column('client_timestamp', sa.DateTime(), nullable=True),
+            sa.Column('processed_at', sa.DateTime(), nullable=True),
+            sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
+            sa.ForeignKeyConstraint(['pregnancy_id'], ['pregnancies.id'], ),
+            sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+            sa.PrimaryKeyConstraint('id')
+        )
     
     # Add check constraints for data integrity
     op.create_check_constraint(
@@ -81,8 +85,7 @@ def upgrade() -> None:
         'idx_posts_pregnancy_created_published',
         'posts',
         ['pregnancy_id', 'created_at', 'status'],
-        postgresql_where=sa.text("status = 'published'"),
-        postgresql_concurrently=True
+        postgresql_where=sa.text("status = 'PUBLISHED'")
     )
     
     # Trending posts optimization
@@ -90,8 +93,7 @@ def upgrade() -> None:
         'idx_posts_trending_score_created',
         'posts',
         ['trending_score', 'created_at'],
-        postgresql_where=sa.text("trending_score > 0.0"),
-        postgresql_concurrently=True
+        postgresql_where=sa.text("trending_score > 0.0")
     )
     
     # Family warmth optimization
@@ -99,8 +101,7 @@ def upgrade() -> None:
         'idx_posts_family_warmth_created',
         'posts',
         ['family_warmth_score', 'created_at'],
-        postgresql_where=sa.text("family_warmth_score > 0.3"),
-        postgresql_concurrently=True
+        postgresql_where=sa.text("family_warmth_score > 0.3")
     )
     
     # Reaction aggregation optimization

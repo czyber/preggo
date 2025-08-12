@@ -38,15 +38,24 @@
           </div>
         </div>
 
-        <!-- Menu Button -->
-        <button 
-          @click="handleMenuAction('menu')"
-          class="p-1.5 hover:bg-warm-gray rounded-full transition-colors"
-        >
-          <svg class="w-4 h-4 text-neutral-gray" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
-          </svg>
-        </button>
+        <!-- Circle Indicator & Menu -->
+        <div class="flex items-center gap-2">
+          <!-- Circle Badge -->
+          <div class="flex items-center gap-1.5 px-2 py-1 bg-gray-50 rounded-full border border-gray-200">
+            <span class="text-sm">{{ getCircleIcon() }}</span>
+            <span class="text-xs font-medium text-gray-700">{{ getCircleName() }}</span>
+          </div>
+
+          <!-- Menu Button -->
+          <button
+            @click="handleMenuAction('menu')"
+            class="p-1.5 hover:bg-warm-gray rounded-full transition-colors"
+          >
+            <svg class="w-4 h-4 text-neutral-gray" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+            </svg>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -192,6 +201,29 @@ const getCardVariant = () => {
     return 'warm'
   }
   return 'default'
+}
+
+// Circle display helpers
+const getCircleIcon = () => {
+  const visibility = props.post.privacy?.visibility || 'ALL_FAMILY'
+  const icons = {
+    'PRIVATE': '🔒',
+    'PARTNER_ONLY': '💕',
+    'IMMEDIATE': '👨‍👩‍👧‍👦',
+    'ALL_FAMILY': '🌟'
+  }
+  return icons[visibility] || '🌟'
+}
+
+const getCircleName = () => {
+  const visibility = props.post.privacy?.visibility || 'ALL_FAMILY'
+  const names = {
+    'PRIVATE': 'Private',
+    'PARTNER_ONLY': 'Partner',
+    'IMMEDIATE': 'Inner Circle',
+    'ALL_FAMILY': 'Everyone'
+  }
+  return names[visibility] || 'Everyone'
 }
 
 // Methods

@@ -34,6 +34,11 @@ from .health import (
     WeightTracking, SymptomSummary, MoodTracking, SleepSummary, UpcomingAppointment,
     HealthSnapshot, HealthSharingSettings
 )
+from .circle_patterns import (
+    CirclePattern, UserCirclePattern, CirclePatternUsage, PatternSuggestion,
+    PatternSuggestionSource, PatternConfiguration, UserPatternPreferences, SuggestionContext,
+    SYSTEM_DEFAULT_PATTERNS
+)
 
 # Keep the existing imports
 from .item import Item

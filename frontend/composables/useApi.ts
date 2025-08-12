@@ -282,6 +282,58 @@ export const useApi = () => {
         params: { path: { group_id: groupId } },
         body: data
       }),
+
+    getUserFamilyGroups: () => loggedGET('/family/'),
+
+    getFamilyInvitations: () => loggedGET('/family/invitations'),
+
+    createFamilyInvitation: (data: any) => loggedPOST('/family/invitations', { body: data }),
+
+    updateFamilyInvitation: (invitationId: string, data: any) =>
+      loggedPUT('/family/invitations/{invitation_id}', {
+        params: { path: { invitation_id: invitationId } },
+        body: data
+      }),
+
+    generateFamilyInviteLink: (data: any) => loggedPOST('/family/invitations/generate-link', { body: data }),
+
+    // ==================== CONTEXTUAL INVITES ====================
+    getInviteContext: (token: string) =>
+      loggedGET('/invites/{token}/context', {
+        params: { path: { token } }
+      }),
+
+    acceptInvite: (token: string, data: { user_id: string }) =>
+      loggedPOST('/invites/{token}/accept', {
+        params: { path: { token } },
+        body: data
+      }),
+
+    createContextualInvite: (pregnancyId: string, data: any) =>
+      loggedPOST('/invites/contextual/{pregnancy_id}', {
+        params: { path: { pregnancy_id: pregnancyId } },
+        body: data
+      }),
+
+    // ==================== CIRCLE PATTERNS ====================
+    getCirclePatterns: (pregnancyId?: string) =>
+      loggedGET('/circles/patterns', {
+        params: pregnancyId ? { query: { pregnancy_id: pregnancyId } } : {}
+      }),
+
+    createCirclePattern: (data: any) =>
+      loggedPOST('/circles/patterns', { body: data }),
+
+    updateCirclePattern: (patternId: string, data: any) =>
+      loggedPUT('/circles/patterns/{pattern_id}', {
+        params: { path: { pattern_id: patternId } },
+        body: data
+      }),
+
+    getCircleSuggestions: (postContent: string, postType: string) =>
+      loggedPOST('/circles/suggestions', {
+        body: { content: postContent, type: postType }
+      }),
   }
 }
 
