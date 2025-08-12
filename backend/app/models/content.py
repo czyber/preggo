@@ -50,13 +50,26 @@ class PostStatus(str, Enum):
 
 
 class ReactionType(str, Enum):
-    LOVE = "love"           # ❤️
-    EXCITED = "excited"     # 😍
-    CARE = "care"           # 🤗
-    SUPPORT = "support"     # 💪
-    BEAUTIFUL = "beautiful"  # ✨
-    FUNNY = "funny"         # 😂
-    PRAYING = "praying"     # 🙏
+    """Enhanced pregnancy-specific reactions with 9 types"""
+    # Primary reactions (core pregnancy emotions)
+    LOVE = "love"           # ❤️ - General love and support
+    EXCITED = "excited"     # 😍 - Excitement for milestones/moments
+    SUPPORTIVE = "supportive"  # 🤗 - Caring, nurturing, being there
+    STRONG = "strong"       # 💪 - Strength, encouragement, "you got this"
+    BLESSED = "blessed"     # ✨ - Beautiful moments, feeling blessed
+    
+    # Additional reactions (extended emotions)
+    HAPPY = "happy"         # 😂 - Joy, laughter, funny moments
+    GRATEFUL = "grateful"   # 🙏 - Gratitude, prayers, thankfulness
+    CELEBRATING = "celebrating"  # 🎉 - Celebrating achievements/milestones
+    AMAZED = "amazed"       # 🌟 - Wonder, awe, amazement at development
+    
+    # Legacy mappings (for backwards compatibility)
+    CARE = "supportive"     # Map old 'care' to 'supportive'
+    SUPPORT = "strong"      # Map old 'support' to 'strong' 
+    BEAUTIFUL = "blessed"   # Map old 'beautiful' to 'blessed'
+    FUNNY = "happy"         # Map old 'funny' to 'happy'
+    PRAYING = "grateful"    # Map old 'praying' to 'grateful'
 
 
 class MediaType(str, Enum):
@@ -284,7 +297,7 @@ class Reaction(SQLModel, table=True):
 
 
 class Comment(SQLModel, table=True):
-    """Comments on posts"""
+    """Enhanced comments on posts with threading support up to 5 levels deep"""
     __tablename__ = "comments"
     
     id: str = Field(
@@ -297,18 +310,55 @@ class Comment(SQLModel, table=True):
     user_id: str = Field(foreign_key="users.id", description="Comment author")
     parent_id: Optional[str] = Field(default=None, foreign_key="comments.id", description="Parent comment for threaded replies")
     
+    # Threading support
+    thread_depth: int = Field(default=0, ge=0, le=5, description="Depth in comment thread (0-5, 0 = root)")
+    thread_path: str = Field(default="", description="Path from root comment (e.g., '1.2.3')")
+    root_comment_id: Optional[str] = Field(default=None, foreign_key="comments.id", description="Root comment of this thread")
+    
     # Comment content
-    content: str = Field(description="Comment text content")
+    content: str = Field(max_length=2000, description="Comment text content (max 2000 chars)")
     mentions: List[str] = Field(
         default_factory=list,
         sa_column=Column(JSON),
-        description="User IDs mentioned in comment"
+        description="User IDs mentioned in comment (@mentions)"
+    )
+    mention_names: List[str] = Field(
+        default_factory=list,
+        sa_column=Column(JSON),
+        description="Display names of mentioned users for frontend display"
     )
     
-    # Comment metadata
+    # Enhanced comment features
     edited: bool = Field(default=False, description="Whether comment has been edited")
+    edit_history: Optional[List[Dict[str, Any]]] = Field(
+        default=None,
+        sa_column=Column(JSON),
+        description="Edit history for transparency"
+    )
+    
+    # Engagement metrics
     reaction_count: int = Field(default=0, description="Number of reactions to this comment")
-    reply_count: int = Field(default=0, description="Number of replies to this comment")
+    reply_count: int = Field(default=0, description="Number of direct replies to this comment")
+    total_descendant_count: int = Field(default=0, description="Total number of descendants in thread")
+    
+    # Real-time features
+    is_typing_reply: bool = Field(default=False, description="Whether someone is currently typing a reply")
+    last_typing_user: Optional[str] = Field(default=None, description="User ID of last person typing a reply")
+    last_typing_at: Optional[datetime] = Field(default=None, description="When last typing activity occurred")
+    
+    # Performance and caching
+    reaction_summary: Optional[Dict[str, int]] = Field(
+        default_factory=dict,
+        sa_column=Column(JSON),
+        description="Cached reaction counts by type for performance"
+    )
+    
+    # Family warmth integration
+    family_warmth_contribution: float = Field(
+        default=0.0, 
+        ge=0.0, le=1.0,
+        description="Contribution to overall family warmth score"
+    )
     
     # Timestamps
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -316,6 +366,17 @@ class Comment(SQLModel, table=True):
     
     # Relationships
     author: Optional["User"] = Relationship(back_populates="comments")
+    
+    def get_next_thread_path(self, parent_reply_count: int) -> str:
+        """Generate thread path for a new reply"""
+        if self.thread_depth == 0:
+            return str(parent_reply_count + 1)
+        else:
+            return f"{self.thread_path}.{parent_reply_count + 1}"
+    
+    def can_accept_replies(self) -> bool:
+        """Check if comment can accept replies based on depth limit"""
+        return self.thread_depth < 5
 
 
 class PostView(SQLModel, table=True):

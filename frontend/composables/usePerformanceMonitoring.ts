@@ -92,7 +92,7 @@ export const usePerformanceMonitoring = (config: PerformanceConfig = {}) => {
   // Observers
   let performanceObserver: PerformanceObserver | null = null
   let intersectionObserver: IntersectionObserver | null = null
-  let reportingInterval: NodeJS.Timeout | null = null
+  let reportingIntervalId: NodeJS.Timeout | null = null
 
   /**
    * Initialize performance monitoring
@@ -522,7 +522,7 @@ export const usePerformanceMonitoring = (config: PerformanceConfig = {}) => {
    * Start periodic reporting
    */
   function startReporting(): void {
-    reportingInterval = setInterval(() => {
+    reportingIntervalId = setInterval(() => {
       if (reportingQueue.value.length > 0) {
         sendPerformanceData()
       }
@@ -594,8 +594,8 @@ export const usePerformanceMonitoring = (config: PerformanceConfig = {}) => {
       intersectionObserver.disconnect()
     }
     
-    if (reportingInterval) {
-      clearInterval(reportingInterval)
+    if (reportingIntervalId) {
+      clearInterval(reportingIntervalId)
     }
     
     // Send final performance data

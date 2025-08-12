@@ -122,7 +122,7 @@ async def get_family_feed(
         )
         
         # Get the enhanced family feed with Instagram-like features
-        feed_response = await feed_service.get_instagram_like_family_feed(
+        feed_response = await feed_service.get_family_feed(
             session, user_id, pregnancy_id, feed_request
         )
         
@@ -182,10 +182,11 @@ async def get_personal_timeline(
                 detail="You can only access your own personal timeline"
             )
         
-        # Build feed request
+        # Build feed request (personal timeline still uses offset-based pagination)
         feed_request = FeedRequest(
             limit=limit,
-            offset=offset,
+            cursor=None,  # Personal timeline uses offset, not cursor
+            offset=offset,  # Use offset for personal timeline
             filter_type=filter_type,
             sort_by=sort_by,
             include_reactions=include_reactions,

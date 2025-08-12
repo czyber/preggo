@@ -1,12 +1,30 @@
 <template>
-  <div ref="timelineRef" class="feed-timeline w-full max-w-2xl mx-auto space-y-6">
+  <div 
+    ref="timelineRef" 
+    class="feed-timeline w-full max-w-2xl mx-auto"
+    :style="{ height: containerHeight + 'px' }"
+  >
     <!-- Feed Header with Filters -->
     <div ref="headerRef" class="sticky top-0 bg-off-white/95 backdrop-blur-sm z-20 pb-4 border-b border-light-gray/30">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-semibold font-inter text-warm-graphite">
           Family Feed
+          <span v-if="isRealtimeConnected" class="ml-2 inline-flex items-center">
+            <div class="w-2 h-2 bg-sage-green rounded-full animate-pulse"></div>
+          </span>
         </h2>
         <div class="flex items-center gap-2">
+          <button
+            v-if="wsStats.messagesReceived > 0"
+            @click="scrollToTop"
+            class="p-2 text-neutral-gray hover:text-warm-graphite transition-colors"
+            title="New updates available"
+          >
+            <div class="relative">
+              <ArrowUp class="w-4 h-4" />
+              <div class="absolute -top-1 -right-1 w-2 h-2 bg-blush-rose rounded-full animate-pulse"></div>
+            </div>
+          </button>
           <FeedFilters
             :activeFilter="activeFilter"
             :sortBy="sortBy"
@@ -17,11 +35,11 @@
         </div>
       </div>
       
-      <!-- Quick Stats -->
+      <!-- Quick Stats with Real-time Updates -->
       <div v-if="familyEngagementStats" class="flex items-center gap-4 text-sm text-neutral-gray">
         <span>{{ totalCount }} posts</span>
-        <span>{{ familyEngagementStats.totalReactions }} reactions</span>
-        <span>{{ familyEngagementStats.totalComments }} comments</span>
+        <span class="transition-all duration-300" :class="realtimeReactionPulse ? 'text-blush-rose scale-105' : ''">{{ familyEngagementStats.totalReactions }} reactions</span>
+        <span class="transition-all duration-300" :class="realtimeCommentPulse ? 'text-sage-green scale-105' : ''">{{ familyEngagementStats.totalComments }} comments</span>
         <span v-if="needsAttentionPosts.length" class="text-blush-rose font-medium">
           {{ needsAttentionPosts.length }} need attention
         </span>
@@ -38,95 +56,110 @@
       />
     </div>
 
-    <!-- Feed Content -->
-    <div class="feed-content space-y-6">
-      <!-- Loading State -->
-      <div v-if="loading && posts.length === 0" class="space-y-6">
-        <div v-for="i in 3" :key="i" class="animate-pulse">
-          <BaseCard class="p-6">
-            <div class="flex items-start space-x-4">
-              <div class="w-12 h-12 bg-gray-200 rounded-full"></div>
-              <div class="flex-1 space-y-3">
-                <div class="h-4 bg-gray-200 rounded w-1/3"></div>
-                <div class="space-y-2">
-                  <div class="h-3 bg-gray-200 rounded"></div>
-                  <div class="h-3 bg-gray-200 rounded w-5/6"></div>
-                </div>
-                <div class="flex space-x-4">
-                  <div class="h-6 bg-gray-200 rounded w-16"></div>
-                  <div class="h-6 bg-gray-200 rounded w-16"></div>
-                  <div class="h-6 bg-gray-200 rounded w-16"></div>
+    <!-- Virtual Scrolling Feed Content -->
+    <div 
+      ref="scrollContainerRef" 
+      class="virtual-scroll-container flex-1 overflow-auto min-h-0"
+      style="height: 600px;"
+      @scroll="handleScroll"
+    >
+      <!-- Virtual spacer for items above viewport -->
+      <div :style="{ height: offsetY + 'px' }"></div>
+      
+      <!-- Rendered visible items -->
+      <div class="virtual-items-container" :style="{ height: totalHeight + 'px' }">
+        <!-- Loading State -->
+        <div v-if="loading && (!posts || (posts && posts.length === 0))" class="space-y-6 px-4">
+          <div v-for="i in 3" :key="i" class="animate-pulse">
+            <BaseCard class="p-6">
+              <div class="flex items-start space-x-4">
+                <div class="w-12 h-12 bg-gray-200 rounded-full"></div>
+                <div class="flex-1 space-y-3">
+                  <div class="h-4 bg-gray-200 rounded w-1/3"></div>
+                  <div class="space-y-2">
+                    <div class="h-3 bg-gray-200 rounded"></div>
+                    <div class="h-3 bg-gray-200 rounded w-5/6"></div>
+                  </div>
+                  <div class="flex space-x-4">
+                    <div class="h-6 bg-gray-200 rounded w-16"></div>
+                    <div class="h-6 bg-gray-200 rounded w-16"></div>
+                    <div class="h-6 bg-gray-200 rounded w-16"></div>
+                  </div>
                 </div>
               </div>
+            </BaseCard>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div v-else-if="!loading && (!filteredPosts || filteredPosts.length === 0)" class="text-center py-12 px-4">
+          <div class="max-w-md mx-auto bg-off-white rounded-lg p-6 shadow-sm border border-light-gray">
+            <div class="space-y-4">
+              <div class="text-4xl">👶</div>
+              <h3 class="text-lg font-semibold font-inter text-warm-graphite">
+                {{ getEmptyStateTitle() }}
+              </h3>
+              <p class="text-soft-charcoal text-sm">
+                {{ getEmptyStateMessage() }}
+              </p>
+              <BaseButton
+                v-if="activeFilter !== 'all'"
+                @click="handleFilterChange('all')"
+                variant="outline"
+                size="sm"
+              >
+                View All Posts
+              </BaseButton>
             </div>
-          </BaseCard>
-        </div>
-      </div>
-
-      <!-- Empty State -->
-      <div v-else-if="!loading && filteredPosts.length === 0" class="text-center py-12">
-        <div class="max-w-md mx-auto bg-off-white rounded-lg p-6 shadow-sm border border-light-gray">
-          <div class="space-y-4">
-            <div class="text-4xl">👶</div>
-            <h3 class="text-lg font-semibold font-inter text-warm-graphite">
-              {{ getEmptyStateTitle() }}
-            </h3>
-            <p class="text-soft-charcoal text-sm">
-              {{ getEmptyStateMessage() }}
-            </p>
-            <BaseButton
-              v-if="activeFilter !== 'all'"
-              @click="handleFilterChange('all')"
-              variant="outline"
-              size="sm"
-            >
-              View All Posts
-            </BaseButton>
-          </div>
           </div>
         </div>
 
-      <!-- Posts -->
-      <TransitionGroup
-        v-else
-        name="feed-item"
-        tag="div"
-        class="space-y-6 animate-stagger"
-      >
-        <FeedPostCard
-          v-for="(post, index) in filteredPosts"
-          :key="post.id"
-          :post="post"
-          :celebrations="getCelebrationsForPost(post.id)"
-          :data-animation-delay="index * 100"
-          @reaction="handleReaction"
-          @removeReaction="handleRemoveReaction"
-          @view="handleView"
-          @comment="handleComment"
-          @share="handleShare"
-        />
-      </TransitionGroup>
-
-      <!-- Load More -->
-      <div v-if="hasMore" class="flex justify-center py-8">
-        <BaseButton
-          @click="loadMore"
-          :loading="loading"
-          variant="outline"
-          class="min-w-32"
+        <!-- Feed Posts -->
+        <TransitionGroup
+          v-else
+          name="feed-item"
+          tag="div"
+          class="space-y-6 px-4"
         >
-          {{ loading ? 'Loading...' : 'Load More Posts' }}
-        </BaseButton>
-      </div>
+          <FeedPostCard
+            v-for="(post, index) in filteredPosts"
+            :key="post.id"
+            :post="post"
+            :celebrations="getCelebrationsForPost(post.id)"
+            :data-post-index="index"
+            :data-animation-delay="index * 50"
+            @reaction="handleReaction"
+            @removeReaction="handleRemoveReaction"
+            @view="handleView"
+            @comment="handleComment"
+            @share="handleShare"
+          />
+        </TransitionGroup>
+        
+        <!-- Infinite scroll trigger -->
+        <div 
+          ref="infiniteScrollTrigger"
+          v-if="hasMore && visibleItems.length > 0"
+          class="h-20 flex items-center justify-center"
+        >
+          <div v-if="loading" class="flex items-center gap-2 text-neutral-gray">
+            <div class="w-4 h-4 border-2 border-neutral-gray/30 border-t-neutral-gray rounded-full animate-spin"></div>
+            <span class="text-sm">Loading more...</span>
+          </div>
+        </div>
 
-      <!-- End of Feed -->
-      <div v-else-if="filteredPosts.length > 0" class="text-center py-8 text-neutral-gray text-sm">
-        <div class="flex items-center justify-center gap-2">
-          <div class="w-8 h-px bg-light-gray"></div>
-          <span>You're all caught up!</span>
-          <div class="w-8 h-px bg-light-gray"></div>
+        <!-- End of Feed -->
+        <div v-else-if="filteredPosts && filteredPosts.length > 0 && !hasMore" class="text-center py-8 text-neutral-gray text-sm px-4">
+          <div class="flex items-center justify-center gap-2">
+            <div class="w-8 h-px bg-light-gray"></div>
+            <span>You're all caught up!</span>
+            <div class="w-8 h-px bg-light-gray"></div>
+          </div>
         </div>
       </div>
+      
+      <!-- Virtual spacer for items below viewport -->
+      <div :style="{ height: Math.max(0, totalHeight - offsetY - containerHeight) + 'px' }"></div>
     </div>
 
     <!-- Scroll to Top -->
@@ -152,33 +185,37 @@ import { storeToRefs } from 'pinia'
 import { useFeedStore } from "~/stores/feed"
 import { cn } from '~/components/ui/utils'
 import { useScrollAnimation, useFeedAnimations, useGentleTransitions } from '~/composables/useAnimations'
+import { useVirtualScrolling } from '~/composables/useVirtualScrolling'
+import { useWebSocket } from '~/composables/useWebSocket'
+import { useOptimisticUpdates } from '~/composables/useOptimisticUpdates'
+import { useAuth } from '~/composables/useAuth'
+import { ArrowUp } from 'lucide-vue-next'
 
 interface Props {
   pregnancyId?: string
   initialFilter?: string
+  containerHeight?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  initialFilter: 'all'
+  initialFilter: 'all',
+  containerHeight: 800
 })
 
 const emit = defineEmits<{
   postInteraction: [{ type: string, postId: string, data?: any }]
   filterChanged: [{ filter: string, count: number }]
   celebrationViewed: [{ celebrationId: string, postId: string }]
+  realtimeUpdate: [{ type: string, data: any }]
 }>()
 
 // Store
 const feedStore = useFeedStore()
 
-// Animation composables
-const { animateOnScroll, observeElement } = useScrollAnimation()
-const { animateTimelineItem } = useFeedAnimations()
-const { createGentleHover, animateElementIn } = useGentleTransitions()
-
 // Reactive store state
 const {
   posts,
+  personalPosts,
   filteredPosts,
   celebrations,
   loading,
@@ -191,6 +228,30 @@ const {
   familyEngagementStats
 } = storeToRefs(feedStore)
 
+// Initialize virtual scrolling with empty array first
+const virtualScrolling = useVirtualScrolling([], {
+  itemHeight: 300, // Estimated post height
+  containerHeight: props.containerHeight,
+  overscan: 3
+})
+
+// Real-time connection - disabled for now to avoid WebSocket errors
+// const websocket = useWebSocket({
+//   pregnancyOptimizations: true,
+//   enableHaptics: true
+// })
+
+// Optimistic updates - disabled for now
+// const optimisticUpdates = useOptimisticUpdates({
+//   pregnancyAdaptations: true,
+//   enableHapticFeedback: true
+// })
+
+// Animation composables
+const { animateOnScroll, observeElement } = useScrollAnimation()
+const { animateTimelineItem } = useFeedAnimations()
+const { createGentleHover, animateElementIn } = useGentleTransitions()
+
 // Remove debug code
 
 // Local state
@@ -198,6 +259,11 @@ const showScrollToTop = ref(false)
 const timelineRef = ref<HTMLElement>()
 const headerRef = ref<HTMLElement>()
 const scrollTopBtnRef = ref<HTMLElement>()
+const scrollContainerRef = ref<HTMLElement>()
+const infiniteScrollTrigger = ref<HTMLElement>()
+const realtimeReactionPulse = ref(false)
+const realtimeCommentPulse = ref(false)
+const lastScrollPosition = ref(0)
 const availableFilters = ref([
   { value: 'all', label: 'All Posts', count: 0 },
   { value: 'milestones', label: 'Milestones', count: 0 },
@@ -206,6 +272,29 @@ const availableFilters = ref([
   { value: 'celebrations', label: 'Celebrations', count: 0 },
   { value: 'recent', label: 'Recent', count: 0 },
 ])
+
+// Virtual scrolling references
+const { 
+  containerRef,
+  visibleItems,
+  totalHeight,
+  offsetY,
+  measureItem,
+  scrollToTop: virtualScrollToTop
+} = virtualScrolling
+
+// Auth composable
+const auth = useAuth()
+
+// WebSocket connection state - disabled for now
+const isRealtimeConnected = ref(false)
+const wsStats = ref({ messagesReceived: 0 })
+// const { 
+//   isConnected: isRealtimeConnected,
+//   stats: wsStats,
+//   onMessage,
+//   send: sendWebSocketMessage
+// } = websocket
 
 // Computed
 const activeCelebrations = computed(() => {
@@ -250,8 +339,19 @@ function handleSortChange(sort: string) {
 
 async function handleReaction(data: { postId: string, reactionType: string }) {
   try {
-    await feedStore.addReaction(data.postId, data.reactionType as any)
+    // Simplified reaction handling without optimistic updates for now
+    
+    // Trigger pulse animation
+    realtimeReactionPulse.value = true
+    setTimeout(() => {
+      realtimeReactionPulse.value = false
+    }, 300)
+    
     emit('postInteraction', { type: 'reaction', postId: data.postId, data })
+    
+    // Send to server
+    await feedStore.addReaction(data.postId, data.reactionType as any)
+    
   } catch (error) {
     console.error('Failed to add reaction:', error)
   }
@@ -287,16 +387,114 @@ function handleCelebrationDismiss(celebrationId: string) {
 }
 
 async function loadMore() {
-  await feedStore.loadMore()
+  if (loading.value || !hasMore.value) return
+  
+  try {
+    await feedStore.loadMore()
+    
+    // Update virtual scrolling items after new posts loaded
+    await nextTick()
+    virtualScrolling.updateVirtualItems()
+  } catch (error) {
+    console.error('Failed to load more posts:', error)
+  }
 }
 
-function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+// Handle real-time reaction updates
+function handleRealtimeReaction(message: any) {
+  const { postId, reactionType, userId, userDisplayName } = message.payload
+  
+  // Update post in store if it's visible
+  const post = feedStore.getPostById(postId)
+  if (post) {
+    // Update reaction count
+    if (!post.reaction_summary) {
+      post.reaction_summary = {
+        total_count: 0,
+        reaction_counts: {},
+        recent_reactors: []
+      }
+    }
+    
+    if (!post.reaction_summary.reaction_counts[reactionType]) {
+      post.reaction_summary.reaction_counts[reactionType] = 0
+    }
+    
+    post.reaction_summary.reaction_counts[reactionType]++
+    post.reaction_summary.total_count++
+    
+    // Add to recent reactors
+    if (!post.reaction_summary.recent_reactors) {
+      post.reaction_summary.recent_reactors = []
+    }
+    post.reaction_summary.recent_reactors.unshift(userDisplayName)
+    post.reaction_summary.recent_reactors = post.reaction_summary.recent_reactors.slice(0, 3)
+    
+    // Trigger pulse animation
+    realtimeReactionPulse.value = true
+    setTimeout(() => {
+      realtimeReactionPulse.value = false
+    }, 300)
+    
+    emit('realtimeUpdate', { type: 'reaction', data: message.payload })
+  }
 }
+
+// Handle real-time comment updates
+function handleRealtimeComment(message: any) {
+  const { postId, comment, userId, userDisplayName } = message.payload
+  
+  // Update post in store
+  const post = feedStore.getPostById(postId)
+  if (post) {
+    if (!post.comment_preview) {
+      post.comment_preview = {
+        total_count: 0,
+        recent_comments: [],
+        recent_commenters: []
+      }
+    }
+    
+    post.comment_preview.total_count++
+    post.comment_preview.recent_commenters.unshift(userDisplayName)
+    post.comment_preview.recent_commenters = post.comment_preview.recent_commenters.slice(0, 3)
+    
+    // Trigger pulse animation
+    realtimeCommentPulse.value = true
+    setTimeout(() => {
+      realtimeCommentPulse.value = false
+    }, 300)
+    
+    emit('realtimeUpdate', { type: 'comment', data: message.payload })
+  }
+}
+
 
 // Scroll handler
 function handleScroll() {
-  showScrollToTop.value = window.scrollY > 500
+  if (!scrollContainerRef.value) return
+  
+  const scrollTop = scrollContainerRef.value.scrollTop
+  showScrollToTop.value = scrollTop > 500
+  
+  // Check for infinite scroll - simplified version
+  const scrollBottom = scrollTop + scrollContainerRef.value.clientHeight
+  const scrollHeight = scrollContainerRef.value.scrollHeight
+  const threshold = 200 // pixels from bottom
+  
+  if (scrollBottom >= scrollHeight - threshold && hasMore.value && !loading.value) {
+    loadMore()
+  }
+  
+  // Update last scroll position for smooth experience
+  lastScrollPosition.value = scrollTop
+}
+
+// Enhanced scroll to top with virtual scrolling support
+function scrollToTop() {
+  if (scrollContainerRef.value) {
+    virtualScrollToTop('smooth')
+  }
 }
 
 // Lifecycle
@@ -343,13 +541,42 @@ onMounted(async () => {
     feedStore.fetchCelebrations(props.pregnancyId)
   ])
 
-  // Set up scroll listener
-  window.addEventListener('scroll', handleScroll)
+  // Assign the scroll container ref to virtual scrolling
+  await nextTick()
+  if (scrollContainerRef.value) {
+    containerRef.value = scrollContainerRef.value
+    scrollContainerRef.value.addEventListener('scroll', handleScroll, { passive: true })
+  }
+  
+  // Set up WebSocket message handlers - disabled for now
+  // const unsubscribeReaction = onMessage('reaction', handleRealtimeReaction)
+  // const unsubscribeComment = onMessage('comment', handleRealtimeComment)
+  
+  // Set up intersection observer for infinite scroll
+  if (infiniteScrollTrigger.value) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore.value && !loading.value) {
+          loadMore()
+        }
+      },
+      { threshold: 0.1 }
+    )
+    observer.observe(infiniteScrollTrigger.value)
+    
+    onUnmounted(() => {
+      observer.disconnect()
+      // unsubscribeReaction()
+      // unsubscribeComment()
+    })
+  }
 
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
+  if (scrollContainerRef.value) {
+    scrollContainerRef.value.removeEventListener('scroll', handleScroll)
+  }
 })
 
 // Watch for pregnancy ID changes
@@ -360,6 +587,11 @@ watch(() => props.pregnancyId, async (newId) => {
     await feedStore.fetchCelebrations(newId)
   }
 })
+
+// Watch for filteredPosts changes and update virtual scrolling
+watch(filteredPosts, () => {
+  virtualScrolling.updateVirtualItems()
+}, { immediate: true })
 </script>
 
 <style scoped>

@@ -10,16 +10,19 @@ from app.schemas.content import PostResponse
 
 
 class PregnancyReactionType(str, Enum):
-    """Extended reaction types specific to pregnancy content"""
+    """Enhanced pregnancy-specific reactions matching the 9 core types"""
+    # Primary reactions (core pregnancy emotions)
     LOVE = "love"           # ❤️ General love and support
-    EXCITED = "excited"     # 😍 Excitement for milestones
-    CARE = "care"           # 🤗 Caring and nurturing
-    SUPPORT = "support"     # 💪 Strength and encouragement
-    BEAUTIFUL = "beautiful"  # ✨ Beautiful moments/photos
-    FUNNY = "funny"         # 😂 Funny pregnancy moments
-    PRAYING = "praying"     # 🙏 Prayers and well wishes
-    PROUD = "proud"         # 🏆 Pride in achievements
-    GRATEFUL = "grateful"   # 🙏✨ Gratitude and thankfulness
+    EXCITED = "excited"     # 😍 Excitement for milestones/moments
+    SUPPORTIVE = "supportive"  # 🤗 Caring, nurturing, being there
+    STRONG = "strong"       # 💪 Strength, encouragement, "you got this"
+    BLESSED = "blessed"     # ✨ Beautiful moments, feeling blessed
+    
+    # Additional reactions (extended emotions)
+    HAPPY = "happy"         # 😂 Joy, laughter, funny moments
+    GRATEFUL = "grateful"   # 🙏 Gratitude, prayers, thankfulness
+    CELEBRATING = "celebrating"  # 🎉 Celebrating achievements/milestones
+    AMAZED = "amazed"       # 🌟 Wonder, awe, amazement at development
 
 
 class FeedFilterType(str, Enum):
@@ -77,6 +80,7 @@ class FeedRequest(BaseModel):
     """Enhanced request parameters for Instagram-like feed queries"""
     limit: int = Field(default=20, ge=1, le=50, description="Number of posts to return (reduced max for performance)")
     cursor: Optional[str] = Field(default=None, description="Cursor for pagination (replaces offset)")
+    offset: Optional[int] = Field(default=0, ge=0, description="Offset for personal timeline pagination (legacy)")
     filter_type: FeedFilterType = Field(default=FeedFilterType.ALL, description="Type of content to show")
     sort_by: FeedSortType = Field(default=FeedSortType.CHRONOLOGICAL, description="How to sort the feed")
     include_reactions: bool = Field(default=True, description="Include reaction counts and types")

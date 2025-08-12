@@ -28,19 +28,6 @@
 
           <!-- Right Side - User Menu -->
           <div class="flex items-center gap-3">
-            <!-- Notifications -->
-            <button
-              @click="toggleNotifications"
-              class="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
-              aria-label="Notifications"
-            >
-              <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 -5l5 -5h-5m-6 10v-5a6 6 0 1 1 12 0v5" />
-              </svg>
-              <div v-if="unreadNotifications > 0" class="absolute -top-1 -right-1 w-5 h-5 bg-soft-pink text-white text-xs rounded-full flex items-center justify-center font-medium">
-                {{ unreadNotifications > 9 ? '9+' : unreadNotifications }}
-              </div>
-            </button>
 
             <!-- User Profile -->
             <div class="relative">
@@ -49,7 +36,7 @@
                 class="flex items-center gap-2 p-1 hover:bg-gray-100 rounded-full transition-colors"
                 aria-label="User menu"
               >
-                <UserAvatar :user="user" size="md" />
+                <UserAvatar :user="userForAvatar" size="md" />
               </button>
             </div>
           </div>
@@ -217,7 +204,12 @@
           </div>
 
           <!-- Empty State for No Posts -->
-          <div v-else-if="!loading && feedStore.filteredPosts.length === 0" class="text-center py-16">
+          <div v-else-if="!feedStore.loading && feedStore.filteredPosts.length === 0" class="text-center py-16">
+            <div class="text-xs text-gray-400 mb-4">DEBUG: Showing empty state - no posts found</div>
+            <!-- DEBUG: Remove this after debugging -->
+            <div class="text-xs text-gray-400 mb-4">
+              DEBUG: pageLoading={{ pageLoading }}, feedLoading={{ feedStore.loading }}, posts={{ feedStore.posts.length }}, personalPosts={{ feedStore.personalPosts.length }}, filteredPosts={{ feedStore.filteredPosts.length }}
+            </div>
             <BaseCard variant="warm" class="max-w-md mx-auto">
               <div class="space-y-6">
                 <div class="text-6xl">📝</div>
@@ -278,31 +270,13 @@
       </svg>
     </button>
 
-    <!-- Modals and Overlays -->
-    <Teleport to="body">
-      <!-- Notifications Panel -->
-      <div
-        v-if="showNotifications"
-        class="fixed inset-0 z-50 lg:inset-auto lg:top-16 lg:right-4 lg:w-80"
-      >
-        <div class="absolute inset-0 bg-black/20 lg:hidden" @click="closeNotifications" />
-        <div class="relative bg-white rounded-lg shadow-xl border border-gray-100 h-full lg:h-auto lg:max-h-96 overflow-hidden">
-          <!-- Notifications content would go here -->
-          <div class="p-4 border-b border-gray-100">
-            <h3 class="font-semibold text-gray-800">Notifications</h3>
-          </div>
-          <div class="p-4 text-center text-gray-500 text-sm">
-            No new notifications
-          </div>
-        </div>
-      </div>
-    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
 import { useFeedStore } from "@/stores/feed"
 import { usePregnancyStore } from "@/stores/pregnancy"
 import { useFamilyStore } from "@/stores/family"
@@ -314,9 +288,20 @@ import FeedTimeline from '~/components/feed/FeedTimeline.vue'
 // Composables
 const route = useRoute()
 const router = useRouter()
-const { user, isAuthenticated } = useAuth()
+const { user, userProfile, isAuthenticated } = useAuth()
 const { showToast } = useToast()
 
+// Convert userProfile to UserAvatar compatible format
+const userForAvatar = computed(() => {
+  if (!userProfile.value) return undefined
+
+  return {
+    id: userProfile.value.id,
+    email: userProfile.value.email,
+    first_name: userProfile.value.first_name,
+    last_name: userProfile.value.last_name,
+  }
+})
 // Stores
 const feedStore = useFeedStore()
 const pregnancyStore = usePregnancyStore()

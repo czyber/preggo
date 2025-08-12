@@ -1,5 +1,8 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
+import { useWebSocket } from '~/composables/useWebSocket'
+import { useOptimisticUpdates } from '~/composables/useOptimisticUpdates'
+import { useAuth } from '~/composables/useAuth'
 import type { components } from '@/types/api'
 
 // Type aliases for cleaner code - matching backend schemas
@@ -28,15 +31,36 @@ interface FeedState {
   loading: boolean
   error: string | null
   hasMore: boolean
-  nextOffset: number
+  nextCursor: string | null
   totalCount: number
   activeFilter: FeedFilterType
   sortBy: FeedSortType
   lastFetchTime: Date | null
   cache: Map<string, { data: any; timestamp: number; ttl: number }>
+  // Real-time state
+  realtimeEnabled: boolean
+  connectionStatus: 'disconnected' | 'connecting' | 'connected' | 'error'
+  pendingOperations: Map<string, any>
+  // Performance state
+  virtualScrollEnabled: boolean
+  prefetchDistance: number
 }
 
 export const useFeedStore = defineStore('feed', () => {
+  // Auth composable - initialize at store level to avoid reactivity issues
+  const auth = useAuth()
+  
+  // Real-time and optimistic updates composables - disabled for now
+  // const websocket = useWebSocket({
+  //   pregnancyOptimizations: true,
+  //   enableHaptics: true
+  // })
+  
+  // const optimisticUpdates = useOptimisticUpdates({
+  //   pregnancyAdaptations: true,
+  //   enableHapticFeedback: true
+  // })
+  
   // State as refs
   const posts = ref<EnrichedPost[]>([])
   const personalPosts = ref<EnrichedPost[]>([])
@@ -47,12 +71,21 @@ export const useFeedStore = defineStore('feed', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
   const hasMore = ref(true)
-  const nextOffset = ref(0)
+  const nextCursor = ref<string | null>(null)
   const totalCount = ref(0)
   const activeFilter = ref<FeedFilterType>('all')
   const sortBy = ref<FeedSortType>('chronological')
   const lastFetchTime = ref<Date | null>(null)
   const cache = ref<Map<string, { data: any; timestamp: number; ttl: number }>>(new Map())
+  
+  // Real-time state - disabled for now
+  const realtimeEnabled = ref(false)
+  const connectionStatus = ref('disconnected')
+  const pendingOperations = reactive<Map<string, any>>(new Map())
+  
+  // Performance state
+  const virtualScrollEnabled = ref(true)
+  const prefetchDistance = ref(3) // Number of posts to prefetch ahead
 
   // Computed properties
   const getPostById = computed(() => (id: string) => {
@@ -63,6 +96,7 @@ export const useFeedStore = defineStore('feed', () => {
   const allPosts = computed(() => {
     // Combine personal posts and family posts, then sort by date
     const combined = [...personalPosts.value, ...posts.value]
+    
     return combined.sort((a, b) => {
       const dateA = new Date(a.created_at!).getTime()
       const dateB = new Date(b.created_at!).getTime()
@@ -90,8 +124,7 @@ export const useFeedStore = defineStore('feed', () => {
     // Apply active filter
     switch (activeFilter.value) {
       case 'my_posts':
-        // Get current user ID from auth
-        const auth = useAuth()
+        // Use auth from store level
         const currentUserId = auth.userProfile.value?.id
         filtered = filtered.filter(post => 
           post.author?.id === currentUserId
@@ -231,7 +264,75 @@ export const useFeedStore = defineStore('feed', () => {
     })
   }
 
-  // Actions
+  // Real-time event handlers - disabled for now
+  function setupRealtimeHandlers() {
+    // Disabled WebSocket functionality
+    return
+  }
+  
+  function updatePostReaction(post: EnrichedPost, reactionType: string, userId: string, userDisplayName: string) {
+    if (!post.reaction_summary) {
+      post.reaction_summary = {
+        total_count: 0,
+        reaction_counts: {},
+        recent_reactors: []
+      }
+    }
+    
+    // Update reaction count
+    if (!post.reaction_summary.reaction_counts[reactionType]) {
+      post.reaction_summary.reaction_counts[reactionType] = 0
+    }
+    post.reaction_summary.reaction_counts[reactionType]++
+    post.reaction_summary.total_count++
+    
+    // Update recent reactors
+    if (!post.reaction_summary.recent_reactors) {
+      post.reaction_summary.recent_reactors = []
+    }
+    post.reaction_summary.recent_reactors.unshift(userDisplayName)
+    post.reaction_summary.recent_reactors = post.reaction_summary.recent_reactors.slice(0, 3)
+  }
+  
+  function updatePostComments(post: EnrichedPost, comment: any, userId: string, userDisplayName: string) {
+    if (!post.comment_preview) {
+      post.comment_preview = {
+        total_count: 0,
+        recent_comments: [],
+        recent_commenters: []
+      }
+    }
+    
+    post.comment_preview.total_count++
+    
+    if (!post.comment_preview.recent_commenters) {
+      post.comment_preview.recent_commenters = []
+    }
+    post.comment_preview.recent_commenters.unshift(userDisplayName)
+    post.comment_preview.recent_commenters = post.comment_preview.recent_commenters.slice(0, 3)
+  }
+  
+  function shouldIncludePostInFeed(post: EnrichedPost): boolean {
+    // Apply current filter logic
+    switch (activeFilter.value) {
+      case 'milestones':
+        return post.type === 'milestone' || post.pregnancy_context?.is_milestone_week
+      case 'photos':
+        return post.media_items && post.media_items.length > 0
+      case 'updates':
+        return post.type === 'update' || post.type === 'journal'
+      default:
+        return true
+    }
+  }
+  
+  function syncMissedUpdates() {
+    // Fetch updates since last sync
+    // In a real app, this would call a sync endpoint
+    console.log('Syncing missed updates...')
+  }
+
+  // Actions with cursor-based pagination
   async function fetchFeed(pregnancyId?: string, options: Partial<FeedRequest> = {}) {
     loading.value = true
     error.value = null
@@ -240,7 +341,7 @@ export const useFeedStore = defineStore('feed', () => {
       const api = useApi()
       const requestData: FeedRequest = {
         limit: 20,
-        offset: nextOffset.value,
+        cursor: nextCursor.value,
         filter_type: activeFilter.value,
         sort_by: sortBy.value,
         include_reactions: true,
@@ -250,13 +351,14 @@ export const useFeedStore = defineStore('feed', () => {
       }
 
       // Check cache for first-page requests
-      if (pregnancyId && nextOffset.value === 0) {
+      if (pregnancyId && !nextCursor.value) {
         const cacheKey = getCacheKey(pregnancyId, requestData)
         const cachedData = getCachedData(cacheKey)
         if (cachedData) {
           posts.value = cachedData.posts || []
           personalPosts.value = cachedData.personalPosts || []
           hasMore.value = cachedData.hasMore || false
+          nextCursor.value = cachedData.nextCursor || null
           totalCount.value = cachedData.totalCount || 0
           loading.value = false
           return
@@ -285,30 +387,31 @@ export const useFeedStore = defineStore('feed', () => {
         if (!familyResponse.error) {
           const feedResponse = familyResponse.data as FeedResponse
           
-          if (nextOffset.value === 0) {
+          if (!nextCursor.value) {
             posts.value = feedResponse.posts || []
           } else {
             posts.value.push(...(feedResponse.posts || []))
           }
 
           hasMore.value = feedResponse.has_more
-          nextOffset.value = feedResponse.next_offset || 0
+          nextCursor.value = feedResponse.next_cursor || null
           totalCount.value = feedResponse.total_count
         } else {
           console.warn('Family feed failed to load:', familyResponse.error)
           posts.value = []
           hasMore.value = false
-          nextOffset.value = 0
+          nextCursor.value = null
           totalCount.value = personalPosts.value.length
         }
 
         // Cache the results for first-page requests
-        if (nextOffset.value === 0) {
+        if (!nextCursor.value) {
           const cacheKey = getCacheKey(pregnancyId, requestData)
           setCachedData(cacheKey, {
             posts: posts.value,
             personalPosts: personalPosts.value,
             hasMore: hasMore.value,
+            nextCursor: nextCursor.value,
             totalCount: totalCount.value
           })
         }
@@ -323,14 +426,14 @@ export const useFeedStore = defineStore('feed', () => {
 
         const feedResponse = data as FeedResponse
         
-        if (nextOffset.value === 0) {
+        if (!nextCursor.value) {
           posts.value = feedResponse.posts || []
         } else {
           posts.value.push(...(feedResponse.posts || []))
         }
 
         hasMore.value = feedResponse.has_more
-        nextOffset.value = feedResponse.next_offset || 0
+        nextCursor.value = feedResponse.next_cursor || null
         totalCount.value = feedResponse.total_count
       }
 
@@ -419,6 +522,38 @@ export const useFeedStore = defineStore('feed', () => {
   }
 
   async function addReaction(postId: string, reactionType: PregnancyReactionType) {
+    const post = getPostById.value(postId)
+    if (!post) {
+      throw new Error('Post not found')
+    }
+    
+    // Simplified reaction handling without optimistic updates for now
+    
+    // Apply optimistic UI update
+    if (!post.reaction_summary) {
+      post.reaction_summary = {
+        total_count: 0,
+        reaction_counts: {},
+        recent_reactors: []
+      }
+    }
+    
+    const currentReaction = post.reaction_summary.user_reaction
+    
+    // Remove previous reaction count if exists
+    if (currentReaction && post.reaction_summary.reaction_counts[currentReaction]) {
+      post.reaction_summary.reaction_counts[currentReaction]--
+      post.reaction_summary.total_count--
+    }
+
+    // Add new reaction count
+    if (!post.reaction_summary.reaction_counts[reactionType]) {
+      post.reaction_summary.reaction_counts[reactionType] = 0
+    }
+    post.reaction_summary.reaction_counts[reactionType]++
+    post.reaction_summary.total_count++
+    post.reaction_summary.user_reaction = reactionType
+    
     try {
       const api = useApi()
       const reactionData: ReactionRequest = {
@@ -430,26 +565,6 @@ export const useFeedStore = defineStore('feed', () => {
 
       if (apiError) {
         throw new Error(`Failed to add reaction: ${apiError}`)
-      }
-
-      // Update local state optimistically
-      const post = getPostById.value(postId)
-      if (post && post.reaction_summary) {
-        const currentReaction = post.reaction_summary.user_reaction
-        
-        // Remove previous reaction count if exists
-        if (currentReaction && post.reaction_summary.reaction_counts[currentReaction]) {
-          post.reaction_summary.reaction_counts[currentReaction]--
-          post.reaction_summary.total_count--
-        }
-
-        // Add new reaction count
-        if (!post.reaction_summary.reaction_counts[reactionType]) {
-          post.reaction_summary.reaction_counts[reactionType] = 0
-        }
-        post.reaction_summary.reaction_counts[reactionType]++
-        post.reaction_summary.total_count++
-        post.reaction_summary.user_reaction = reactionType
       }
 
       return data as ReactionResponse
@@ -510,7 +625,7 @@ export const useFeedStore = defineStore('feed', () => {
   function updateFilter(filterType: FeedFilterType) {
     activeFilter.value = filterType
     // Reset pagination and refetch
-    nextOffset.value = 0
+    nextCursor.value = null
     posts.value = []
     lastFetchTime.value = null
     fetchFeed(currentPregnancyId.value || undefined)
@@ -539,13 +654,43 @@ export const useFeedStore = defineStore('feed', () => {
     loading.value = false
     error.value = null
     hasMore.value = true
-    nextOffset.value = 0
+    nextCursor.value = null
     totalCount.value = 0
     activeFilter.value = 'all'
     sortBy.value = 'chronological'
     lastFetchTime.value = null
     cache.value.clear()
+    
+    // Reset real-time state
+    pendingOperations.clear()
+    // optimisticUpdates.cleanup()
   }
+  
+  // Performance optimization methods
+  function enableVirtualScrolling(enabled: boolean = true) {
+    virtualScrollEnabled.value = enabled
+  }
+  
+  function setPrefetchDistance(distance: number) {
+    prefetchDistance.value = Math.max(1, Math.min(10, distance))
+  }
+  
+  function enableRealtime(enabled: boolean = true) {
+    realtimeEnabled.value = enabled
+    if (enabled) {
+      setupRealtimeHandlers()
+    }
+  }
+  
+  // Initialize the store
+  function initialize() {
+    if (realtimeEnabled.value) {
+      setupRealtimeHandlers()
+    }
+  }
+  
+  // Call initialize when store is created
+  initialize()
 
   // Return all state, computed properties, and functions
   return {
@@ -559,11 +704,20 @@ export const useFeedStore = defineStore('feed', () => {
     loading,
     error,
     hasMore,
-    nextOffset,
+    nextCursor,
     totalCount,
     activeFilter,
     sortBy,
     lastFetchTime,
+    
+    // Real-time state
+    realtimeEnabled,
+    connectionStatus,
+    pendingOperations,
+    
+    // Performance state
+    virtualScrollEnabled,
+    prefetchDistance,
 
     // Computed
     getPostById,
@@ -586,6 +740,14 @@ export const useFeedStore = defineStore('feed', () => {
     updateFilter,
     updateSort,
     loadMore,
-    reset
+    reset,
+    
+    // Real-time methods
+    setupRealtimeHandlers,
+    enableRealtime,
+    
+    // Performance methods
+    enableVirtualScrolling,
+    setPrefetchDistance
   }
 })

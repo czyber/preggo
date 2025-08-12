@@ -291,7 +291,7 @@ export const useInvites = () => {
       description: `${inviterName} has invited you to share in the excitement of their pregnancy journey as their ${relationship}.`,
       steps: [
         `You're now part of ${babyName}'s support circle`,
-        'You'll receive updates about milestones and special moments',
+        "You'll receive updates about milestones and special moments",
         'You can react, comment, and share in the joy',
         'Your privacy is protected - only invited family sees updates'
       ]

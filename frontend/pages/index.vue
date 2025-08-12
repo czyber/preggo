@@ -213,7 +213,7 @@
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div class="mb-4 sm:mb-0">
               <h1 class="text-3xl font-inter font-semibold text-warm-graphite leading-tight">
-                Welcome back, {{ currentUser?.full_name || currentUser?.email?.split('@')[0] || 'Beautiful' }}!
+                Welcome back, {{ currentUser?.first_name }}!
               </h1>
               <p class="text-soft-charcoal font-inter font-normal mt-2">Here's your pregnancy journey overview</p>
             </div>

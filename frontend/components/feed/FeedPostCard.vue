@@ -1,7 +1,13 @@
 <template>
   <article 
     ref="postCardRef"
-    class="feed-post-card bg-off-white border border-light-gray rounded-lg overflow-hidden hover:border-neutral-gray/40 transition-all duration-200 shadow-sm hover:shadow-md"
+    class="feed-post-card bg-off-white border border-light-gray rounded-lg overflow-hidden transition-all duration-200 shadow-sm relative"
+    :class="{
+      'border-blush-rose shadow-md': isHighlighted,
+      'border-neutral-gray/40 hover:shadow-md': !isHighlighted,
+      'animate-pulse-love': isShowingLoveAnimation,
+      'glow-milestone': post.type === 'milestone' || post.pregnancy_context?.is_milestone_week
+    }"
     :data-post-id="post.id"
   >
     <!-- Post Header -->
@@ -59,14 +65,70 @@
       </div>
     </header>
 
-    <!-- Post Content -->
-    <div class="px-4 py-3">
+    <!-- Post Content with Gesture Support -->
+    <div class="px-4 py-3 relative" @click="handleContentClick">
       <PostContent 
         :post="post"
         :expanded="isExpanded"
         @toggle-expansion="toggleExpansion"
         @media-click="handleMediaClick"
       />
+      
+      <!-- Love Animation Overlay -->
+      <div 
+        v-if="isShowingLoveAnimation"
+        class="absolute inset-0 pointer-events-none flex items-center justify-center z-10"
+      >
+        <div class="love-burst-animation">
+          <div class="text-6xl animate-bounce">❤️</div>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div class="w-20 h-20 border-4 border-blush-rose rounded-full animate-ping"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Swipe Indicators -->
+      <div 
+        v-if="swipeIndicator.visible"
+        class="absolute inset-y-0 flex items-center pointer-events-none z-10"
+        :class="swipeIndicator.side === 'right' ? 'right-4' : 'left-4'"
+      >
+        <div 
+          class="p-3 rounded-full transition-all duration-200"
+          :class="{
+            'bg-blush-rose/20 text-blush-rose': swipeIndicator.side === 'right',
+            'bg-sage-green/20 text-sage-green': swipeIndicator.side === 'left'
+          }"
+          :style="{ transform: `scale(${swipeIndicator.intensity})` }"
+        >
+          <Heart v-if="swipeIndicator.side === 'right'" class="w-6 h-6" />
+          <Bookmark v-else class="w-6 h-6" />
+        </div>
+      </div>
+      
+      <!-- Long Press Reaction Picker -->
+      <div 
+        v-if="showReactionPicker"
+        ref="reactionPickerRef"
+        class="absolute z-30 bg-off-white rounded-2xl shadow-lg border border-light-gray p-3"
+        :style="reactionPickerPosition"
+        @click.stop
+      >
+        <div class="flex gap-2 items-center">
+          <button
+            v-for="(reaction, index) in pregnancyReactions"
+            :key="reaction.type"
+            @click="selectReaction(reaction.type)"
+            class="reaction-button p-2 rounded-full transition-all duration-200 hover:scale-110 hover:bg-warm-gray"
+            :style="{ animationDelay: `${index * 50}ms` }"
+          >
+            <span class="text-2xl">{{ reaction.emoji }}</span>
+          </button>
+        </div>
+        <div class="text-xs text-center mt-2 text-neutral-gray font-medium">
+          Choose your reaction
+        </div>
+      </div>
     </div>
 
     <!-- Post Engagement -->
@@ -100,11 +162,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, reactive, onMounted, onUnmounted, nextTick } from 'vue'
 import { cn } from '~/components/ui/utils'
 import type { components } from '~/types/api'
 import { useGentleTransitions, useFeedAnimations, useCelebrationAnimation, useScrollAnimation } from '~/composables/useAnimations'
 import { usePostsStore } from "~/stores/posts"
+import { useOptimisticUpdates } from '~/composables/useOptimisticUpdates'
+import { Heart, Bookmark } from 'lucide-vue-next'
 import PostContent from "~/components/feed/PostContent.vue";
 import PostHeader from "~/components/feed/PostHeader.vue";
 import PostEngagement from "~/components/feed/PostEngagement.vue";
@@ -134,14 +198,24 @@ const emit = defineEmits<{
   comment: [postId: string]
   share: [postId: string]
   view: [postId: string]
+  bookmark: [postId: string]
   menuAction: [{ action: string, postId: string }]
   mediaClick: [{ postId: string, mediaIndex: number }]
   viewReactions: [postId: string]
   viewComments: [postId: string]
+  mounted: [element: HTMLElement]
 }>()
 
+// Optimistic updates - disabled for now
+// const optimisticUpdates = useOptimisticUpdates({
+//   pregnancyAdaptations: true,
+//   enableHapticFeedback: true
+// })
+
 // Simple transitions only
-const { createGentleHover, animateElementIn } = useGentleTransitions()
+const { createGentleHover, animateElementIn, glowElement, pulseElement } = useGentleTransitions()
+const { observeElement } = useScrollAnimation()
+const { animatePostEntry } = useFeedAnimations()
 
 // Auth composable for checking current user
 const auth = useAuth()
@@ -153,15 +227,47 @@ const postsStore = usePostsStore()
 const isExpanded = ref(false)
 const isHighlighted = ref(props.highlighted)
 const postCardRef = ref<HTMLElement>()
+const reactionPickerRef = ref<HTMLElement>()
 const showComments = ref(false)
 const postComments = ref<Comment[]>([])
 const loadingComments = ref(false)
+
+// Gesture state - removed to fix dependency conflict
+
+// Animation states
+const isShowingLoveAnimation = ref(false)
+const showReactionPicker = ref(false)
+const reactionPickerPosition = ref({ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' })
+
+// Swipe feedback state
+const swipeIndicator = reactive({
+  visible: false,
+  side: 'right' as 'left' | 'right',
+  intensity: 1
+})
+
+// Pregnancy-specific reactions
+const pregnancyReactions = [
+  { type: 'love', emoji: '❤️', label: 'Love' },
+  { type: 'excited', emoji: '😍', label: 'Excited' },
+  { type: 'care', emoji: '🤗', label: 'Caring' },
+  { type: 'support', emoji: '💪', label: 'Support' },
+  { type: 'beautiful', emoji: '✨', label: 'Beautiful' },
+  { type: 'funny', emoji: '😂', label: 'Funny' },
+  { type: 'praying', emoji: '🙏', label: 'Praying' },
+  { type: 'proud', emoji: '🏆', label: 'Proud' },
+  { type: 'grateful', emoji: '🙏✨', label: 'Grateful' }
+]
 
 // Computed properties
 const isCurrentUserPost = computed(() => {
   const currentUserId = auth.userProfile.value?.id
   const postAuthorId = props.post.author?.id
   return !!(currentUserId && postAuthorId && currentUserId === postAuthorId)
+})
+
+const canShowReactionPicker = computed(() => {
+  return !isCurrentUserPost.value && showReactionPicker.value
 })
 
 // Helper methods for clean header
@@ -232,12 +338,32 @@ function toggleExpansion() {
 }
 
 function handleReaction(data: { reactionType: string }) {
+  // Apply optimistic update immediately
+  const operationId = optimisticUpdates.applyOptimistic(
+    props.post.id!,
+    'update',
+    { reactionType: data.reactionType },
+    undefined,
+    () => {
+      // Rollback reaction visually
+      const post = props.post
+      if (post.reaction_summary?.user_reaction === data.reactionType) {
+        post.reaction_summary.user_reaction = undefined
+        if (post.reaction_summary.reaction_counts[data.reactionType]) {
+          post.reaction_summary.reaction_counts[data.reactionType]--
+          post.reaction_summary.total_count--
+        }
+      }
+    }
+  )
+  
   emit('reaction', { postId: props.post.id!, reactionType: data.reactionType })
   
-  // Simple visual feedback for reactions
-  if (postCardRef.value) {
-    animateElementIn(postCardRef.value)
-  }
+  // Show love animation for immediate feedback
+  triggerLoveAnimation()
+  
+  // Set up auto-rollback
+  optimisticUpdates.setupAutoRollback(operationId)
 }
 
 function handleRemoveReaction() {
@@ -346,6 +472,8 @@ onMounted(async () => {
       createGentleHover(element as HTMLElement, 'lift')
     })
     
+    // Gesture recognition removed to fix dependency conflict
+    
     // Special animations for milestone posts
     if (props.post.type === 'milestone' || props.post.pregnancy_context?.is_milestone_week) {
       setTimeout(() => {
@@ -390,22 +518,214 @@ onMounted(async () => {
   if (postCardRef.value && typeof postCardRef.value.querySelectorAll === 'function') {
     observer.observe(postCardRef.value)
   }
+  
+  // Emit mounted event for parent virtual scrolling
+  emit('mounted', postCardRef.value)
 
   onUnmounted(() => {
     observer.disconnect()
+    document.removeEventListener('click', handleClickOutside)
   })
+  
+  // Set up click outside listener for reaction picker
+  document.addEventListener('click', handleClickOutside)
 })
+
+// Gesture handling removed to fix dependency conflict
+
+// Gesture handlers
+function handleDoubleTap(gesture: any) {
+  if (isCurrentUserPost.value) return
+  
+  // Double tap to love
+  handleReaction({ reactionType: 'love' })
+}
+
+function handleLongPressStart() {
+  if (isCurrentUserPost.value) return
+  
+  // Start showing reaction picker preview
+  if ('vibrate' in navigator) {
+    navigator.vibrate([15]) // Gentle start feedback
+  }
+}
+
+function handleLongPress(gesture: any) {
+  if (isCurrentUserPost.value) return
+  
+  // Show reaction picker
+  showReactionPicker.value = true
+  
+  // Position the picker near the touch point
+  if (postCardRef.value) {
+    const rect = postCardRef.value.getBoundingClientRect()
+    const x = gesture.point.x - rect.left
+    const y = gesture.point.y - rect.top
+    
+    reactionPickerPosition.value = {
+      top: `${Math.max(10, Math.min(y - 60, rect.height - 120))}px`,
+      left: `${Math.max(10, Math.min(x - 100, rect.width - 200))}px`,
+      transform: 'none'
+    }
+  }
+  
+  // Haptic feedback
+  if ('vibrate' in navigator) {
+    navigator.vibrate([25, 10, 25]) // Confirmation pattern
+  }
+  
+  // Auto-hide after 5 seconds
+  setTimeout(() => {
+    if (showReactionPicker.value) {
+      showReactionPicker.value = false
+    }
+  }, 5000)
+}
+
+function handleSwipeRight(gesture: any) {
+  if (isCurrentUserPost.value) return
+  
+  // Swipe right for love
+  if (gesture.distance > 60 && gesture.velocity > 0.1) {
+    handleReaction({ reactionType: 'love' })
+  }
+}
+
+function handleSwipeLeft(gesture: any) {
+  // Swipe left to save to memory book
+  if (gesture.distance > 60 && gesture.velocity > 0.1) {
+    emit('bookmark', props.post.id!)
+  }
+}
+
+function handleContentClick(event: MouseEvent) {
+  // Content click handler - simplified without gesture state
+}
+
+// Reaction picker methods
+function selectReaction(reactionType: string) {
+  showReactionPicker.value = false
+  handleReaction({ reactionType })
+}
+
+function hideReactionPicker() {
+  showReactionPicker.value = false
+}
+
+// Animation helpers
+function triggerLoveAnimation() {
+  if (isShowingLoveAnimation.value) return
+  
+  isShowingLoveAnimation.value = true
+  setTimeout(() => {
+    isShowingLoveAnimation.value = false
+  }, 1000)
+}
+
+function showSwipeIndicator(side: 'left' | 'right', intensity: number) {
+  swipeIndicator.visible = true
+  swipeIndicator.side = side
+  swipeIndicator.intensity = Math.max(1, intensity)
+}
+
+function hideSwipeIndicator() {
+  swipeIndicator.visible = false
+  swipeIndicator.intensity = 1
+}
+
+// Click outside handler for reaction picker
+function handleClickOutside(event: Event) {
+  if (showReactionPicker.value && 
+      reactionPickerRef.value && 
+      !reactionPickerRef.value.contains(event.target as Node)) {
+    hideReactionPicker()
+  }
+}
 </script>
 
 <style scoped>
-/* Clean, minimal post card styling */
+/* Instagram-like post card styling */
 .feed-post-card {
-  transition: border-color 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* Gesture states - removed scaling to prevent resize animation on click */
+.feed-post-card:active {
+  /* transform: scale(0.98); */
+}
+
+/* Love animation */
+.animate-pulse-love {
+  animation: love-pulse 0.6s ease-out;
+}
+
+@keyframes love-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Love burst animation */
+.love-burst-animation {
+  animation: love-burst 1s ease-out;
+}
+
+@keyframes love-burst {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  20% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  80% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* Milestone glow effect */
+.glow-milestone {
+  box-shadow: 0 0 20px rgba(232, 180, 184, 0.4);
+  animation: milestone-glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes milestone-glow {
+  0% {
+    box-shadow: 0 0 20px rgba(232, 180, 184, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 30px rgba(232, 180, 184, 0.5);
+  }
+}
+
+/* Reaction picker animation */
+.reaction-button {
+  animation: reaction-pop-in 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+  opacity: 0;
+  transform: scale(0);
+}
+
+@keyframes reaction-pop-in {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Swipe indicator animations */
+.swipe-indicator {
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 /* Comments section animation */
 .comments-section {
-  animation: comments-slide-in 0.2s ease-out;
+  animation: comments-slide-in 0.3s ease-out;
 }
 
 @keyframes comments-slide-in {
@@ -417,14 +737,62 @@ onMounted(async () => {
     opacity: 1;
     transform: translateY(0);
   }
+  
+  .reaction-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  /* Better gesture recognition on mobile */
+  .feed-post-card:active {
+    background-color: rgba(245, 244, 242, 0.5);
+  }
 }
 
-/* Mobile adjustments */
+/* Touch feedback */
+@media (hover: none) {
+  .feed-post-card {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+/* Enhanced mobile experience */
 @media (max-width: 640px) {
   .feed-post-card {
     border-radius: 0;
     border-left: 0;
     border-right: 0;
+    /* Ensure touch targets are at least 44px */
+    min-height: 44px;
   }
+}
+
+/* Accessibility enhancements */
+@media (prefers-reduced-motion: reduce) {
+  .feed-post-card,
+  .love-burst-animation,
+  .animate-pulse-love,
+  .reaction-button {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .glow-milestone {
+    box-shadow: 0 0 10px rgba(232, 180, 184, 0.3);
+  }
+}
+
+/* Focus styles for keyboard navigation */
+.feed-post-card:focus-visible {
+  outline: 2px solid var(--color-blush-rose);
+  outline-offset: 2px;
+}
+
+.reaction-button:focus-visible {
+  outline: 2px solid var(--color-sage-green);
+  outline-offset: 2px;
 }
 </style>

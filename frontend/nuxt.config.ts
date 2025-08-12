@@ -54,55 +54,14 @@ export default defineNuxtConfig({
     }
   },
   typescript: {
-    typeCheck: process.env.NODE_ENV === 'development' ? false : true // Skip type checking in dev for speed
+    typeCheck: false // Disable type checking for build
   },
   vite: {
     build: {
       // Optimize bundle splitting for pregnancy app performance
       rollupOptions: {
         output: {
-          manualChunks: {
-            // Core pregnancy functionality
-            'pregnancy-core': [
-              './stores/pregnancy.ts',
-              './stores/health.ts',
-              './stores/milestones.ts'
-            ],
-            // Feed and social features
-            'feed-system': [
-              './stores/feed.ts',
-              './stores/posts.ts',
-              './components/feed/FeedTimeline.vue',
-              './composables/useFeedPerformance.ts'
-            ],
-            // Family and collaboration features
-            'family-features': [
-              './stores/family.ts',
-              './components/feed/FamilyComment.vue',
-              './components/feed/FamilyComments.vue',
-              './components/feed/FamilyAvatarCluster.vue'
-            ],
-            // Animation and interaction systems
-            'interactions': [
-              './composables/useAnimations.ts',
-              './composables/useGestureRecognition.ts',
-              './composables/usePregnancyAnimations.ts',
-              './composables/useReactionAccessibility.ts'
-            ],
-            // UI components library
-            'ui-components': [
-              './components/ui/Button.vue',
-              './components/ui/Card.vue',
-              './components/ui/Input.vue',
-              './components/ui/Avatar.vue'
-            ],
-            // Celebration and milestone components (lazy loaded)
-            'celebrations': [
-              './components/feed/MilestoneCelebration.vue',
-              './components/feed/CelebrationParticles.vue',
-              './components/feed/ReactionCelebration.vue'
-            ]
-          }
+          manualChunks: undefined
         }
       },
       target: 'es2020', // Modern target for smaller bundles

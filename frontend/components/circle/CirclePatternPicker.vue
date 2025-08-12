@@ -35,13 +35,14 @@
       </div>
       
       <div class="flex flex-wrap gap-2">
-        <PatternSuggestion
+        <!-- PatternSuggestion component commented out - file missing -->
+        <!-- <PatternSuggestion
           v-for="suggestion in suggestions"
           :key="suggestion.pattern.id"
           :suggestion="suggestion"
           :selected="selectedPattern?.id === suggestion.pattern.id"
           @select="selectPattern(suggestion.pattern)"
-        />
+        /> -->
       </div>
     </div>
 
@@ -117,7 +118,7 @@ import { computed, ref, watch, onMounted } from 'vue'
 import type { CirclePattern, CircleSuggestion, FamilyMember, PostType } from '~/types/api'
 import PatternCard from './PatternCard.vue'
 import PatternPreview from './PatternPreview.vue'
-import PatternSuggestion from './PatternSuggestion.vue'
+// import PatternSuggestion from './PatternSuggestion.vue'
 import PrivacySelector from '~/components/pregnancy/PrivacySelector.vue'
 
 // Props
